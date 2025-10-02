@@ -18,16 +18,15 @@
 #include <vector>
 #include <wrl.h>
 #include <xaudio2.h>
+#include "2025_CG2_DirectX/engine/Input.h"
 #include "2025_CG2_DirectX/engine/utility/MyMath.h"
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
 #include "externals/DirectXTex/DirectXTex.h"
 #include "externals/DirectXTex/d3dx12.h"
-#define DIRECTINPUT_VERSION     0x0800	//DirectInputのバージョン指定
-#include <dinput.h>
 #include "2025_CG2_DirectX/engine/Debug/DebugCamera.h"
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#include "2025_CG2_DirectX/engine/WindowsApi.h"
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -35,8 +34,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dxcompiler.lib")
 #pragma comment(lib, "xaudio2.lib")
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
 
 struct Transform {
 	Vector3 scale;
@@ -146,24 +143,6 @@ static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
 	MiniDumpWriteDump(GetCurrentProcess(), processId, dumpFileHandle, MiniDumpNormal, &minidumpInformation, nullptr, nullptr);
 	//他に関連付けられているSEH例外ハンドラがあれば実行。通常はプロセスを終了する
 	return EXCEPTION_EXECUTE_HANDLER;
-}
-
-//ウィンドウプロシージャ
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
-		return true;
-	}
-	//メッセージに応じてゲーム固有の処理を行う
-	switch (msg) {
-		//ウィンドウが破棄された
-	case WM_DESTROY:
-		//OSに対して、アプリの終了を伝える
-		PostQuitMessage(0);
-		return 0;
-	}
-	
-	//標準のメッセージ処理を行う
-	return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
 void Log(std::ostream& os, const std::string& message) {
@@ -673,25 +652,6 @@ bool GetKeyUp(const BYTE key[256], const BYTE beforeKey[256], uint8_t keyNum) {
 	return false;
 }
 
-struct enumdata
-{
-	LPDIRECTINPUT8 pInput;                // デバイスを作成するためのインターフェイス
-	LPDIRECTINPUTDEVICE8* ppPadDevice;    // 使用するデバイスを格納するポインタのポインタ
-};
-
-// デバイス発見時に実行される
-BOOL CALLBACK DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef)
-{
-	enumdata* ed = (enumdata*)pvRef;
-
-	HRESULT hr;
-
-	hr = ed->pInput->CreateDevice(ipddi->guidInstance, ed->ppPadDevice, NULL);
-	assert(SUCCEEDED(hr));
-
-	return DIENUM_CONTINUE;
-}
-
 //Windowsアプリでのエントリーポイント
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -727,45 +687,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//起動時にログ出力のテスト
 	//Log(logStream, "test\n");
 
-	WNDCLASS wc{};
-	//ウィンドウプロシージャ
-	wc.lpfnWndProc = WindowProc;
-	//ウィンドウクラス名(なんでも良い)
-	wc.lpszClassName = L"CG2WindowClass";
-	//インスタンスハンドル
-	wc.hInstance = GetModuleHandle(nullptr);
-	//カーソル
-	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-
-	//ウィンドウクラスを登録する
-	RegisterClass(&wc);
-
-	//クライアント領域のサイズ
-	const int32_t kClientWidth = 1280;
-	const int32_t kClientHeight = 720;
-
-	//ウィンドウサイズを表す構造体にクライアント領域を入れる
-	RECT wrc = { 0, 0, kClientWidth, kClientHeight };
-
-	//クライアント領域をもとに実際のサイズにwrcを変更してもらう
-	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
-
-	//ウィンドウの生成
-	HWND hwnd = CreateWindow(
-		wc.lpszClassName,		//利用するクラス名
-		L"CG2",					//タイトルバーの文字(何でも良い)
-		WS_OVERLAPPEDWINDOW,	//よく見るウィンドウスタイル
-		CW_USEDEFAULT,			//表示X座標(Windowsに任せる)
-		CW_USEDEFAULT,			//表示Y座標(WindowsOSに任せる)
-		wrc.right - wrc.left,	//ウィンドウ横幅
-		wrc.bottom - wrc.top,	//ウィンドウ縦幅
-		nullptr,				//親ウィンドウハンドル
-		nullptr,				//メニューハンドル
-		wc.hInstance,			//インスタンスハンドル
-		nullptr);				//オプション
-
-	//ウィンドウを表示する
-	ShowWindow(hwnd, SW_SHOW);
+	//WindowsApi
+	WindowsApi* winApi = nullptr;
+	//WinApiの初期化
+	winApi = new WindowsApi();
+	winApi->Initialize();
 
 	#ifdef _DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug1> debugController = nullptr;
@@ -835,45 +761,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	hr = xAudio2->CreateMasteringVoice(&masterVoice);
 	assert(SUCCEEDED(hr));
 
-	//DirectInputの初期化
-	IDirectInput8* directInput = nullptr;
-	hr = DirectInput8Create(
-		wc.hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8,
-		(void**)&directInput, nullptr);
-	assert(SUCCEEDED(hr));
-
-	//キーボードデバイスの生成
-	IDirectInputDevice8* keyboard = nullptr;
-	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
-	assert(SUCCEEDED(hr));
-
-	//入力データ形式のセット
-	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);//標準形式
-	assert(SUCCEEDED(hr));
-
-	//排他制御レベルのセット
-	hr = keyboard->SetCooperativeLevel(
-		hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(hr));
-
-	//ゲームパッドデバイスの生成
-	IDirectInputDevice8* gamepad = nullptr;
-	enumdata ed;
-	ed.pInput = directInput;
-	ed.ppPadDevice = &gamepad;
-	//ゲームパッドの列挙
-	hr = directInput->EnumDevices(DI8DEVTYPE_GAMEPAD, DeviceFindCallBack, &ed, DIEDFL_ATTACHEDONLY);
-	assert(SUCCEEDED(hr));
-
-	if (gamepad) {
-		//入力データ形式のセット
-		hr = gamepad->SetDataFormat(&c_dfDIJoystick);
-		assert(SUCCEEDED(hr));
-
-		//排他制御レベルのセット
-		hr = gamepad->SetCooperativeLevel(
-			hwnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	}
+	//ポインタ
+	Input* input = nullptr;
+	//入力の初期化
+	input = new Input();
+	input->Initialize(winApi);
 	
 	Log(logStream, "Complete create D3D12Device!!!\n");//初期化完了のログを出す
 
@@ -930,15 +822,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//スワップチェーンを生成する
 	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain = nullptr;
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	swapChainDesc.Width = kClientWidth;		//画面の幅。ウィンドウのクライアント領域を同じものにしておく
-	swapChainDesc.Height = kClientHeight;	//画面の高さ。ウィンドウのクライアント領域を同じものにしておく
+	swapChainDesc.Width = WindowsApi::kClientWidth;		//画面の幅。ウィンドウのクライアント領域を同じものにしておく
+	swapChainDesc.Height = WindowsApi::kClientHeight;	//画面の高さ。ウィンドウのクライアント領域を同じものにしておく
 	swapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	//色の形式
 	swapChainDesc.SampleDesc.Count = 1;	//マルチサンプルしない
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;	//描画のターゲットとして利用する
 	swapChainDesc.BufferCount = 2;	//ダブルバッファ
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;	//モニタにうつしたら、中身を破壊
 	//コマンドキュー、ウィンドウハンドル、設定を渡して生成する
-	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), hwnd, &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
+	hr = dxgiFactory->CreateSwapChainForHwnd(commandQueue.Get(), winApi->GetHwnd(), &swapChainDesc, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
@@ -1823,8 +1715,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//ビューポート
 	D3D12_VIEWPORT viewport{};
 	//クライアント領域のサイズと一緒にして画面全体に表示
-	viewport.Width = kClientWidth;
-	viewport.Height = kClientHeight;
+	viewport.Width = WindowsApi::kClientWidth;
+	viewport.Height = WindowsApi::kClientHeight;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.MinDepth = 0.0f;
@@ -1834,15 +1726,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_RECT scissorRect{};
 	//基本的にビューポートと同じ矩形が構成されるようにする
 	scissorRect.left = 0;
-	scissorRect.right = kClientWidth;
+	scissorRect.right = WindowsApi::kClientWidth;
 	scissorRect.top = 0;
-	scissorRect.bottom = kClientHeight;
+	scissorRect.bottom = WindowsApi::kClientHeight;
 
 	//ImGuiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(hwnd);
+	ImGui_ImplWin32_Init(winApi->GetHwnd());
 	ImGui_ImplDX12_Init(device.Get(),
 		swapChainDesc.BufferCount,
 		rtvDesc.Format,
@@ -2086,7 +1978,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 
 	//DepthStencilTextureをウィンドウのサイズで作成
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, kClientWidth, kClientHeight);
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = CreateDepthStencilTextureResource(device, WindowsApi::kClientWidth, WindowsApi::kClientHeight);
 
 	//DSVの設定
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
@@ -2101,7 +1993,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	BYTE beforeKey[256] = {};
 	
 	DebugCamera* debugcamera = new DebugCamera();
-	debugcamera->Initialize(kClientWidth, kClientHeight);
+	debugcamera->Initialize(WindowsApi::kClientWidth, WindowsApi::kClientHeight);
 	bool useDebugcamera = false;
 
 	bool drawSprite = false;
@@ -2115,456 +2007,443 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	bool playSound = false;
 
-	MSG msg{};
 	//ウィンドウの×ボタンが押されるまでループ
-	while (msg.message != WM_QUIT) {
-		//Windowsにメッセージが来てたら最優先で処理させる
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+	while (true) {
+		
+		//Windowsのメッセージ処理
+		if (winApi->ProcessMessage()) {
+			//ゲームループを抜ける
+			break;
+		}
+		 
+		ImGui_ImplDX12_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		input->Update();
+
+		#ifdef _DEBUG
+			if(input->TriggerKey(DIK_V)) {
+				useDebugcamera = !useDebugcamera;
+			}
+
+			//if (useDebugcamera) {
+			//	debugcamera->Update(key);
+			//}
+		#endif
+
+		//ゲームの処理
+		Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
+		Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WindowsApi::kClientWidth) / float(WindowsApi::kClientHeight), 0.1f, 100.0f);
+		Matrix4x4 worldViewProjectionMatrix;
+		if (useDebugcamera) {
+			worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
 		} else {
-			ImGui_ImplDX12_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+			worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixData->WVP = worldViewProjectionMatrix;
+		transformationMatrixData->World = worldMatrix;
 
-			//キーボード情報の取得開始
-			keyboard->Acquire();
+		Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
+		Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
+		Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsApi::kClientWidth), float(WindowsApi::kClientHeight), 0.0f, 100.0f);
+		Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
+		transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
+		transformationMatrixDataSprite->World = worldMatrixSprite;
 
-			//全キーの入力状態を取得する
-			BYTE key[256] = {};
-			keyboard->GetDeviceState(sizeof(key), key);
+		//球の処理
+		Matrix4x4 worldMatrixSphere = MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
+		Matrix4x4 worldViewProjectionMatrixSphere;
+		if (useDebugcamera) {
+			worldViewProjectionMatrixSphere = Multiply(worldMatrixSphere, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrixSphere = Multiply(worldMatrixSphere, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixDataSphere->WVP = worldViewProjectionMatrixSphere;
+		transformationMatrixDataSphere->World = worldMatrixSphere;
 
-			if (gamepad) {
-				//ゲームパッド情報の取得開始
-				gamepad->Acquire();
+		//Utah Teapotの処理
+		Matrix4x4 worldMatrixTeapot = MakeAffineMatrix(transformTeapot.scale, transformTeapot.rotate, transformTeapot.translate);
+		Matrix4x4 worldViewProjectionMatrixTeapot;
+		if (useDebugcamera) {
+			worldViewProjectionMatrixTeapot = Multiply(worldMatrixTeapot, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrixTeapot = Multiply(worldMatrixTeapot, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixDataTeapot->WVP = worldViewProjectionMatrixTeapot;
+		transformationMatrixDataTeapot->World = worldMatrixTeapot;
 
-				//入力状態を取得する
-				DIJOYSTATE padKey;
-				gamepad->GetDeviceState(sizeof(DIJOYSTATE), &padKey);
+		//Stanford Bunnyの処理
+		Matrix4x4 worldMatrixBunny = MakeAffineMatrix(transformBunny.scale, transformBunny.rotate, transformBunny.translate);
+		Matrix4x4 worldViewProjectionMatrixBunny;
+		if (useDebugcamera) {
+			worldViewProjectionMatrixBunny = Multiply(worldMatrixBunny, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrixBunny = Multiply(worldMatrixBunny, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixDataBunny->WVP = worldViewProjectionMatrixBunny;
+		transformationMatrixDataBunny->World = worldMatrixBunny;
+
+		//Multi Meshの処理
+		Matrix4x4 worldMatrixMultiMesh = MakeAffineMatrix(transformMultiMesh.scale, transformMultiMesh.rotate, transformMultiMesh.translate);
+		Matrix4x4 worldViewProjectionMatrixMultiMesh;
+		if (useDebugcamera) {
+			worldViewProjectionMatrixMultiMesh = Multiply(worldMatrixMultiMesh, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrixMultiMesh = Multiply(worldMatrixMultiMesh, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixDataMultiMesh->WVP = worldViewProjectionMatrixMultiMesh;
+		transformationMatrixDataMultiMesh->World = worldMatrixMultiMesh;
+
+		//Multi Materialの処理
+		Matrix4x4 worldMatrixMultiMaterial = MakeAffineMatrix(transformMultiMaterial.scale, transformMultiMaterial.rotate, transformMultiMaterial.translate);
+		Matrix4x4 worldViewProjectionMatrixMultiMaterial;
+		if (useDebugcamera) {
+			worldViewProjectionMatrixMultiMaterial = Multiply(worldMatrixMultiMaterial, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrixMultiMaterial = Multiply(worldMatrixMultiMaterial, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixDataMultiMaterial->WVP = worldViewProjectionMatrixMultiMaterial;
+		transformationMatrixDataMultiMaterial->World = worldMatrixMultiMaterial;
+
+		//Suzanneの処理
+		Matrix4x4 worldMatrixSuzanne = MakeAffineMatrix(transformSuzanne.scale, transformSuzanne.rotate, transformSuzanne.translate);
+		Matrix4x4 worldViewProjectionMatrixSuzanne;
+		if (useDebugcamera) {
+			worldViewProjectionMatrixSuzanne = Multiply(worldMatrixSuzanne, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
+		} else {
+			worldViewProjectionMatrixSuzanne = Multiply(worldMatrixSuzanne, Multiply(viewMatrix, projectionMatrix));
+		}
+		transformationMatrixDataSuzanne->WVP = worldViewProjectionMatrixSuzanne;
+		transformationMatrixDataSuzanne->World = worldMatrixSuzanne;
+
+		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
+		ImGui::Begin("ImGui");
+		if (ImGui::TreeNode("Sprite")) {
+			ImGui::Checkbox("drawSprite", &drawSprite);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSprite.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSprite.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSprite.translate), 0, 1000);
+			ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("plane.obj")) {
+			ImGui::Checkbox("drawPlane", &drawPlane);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transform.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transform.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transform.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatas[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sphere")) {
+			ImGui::Checkbox("drawSphere", &drawSphere);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSphere.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSphere.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Utah Teapot")) {
+			ImGui::Checkbox("drawTeapot", &drawTeapot);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformTeapot.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformTeapot.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformTeapot.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatasTeapot[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Stanford Bunny")) {
+			ImGui::Checkbox("drawTeapot", &drawBunny);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformBunny.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformBunny.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformBunny.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatasBunny[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Multi Mesh")) {
+			ImGui::Checkbox("drawMultiMesh", &drawMultiMesh);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMesh.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMesh.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMesh.translate), -5, 5);
+			ImGui::Combo("Ligting 1", &materialDatasMultiMesh[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::Combo("Ligting 2", &materialDatasMultiMesh[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Multi Material")) {
+			ImGui::Checkbox("drawMultiMaterial", &drawMultiMaterial);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMaterial.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMaterial.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMaterial.translate), -5, 5);
+			ImGui::Combo("Ligting 1", &materialDatasMultiMaterial[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::Combo("Ligting 2", &materialDatasMultiMaterial[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::DragFloat2("UVTranslate 1", &uvTransformMultiMaterial1.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale 1", &uvTransformMultiMaterial1.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate 1", &uvTransformMultiMaterial1.rotate.z);
+			ImGui::DragFloat2("UVTranslate 2", &uvTransformMultiMaterial2.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale 2", &uvTransformMultiMaterial2.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate 2", &uvTransformMultiMaterial2.rotate.z);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Suzanne")) {
+			ImGui::Checkbox("drawSuzanne", &drawSuzanne);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSuzanne.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSuzanne.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSuzanne.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatasSuzanne[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Lighting")) {
+			ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
+			ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sound")) {
+			if (ImGui::Button("play")) {
+				playSound = true;
 			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Key")) {
+			ImGui::Text("%d", input->PushKey(DIK_SPACE));
+			ImGui::Text("%d", input->TriggerKey(DIK_SPACE));
+			ImGui::TreePop();
+		}
+		ImGui::End();
 
-			#ifdef _DEBUG
-				if(GetKeyDown(key, beforeKey, DIK_V)) {
-					useDebugcamera = !useDebugcamera;
-				}
+		if (playSound) {
+			//音声再生
+			SoundPlayWave(xAudio2.Get(), soundData1);
+			playSound = false;
+		}
 
-				if (useDebugcamera) {
-					debugcamera->Update(key);
-				}
-			#endif
+		directionalLightData->direction = Normalize(directionalLightData->direction);
 
-			//ゲームの処理
-			Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-			Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
-			Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-			Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(kClientWidth) / float(kClientHeight), 0.1f, 100.0f);
-			Matrix4x4 worldViewProjectionMatrix;
-			if (useDebugcamera) {
-				worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixData->WVP = worldViewProjectionMatrix;
-			transformationMatrixData->World = worldMatrix;
+		//パラメータからUVTransform用の行列を生成する
+		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
+		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
+		materialDataSprite->uvTransform = uvTransformMatrix;
 
-			Matrix4x4 worldMatrixSprite = MakeAffineMatrix(transformSprite.scale, transformSprite.rotate, transformSprite.translate);
-			Matrix4x4 viewMatrixSprite = MakeIdentity4x4();
-			Matrix4x4 projectionMatrixSprite = MakeOrthographicMatrix(0.0f, 0.0f, float(kClientWidth), float(kClientHeight), 0.0f, 100.0f);
-			Matrix4x4 worldViewProjectionMatrixSprite = Multiply(worldMatrixSprite, Multiply(viewMatrixSprite, projectionMatrixSprite));
-			transformationMatrixDataSprite->WVP = worldViewProjectionMatrixSprite;
-			transformationMatrixDataSprite->World = worldMatrixSprite;
+		Matrix4x4 uvTransformMatrixMultiMaterial1 = MakeScaleMatrix(uvTransformMultiMaterial1.scale);
+		uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeRotateZMatrix(uvTransformMultiMaterial1.rotate.z));
+		uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeTranslateMatrix(uvTransformMultiMaterial1.translate));
+		materialDatasMultiMaterial[0]->uvTransform = uvTransformMatrixMultiMaterial1;
 
-			//球の処理
-			Matrix4x4 worldMatrixSphere = MakeAffineMatrix(transformSphere.scale, transformSphere.rotate, transformSphere.translate);
-			Matrix4x4 worldViewProjectionMatrixSphere;
-			if (useDebugcamera) {
-				worldViewProjectionMatrixSphere = Multiply(worldMatrixSphere, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrixSphere = Multiply(worldMatrixSphere, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixDataSphere->WVP = worldViewProjectionMatrixSphere;
-			transformationMatrixDataSphere->World = worldMatrixSphere;
+		Matrix4x4 uvTransformMatrixMultiMaterial2 = MakeScaleMatrix(uvTransformMultiMaterial2.scale);
+		uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeRotateZMatrix(uvTransformMultiMaterial2.rotate.z));
+		uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeTranslateMatrix(uvTransformMultiMaterial2.translate));
+		materialDatasMultiMaterial[1]->uvTransform = uvTransformMatrixMultiMaterial2;
 
-			//Utah Teapotの処理
-			Matrix4x4 worldMatrixTeapot = MakeAffineMatrix(transformTeapot.scale, transformTeapot.rotate, transformTeapot.translate);
-			Matrix4x4 worldViewProjectionMatrixTeapot;
-			if (useDebugcamera) {
-				worldViewProjectionMatrixTeapot = Multiply(worldMatrixTeapot, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrixTeapot = Multiply(worldMatrixTeapot, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixDataTeapot->WVP = worldViewProjectionMatrixTeapot;
-			transformationMatrixDataTeapot->World = worldMatrixTeapot;
+		//ImGuiの内部コマンドを生成する
+		ImGui::Render();
 
-			//Stanford Bunnyの処理
-			Matrix4x4 worldMatrixBunny = MakeAffineMatrix(transformBunny.scale, transformBunny.rotate, transformBunny.translate);
-			Matrix4x4 worldViewProjectionMatrixBunny;
-			if (useDebugcamera) {
-				worldViewProjectionMatrixBunny = Multiply(worldMatrixBunny, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrixBunny = Multiply(worldMatrixBunny, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixDataBunny->WVP = worldViewProjectionMatrixBunny;
-			transformationMatrixDataBunny->World = worldMatrixBunny;
+		//これから書き込むバックバッファのインデックスを取得
+		UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-			//Multi Meshの処理
-			Matrix4x4 worldMatrixMultiMesh = MakeAffineMatrix(transformMultiMesh.scale, transformMultiMesh.rotate, transformMultiMesh.translate);
-			Matrix4x4 worldViewProjectionMatrixMultiMesh;
-			if (useDebugcamera) {
-				worldViewProjectionMatrixMultiMesh = Multiply(worldMatrixMultiMesh, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrixMultiMesh = Multiply(worldMatrixMultiMesh, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixDataMultiMesh->WVP = worldViewProjectionMatrixMultiMesh;
-			transformationMatrixDataMultiMesh->World = worldMatrixMultiMesh;
+		//TransitionBarrierの設定
+		D3D12_RESOURCE_BARRIER barrier{};
+		//今回のバリアはTransition
+		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		//Noneにしておく
+		barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		//バリアを張る対象のリソース。現在のバックバッファに対して行う
+		barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+		//遷移前(現在)のResourceState
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+		//遷移後のResourceState
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		//TransitionBarrierを張る
+		commandList->ResourceBarrier(1, &barrier);
 
-			//Multi Materialの処理
-			Matrix4x4 worldMatrixMultiMaterial = MakeAffineMatrix(transformMultiMaterial.scale, transformMultiMaterial.rotate, transformMultiMaterial.translate);
-			Matrix4x4 worldViewProjectionMatrixMultiMaterial;
-			if (useDebugcamera) {
-				worldViewProjectionMatrixMultiMaterial = Multiply(worldMatrixMultiMaterial, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrixMultiMaterial = Multiply(worldMatrixMultiMaterial, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixDataMultiMaterial->WVP = worldViewProjectionMatrixMultiMaterial;
-			transformationMatrixDataMultiMaterial->World = worldMatrixMultiMaterial;
+		//描画先のRTVとDSVを設定する
+		D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
+		commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
+		//指定した色で画面全体をクリアする
+		float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };	//青っぽい色。RGBAの順
+		commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
+		//指定した深度で画面全体をクリアする
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-			//Suzanneの処理
-			Matrix4x4 worldMatrixSuzanne = MakeAffineMatrix(transformSuzanne.scale, transformSuzanne.rotate, transformSuzanne.translate);
-			Matrix4x4 worldViewProjectionMatrixSuzanne;
-			if (useDebugcamera) {
-				worldViewProjectionMatrixSuzanne = Multiply(worldMatrixSuzanne, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
-			} else {
-				worldViewProjectionMatrixSuzanne = Multiply(worldMatrixSuzanne, Multiply(viewMatrix, projectionMatrix));
-			}
-			transformationMatrixDataSuzanne->WVP = worldViewProjectionMatrixSuzanne;
-			transformationMatrixDataSuzanne->World = worldMatrixSuzanne;
-
-			//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-			ImGui::Begin("ImGui");
-			if (ImGui::TreeNode("Sprite")) {
-				ImGui::Checkbox("drawSprite", &drawSprite);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSprite.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSprite.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSprite.translate), 0, 1000);
-				ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-				ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-				ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("plane.obj")) {
-				ImGui::Checkbox("drawPlane", &drawPlane);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transform.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transform.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transform.translate), -5, 5);
-				ImGui::Combo("Ligting", &materialDatas[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Sphere")) {
-				ImGui::Checkbox("drawSphere", &drawSphere);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSphere.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSphere.translate), -5, 5);
-				ImGui::Combo("Ligting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Utah Teapot")) {
-				ImGui::Checkbox("drawTeapot", &drawTeapot);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformTeapot.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformTeapot.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformTeapot.translate), -5, 5);
-				ImGui::Combo("Ligting", &materialDatasTeapot[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Stanford Bunny")) {
-				ImGui::Checkbox("drawTeapot", &drawBunny);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformBunny.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformBunny.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformBunny.translate), -5, 5);
-				ImGui::Combo("Ligting", &materialDatasBunny[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Multi Mesh")) {
-				ImGui::Checkbox("drawMultiMesh", &drawMultiMesh);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMesh.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMesh.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMesh.translate), -5, 5);
-				ImGui::Combo("Ligting 1", &materialDatasMultiMesh[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::Combo("Ligting 2", &materialDatasMultiMesh[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Multi Material")) {
-				ImGui::Checkbox("drawMultiMaterial", &drawMultiMaterial);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMaterial.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMaterial.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMaterial.translate), -5, 5);
-				ImGui::Combo("Ligting 1", &materialDatasMultiMaterial[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::Combo("Ligting 2", &materialDatasMultiMaterial[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::DragFloat2("UVTranslate 1", &uvTransformMultiMaterial1.translate.x, 0.01f, -10.0f, 10.0f);
-				ImGui::DragFloat2("UVScale 1", &uvTransformMultiMaterial1.scale.x, 0.01f, -10.0f, 10.0f);
-				ImGui::SliderAngle("UVRotate 1", &uvTransformMultiMaterial1.rotate.z);
-				ImGui::DragFloat2("UVTranslate 2", &uvTransformMultiMaterial2.translate.x, 0.01f, -10.0f, 10.0f);
-				ImGui::DragFloat2("UVScale 2", &uvTransformMultiMaterial2.scale.x, 0.01f, -10.0f, 10.0f);
-				ImGui::SliderAngle("UVRotate 2", &uvTransformMultiMaterial2.rotate.z);
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Suzanne")) {
-				ImGui::Checkbox("drawSuzanne", &drawSuzanne);
-				ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSuzanne.scale), -5, 5);
-				ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSuzanne.rotate), -5, 5);
-				ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSuzanne.translate), -5, 5);
-				ImGui::Combo("Ligting", &materialDatasSuzanne[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Lighting")) {
-				ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
-				ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
-				ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
-				ImGui::TreePop();
-			}
-			if (ImGui::TreeNode("Sound")) {
-				if (ImGui::Button("play")) {
-					playSound = true;
-				}
-				ImGui::TreePop();
-			}
-			ImGui::End();
-
-			if (playSound) {
-				//音声再生
-				SoundPlayWave(xAudio2.Get(), soundData1);
-				playSound = false;
-			}
-
-			directionalLightData->direction = Normalize(directionalLightData->direction);
-
-			//パラメータからUVTransform用の行列を生成する
-			Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransformSprite.scale);
-			uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransformSprite.rotate.z));
-			uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransformSprite.translate));
-			materialDataSprite->uvTransform = uvTransformMatrix;
-
-			Matrix4x4 uvTransformMatrixMultiMaterial1 = MakeScaleMatrix(uvTransformMultiMaterial1.scale);
-			uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeRotateZMatrix(uvTransformMultiMaterial1.rotate.z));
-			uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeTranslateMatrix(uvTransformMultiMaterial1.translate));
-			materialDatasMultiMaterial[0]->uvTransform = uvTransformMatrixMultiMaterial1;
-
-			Matrix4x4 uvTransformMatrixMultiMaterial2 = MakeScaleMatrix(uvTransformMultiMaterial2.scale);
-			uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeRotateZMatrix(uvTransformMultiMaterial2.rotate.z));
-			uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeTranslateMatrix(uvTransformMultiMaterial2.translate));
-			materialDatasMultiMaterial[1]->uvTransform = uvTransformMatrixMultiMaterial2;
-
-			//ImGuiの内部コマンドを生成する
-			ImGui::Render();
-
-			//これから書き込むバックバッファのインデックスを取得
-			UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-
-			//TransitionBarrierの設定
-			D3D12_RESOURCE_BARRIER barrier{};
-			//今回のバリアはTransition
-			barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-			//Noneにしておく
-			barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-			//バリアを張る対象のリソース。現在のバックバッファに対して行う
-			barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
-			//遷移前(現在)のResourceState
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-			//遷移後のResourceState
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			//TransitionBarrierを張る
-			commandList->ResourceBarrier(1, &barrier);
-
-			//描画先のRTVとDSVを設定する
-			D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap.Get(), descriptorSizeDSV, 0);
-			commandList->OMSetRenderTargets(1, &rtvHandles[backBufferIndex], false, &dsvHandle);
-			//指定した色で画面全体をクリアする
-			float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };	//青っぽい色。RGBAの順
-			commandList->ClearRenderTargetView(rtvHandles[backBufferIndex], clearColor, 0, nullptr);
-			//指定した深度で画面全体をクリアする
-			commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-			//描画用のDescriptorHeapの設定
-			ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get()};
-			commandList->SetDescriptorHeaps(1, descriptorHeaps);
+		//描画用のDescriptorHeapの設定
+		ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get()};
+		commandList->SetDescriptorHeaps(1, descriptorHeaps);
 			
-			commandList->RSSetViewports(1, &viewport);	//Viewportを設定
-			commandList->RSSetScissorRects(1, &scissorRect);	//Scissorを設定
-			// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-			commandList->SetGraphicsRootSignature(rootSignature.Get());
-			commandList->SetPipelineState(graphicsPipelineState.Get());	//PSOを設定
-			//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			//SRVのDescroptorTableの先頭を設定。2はrootParameter[2]である。
-			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesModelGPU[0]);
-			//directionalLight用のCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+		commandList->RSSetViewports(1, &viewport);	//Viewportを設定
+		commandList->RSSetScissorRects(1, &scissorRect);	//Scissorを設定
+		// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+		commandList->SetGraphicsRootSignature(rootSignature.Get());
+		commandList->SetPipelineState(graphicsPipelineState.Get());	//PSOを設定
+		//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//SRVのDescroptorTableの先頭を設定。2はrootParameter[2]である。
+		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesModelGPU[0]);
+		//directionalLight用のCBufferの場所を設定
+		commandList->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
-			for (int32_t i = 0; i < modelData.mesh.size(); i++) {
-				//VBVを設定
-				commandList->IASetVertexBuffers(0, 1, &vertexBufferViews[i]);
-				//wvp用のCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
-				//マテリアルCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(0, materialResources[i]->GetGPUVirtualAddress());
-				//IBVを設定
-				commandList->IASetIndexBuffer(&indexBufferViews[i]);
-				//描画！ (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-				if (drawPlane) {
-					commandList->DrawIndexedInstanced(UINT(modelData.mesh[i].vertices.size()), 1, 0, 0, 0);
-				}
-			}
-
-			//球の描画。変更が必要なものだけ変更する
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);	//VBVを設定
-			//TransformationMatrixCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
+		for (int32_t i = 0; i < modelData.mesh.size(); i++) {
+			//VBVを設定
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViews[i]);
+			//wvp用のCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
 			//マテリアルCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootConstantBufferView(0, materialResources[i]->GetGPUVirtualAddress());
 			//IBVを設定
-			commandList->IASetIndexBuffer(&indexBufferViewSphere);
-			if (drawSphere) {
-				commandList->DrawIndexedInstanced(vertexTotalNumber, 1, 0, 0, 0);
-			}
-
-			for (int32_t i = 0; i < modelDataTeapot.mesh.size(); i++) {
-				//Utah Teapotのテクスチャ
-				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesTeapotGPU[i]);
-				//Utah Teapotの描画。変更が必要なものだけ変更する
-				commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsTeapot[i]);	//VBVを設定
-				//TransformationMatrixCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceTeapot->GetGPUVirtualAddress());
-				//マテリアルCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(0, materialResourcesTeapot[i]->GetGPUVirtualAddress());
-				//IBVを設定
-				commandList->IASetIndexBuffer(&indexBufferViewsTeapot[i]);
-				if (drawTeapot) {
-					commandList->DrawIndexedInstanced(UINT(modelDataTeapot.mesh[i].vertices.size()), 1, 0, 0, 0);
-				}
-			}
-
-			for (int32_t i = 0; i < modelDataBunny.mesh.size(); i++) {
-				//Stanford Bunnyのテクスチャ
-				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesBunnyGPU[i]);
-				//Stanford Bunnyの描画。変更が必要なものだけ変更する
-				commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsBunny[i]);	//VBVを設定
-				//TransformationMatrixCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceBunny->GetGPUVirtualAddress());
-				//マテリアルCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(0, materialResourcesBunny[i]->GetGPUVirtualAddress());
-				//IBVを設定
-				commandList->IASetIndexBuffer(&indexBufferViewsBunny[i]);
-				if (drawBunny) {
-					commandList->DrawIndexedInstanced(UINT(modelDataBunny.mesh[i].vertices.size()), 1, 0, 0, 0);
-				}
-			}
-
-			for (int32_t i = 0; i < modelDataMultiMesh.mesh.size(); i++) {
-				//Multi Meshのテクスチャ
-				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesMultiMeshGPU[i]);
-				//Multi Meshの描画。変更が必要なものだけ変更する
-				commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsMultiMesh[i]);	//VBVを設定
-				//TransformationMatrixCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceMultiMesh->GetGPUVirtualAddress());
-				//マテリアルCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(0, materialResourcesMultiMesh[i]->GetGPUVirtualAddress());
-				//IBVを設定
-				commandList->IASetIndexBuffer(&indexBufferViewsMultiMesh[i]);
-				if (drawMultiMesh) {
-					commandList->DrawIndexedInstanced(UINT(modelDataMultiMesh.mesh[i].vertices.size()), 1, 0, 0, 0);
-				}
-			}
-
-			for (int32_t i = 0; i < modelDataMultiMaterial.mesh.size(); i++) {
-				//Multi Meshのテクスチャ
-				commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesMultiMaterialGPU[i]);
-				//Multi Meshの描画。変更が必要なものだけ変更する
-				commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsMultiMaterial[i]);	//VBVを設定
-				//TransformationMatrixCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceMultiMaterial->GetGPUVirtualAddress());
-				//マテリアルCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(0, materialResourcesMultiMaterial[i]->GetGPUVirtualAddress());
-				//IBVを設定
-				commandList->IASetIndexBuffer(&indexBufferViewsMultiMaterial[i]);
-				if (drawMultiMaterial) {
-					commandList->DrawIndexedInstanced(UINT(modelDataMultiMaterial.mesh[i].vertices.size()), 1, 0, 0, 0);
-				}
-			}
-
-			for (int32_t i = 0; i < modelDataSuzanne.mesh.size(); i++) {
-				//Suzanneはテクスチャなし
-				//Suzanneの描画。変更が必要なものだけ変更する
-				commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsSuzanne[i]);	//VBVを設定
-				//TransformationMatrixCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSuzanne->GetGPUVirtualAddress());
-				//マテリアルCBufferの場所を設定
-				commandList->SetGraphicsRootConstantBufferView(0, materialResourcesSuzanne[i]->GetGPUVirtualAddress());
-				//IBVを設定
-				commandList->IASetIndexBuffer(&indexBufferViewsSuzanne[i]);
-				if (drawSuzanne) {
-					commandList->DrawIndexedInstanced(UINT(modelDataSuzanne.mesh[i].vertices.size()), 1, 0, 0, 0);
-				}
-			}
-
-			//Spriteは常にuvCheckerにする
-			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
-			//Spriteの描画。変更が必要なものだけ変更する
-			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);	//VBVを設定
-			//TransformationMatrixCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
-			//マテリアルCBufferの場所を設定
-			commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
-			//IBVを設定
-			commandList->IASetIndexBuffer(&indexBufferViewSprite);
-			//描画！(DrawCall/ドローコール)
-			if (drawSprite) {
-				commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
-			}
-
-			//実際のcommandListのImGuiの描画コマンドを積む
-			ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
-
-			//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
-			//今回はRenderTargetからPresentにする
-			barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-			barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-			//TransitionBarrierを張る
-			commandList->ResourceBarrier(1, &barrier);
-
-			//コマンドリストの内容を確定させる。全てのコマンドを積んでからCloseすること
-			hr = commandList->Close();
-			assert(SUCCEEDED(hr));
-
-			//GPUにコマンドリストの実行を行わせる
-			ID3D12CommandList* commandLists[] = { commandList.Get()};
-			commandQueue->ExecuteCommandLists(1, commandLists);
-			//GPUとOSに画面の交換を行うよう通知する
-			swapChain->Present(1, 0);
-
-			//Fenceの値を更新
-			fenceValue++;
-			//GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
-			commandQueue->Signal(fence.Get(), fenceValue);
-			//Fenceの値が指定したSignal値にたどり着いているか確認する
-			//GetCompletedValueの初期値はFence作成時に渡した初期値
-			if (fence->GetCompletedValue() < fenceValue) {
-				//指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
-				fence->SetEventOnCompletion(fenceValue, fenceEvent);
-				//イベント待つ
-				WaitForSingleObject(fenceEvent, INFINITE);
-			}
-
-			//次のフレーム用のコマンドリストを準備
-			hr = commandAllocator->Reset();
-			assert(SUCCEEDED(hr));
-			hr = commandList->Reset(commandAllocator.Get(), nullptr);
-			assert(SUCCEEDED(hr));
-
-			//キー入力状態をコピー
-			for (int i = 0; i < 256; i++) {
-				beforeKey[i] = key[i];
+			commandList->IASetIndexBuffer(&indexBufferViews[i]);
+			//描画！ (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
+			if (drawPlane) {
+				commandList->DrawIndexedInstanced(UINT(modelData.mesh[i].vertices.size()), 1, 0, 0, 0);
 			}
 		}
+
+		//球の描画。変更が必要なものだけ変更する
+		commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);	//VBVを設定
+		//TransformationMatrixCBufferの場所を設定
+		commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
+		//マテリアルCBufferの場所を設定
+		commandList->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress());
+		//IBVを設定
+		commandList->IASetIndexBuffer(&indexBufferViewSphere);
+		if (drawSphere) {
+			commandList->DrawIndexedInstanced(vertexTotalNumber, 1, 0, 0, 0);
+		}
+
+		for (int32_t i = 0; i < modelDataTeapot.mesh.size(); i++) {
+			//Utah Teapotのテクスチャ
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesTeapotGPU[i]);
+			//Utah Teapotの描画。変更が必要なものだけ変更する
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsTeapot[i]);	//VBVを設定
+			//TransformationMatrixCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceTeapot->GetGPUVirtualAddress());
+			//マテリアルCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(0, materialResourcesTeapot[i]->GetGPUVirtualAddress());
+			//IBVを設定
+			commandList->IASetIndexBuffer(&indexBufferViewsTeapot[i]);
+			if (drawTeapot) {
+				commandList->DrawIndexedInstanced(UINT(modelDataTeapot.mesh[i].vertices.size()), 1, 0, 0, 0);
+			}
+		}
+
+		for (int32_t i = 0; i < modelDataBunny.mesh.size(); i++) {
+			//Stanford Bunnyのテクスチャ
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesBunnyGPU[i]);
+			//Stanford Bunnyの描画。変更が必要なものだけ変更する
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsBunny[i]);	//VBVを設定
+			//TransformationMatrixCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceBunny->GetGPUVirtualAddress());
+			//マテリアルCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(0, materialResourcesBunny[i]->GetGPUVirtualAddress());
+			//IBVを設定
+			commandList->IASetIndexBuffer(&indexBufferViewsBunny[i]);
+			if (drawBunny) {
+				commandList->DrawIndexedInstanced(UINT(modelDataBunny.mesh[i].vertices.size()), 1, 0, 0, 0);
+			}
+		}
+
+		for (int32_t i = 0; i < modelDataMultiMesh.mesh.size(); i++) {
+			//Multi Meshのテクスチャ
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesMultiMeshGPU[i]);
+			//Multi Meshの描画。変更が必要なものだけ変更する
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsMultiMesh[i]);	//VBVを設定
+			//TransformationMatrixCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceMultiMesh->GetGPUVirtualAddress());
+			//マテリアルCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(0, materialResourcesMultiMesh[i]->GetGPUVirtualAddress());
+			//IBVを設定
+			commandList->IASetIndexBuffer(&indexBufferViewsMultiMesh[i]);
+			if (drawMultiMesh) {
+				commandList->DrawIndexedInstanced(UINT(modelDataMultiMesh.mesh[i].vertices.size()), 1, 0, 0, 0);
+			}
+		}
+
+		for (int32_t i = 0; i < modelDataMultiMaterial.mesh.size(); i++) {
+			//Multi Meshのテクスチャ
+			commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandlesMultiMaterialGPU[i]);
+			//Multi Meshの描画。変更が必要なものだけ変更する
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsMultiMaterial[i]);	//VBVを設定
+			//TransformationMatrixCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceMultiMaterial->GetGPUVirtualAddress());
+			//マテリアルCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(0, materialResourcesMultiMaterial[i]->GetGPUVirtualAddress());
+			//IBVを設定
+			commandList->IASetIndexBuffer(&indexBufferViewsMultiMaterial[i]);
+			if (drawMultiMaterial) {
+				commandList->DrawIndexedInstanced(UINT(modelDataMultiMaterial.mesh[i].vertices.size()), 1, 0, 0, 0);
+			}
+		}
+
+		for (int32_t i = 0; i < modelDataSuzanne.mesh.size(); i++) {
+			//Suzanneはテクスチャなし
+			//Suzanneの描画。変更が必要なものだけ変更する
+			commandList->IASetVertexBuffers(0, 1, &vertexBufferViewsSuzanne[i]);	//VBVを設定
+			//TransformationMatrixCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSuzanne->GetGPUVirtualAddress());
+			//マテリアルCBufferの場所を設定
+			commandList->SetGraphicsRootConstantBufferView(0, materialResourcesSuzanne[i]->GetGPUVirtualAddress());
+			//IBVを設定
+			commandList->IASetIndexBuffer(&indexBufferViewsSuzanne[i]);
+			if (drawSuzanne) {
+				commandList->DrawIndexedInstanced(UINT(modelDataSuzanne.mesh[i].vertices.size()), 1, 0, 0, 0);
+			}
+		}
+
+		//Spriteは常にuvCheckerにする
+		commandList->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+		//Spriteの描画。変更が必要なものだけ変更する
+		commandList->IASetVertexBuffers(0, 1, &vertexBufferViewSprite);	//VBVを設定
+		//TransformationMatrixCBufferの場所を設定
+		commandList->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSprite->GetGPUVirtualAddress());
+		//マテリアルCBufferの場所を設定
+		commandList->SetGraphicsRootConstantBufferView(0, materialResourceSprite->GetGPUVirtualAddress());
+		//IBVを設定
+		commandList->IASetIndexBuffer(&indexBufferViewSprite);
+		//描画！(DrawCall/ドローコール)
+		if (drawSprite) {
+			commandList->DrawIndexedInstanced(6, 1, 0, 0, 0);
+		}
+
+		//実際のcommandListのImGuiの描画コマンドを積む
+		ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList.Get());
+
+		//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
+		//今回はRenderTargetからPresentにする
+		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+		//TransitionBarrierを張る
+		commandList->ResourceBarrier(1, &barrier);
+
+		//コマンドリストの内容を確定させる。全てのコマンドを積んでからCloseすること
+		hr = commandList->Close();
+		assert(SUCCEEDED(hr));
+
+		//GPUにコマンドリストの実行を行わせる
+		ID3D12CommandList* commandLists[] = { commandList.Get()};
+		commandQueue->ExecuteCommandLists(1, commandLists);
+		//GPUとOSに画面の交換を行うよう通知する
+		swapChain->Present(1, 0);
+
+		//Fenceの値を更新
+		fenceValue++;
+		//GPUがここまでたどり着いたときに、Fenceの値を指定した値に代入するようにSignalを送る
+		commandQueue->Signal(fence.Get(), fenceValue);
+		//Fenceの値が指定したSignal値にたどり着いているか確認する
+		//GetCompletedValueの初期値はFence作成時に渡した初期値
+		if (fence->GetCompletedValue() < fenceValue) {
+			//指定したSignalにたどり着いていないので、たどり着くまで待つようにイベントを設定する
+			fence->SetEventOnCompletion(fenceValue, fenceEvent);
+			//イベント待つ
+			WaitForSingleObject(fenceEvent, INFINITE);
+		}
+
+		//次のフレーム用のコマンドリストを準備
+		hr = commandAllocator->Reset();
+		assert(SUCCEEDED(hr));
+		hr = commandList->Reset(commandAllocator.Get(), nullptr);
+		assert(SUCCEEDED(hr));
+		
 	}
 
 	//出力ウィンドウへの文字出力
@@ -2581,11 +2460,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//解放処理
 	delete debugcamera;
 	CloseHandle(fenceEvent);
-	CloseWindow(hwnd);
+	
+	//WindowsApiの終了処理
+	winApi->Finalize();
+
+	//入力解放
+	delete input;
 	//XAudio2解放
 	xAudio2.Reset();
 	//音声データ解放
 	SoundUnload(&soundData1);
+	delete winApi;
 
 	return 0;
 }

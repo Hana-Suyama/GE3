@@ -75,6 +75,12 @@
     <ClCompile Include="2025_CG2_DirectX\engine\debug\DebugCamera.cpp">
       <Filter>ソース ファイル\engine\debug</Filter>
     </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\input.cpp">
+      <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\WindowsApi.cpp">
+      <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.VS.hlsl" />
@@ -110,6 +116,12 @@
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\utility\MyMath.h">
       <Filter>ヘッダー ファイル\engine\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\input.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\WindowsApi.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
