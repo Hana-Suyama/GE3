@@ -34,6 +34,15 @@ public:
 	//キーのトリガーをチェック
 	bool TriggerKey(BYTE keyNumber);
 
+	//キーを押した瞬間かをチェック
+	bool TriggerKeyDown(BYTE keyNumber);
+
+	//キーを離した瞬間かをチェック
+	bool TriggerKeyUp(BYTE keyNumber);
+
+	//ゲームパッドの右スティックを取得
+	DIJOYSTATE GetPadKey() { return padKey; };
+
 private:
 
 	// WindowsApi
@@ -50,6 +59,9 @@ private:
 	BYTE key[256] = {};
 	//前回の全キーの状態
 	BYTE keyPre[256] = {};
+
+	//ゲームパッドの入力状態
+	DIJOYSTATE padKey;
 
 };
 

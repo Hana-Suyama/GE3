@@ -81,6 +81,18 @@
     <ClCompile Include="2025_CG2_DirectX\engine\WindowsApi.cpp">
       <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\utility\Logger.cpp">
+      <Filter>ソース ファイル\engine\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\utility\StringUtility.cpp">
+      <Filter>ソース ファイル\engine\utility</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\DirectXBasic.cpp">
+      <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\FixFPS.cpp">
+      <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.VS.hlsl" />
@@ -121,6 +133,18 @@
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\WindowsApi.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\DirectXBasic.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Logger.h">
+      <Filter>ヘッダー ファイル\engine\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\StringUtility.h">
+      <Filter>ヘッダー ファイル\engine\utility</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\FixFPS.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
   </ItemGroup>

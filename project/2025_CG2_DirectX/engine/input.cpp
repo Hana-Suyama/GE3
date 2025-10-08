@@ -65,7 +65,6 @@ void Input::Update(){
 		gamepad->Acquire();
 
 		//入力状態を取得する
-		DIJOYSTATE padKey;
 		gamepad->GetDeviceState(sizeof(DIJOYSTATE), &padKey);
 	}
 
@@ -84,6 +83,22 @@ bool Input::PushKey(BYTE keyNumber)
 bool Input::TriggerKey(BYTE keyNumber)
 {
 	if (key[keyNumber] != keyPre[keyNumber]) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::TriggerKeyDown(BYTE keyNumber)
+{
+	if (TriggerKey(keyNumber) && key[keyNumber]) {
+		return true;
+	}
+	return false;
+}
+
+bool Input::TriggerKeyUp(BYTE keyNumber)
+{
+	if (TriggerKey(keyNumber) && !key[keyNumber]) {
 		return true;
 	}
 	return false;
