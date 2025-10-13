@@ -4,17 +4,23 @@
 
 class WindowsApi
 {
-public:	// 静的メンバ関数
+public:
+
+	/* --------- 静的メンバ関数 --------- */
 
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-public: // 定数
+public:
+
+	/* --------- 定数 --------- */
 
 	//クライアント領域のサイズ
 	static const int32_t kClientWidth = 1280;// 横
 	static const int32_t kClientHeight = 720;// 縦
 
 public:
+
+	/* --------- public関数 --------- */
 
 	/// <summary>
 	/// 初期化
@@ -31,7 +37,7 @@ public:
 	/// </summary>
 	bool ProcessMessage();
 
-	/* ----- ゲッター ----- */
+	/* --------- ゲッター --------- */
 
 	/// <summary>
 	/// ウィンドウハンドルのゲッター
@@ -45,6 +51,8 @@ public:
 
 
 private:
+
+	/* --------- private変数 --------- */
 
 	// ウィンドウハンドル
 	HWND hwnd = nullptr;

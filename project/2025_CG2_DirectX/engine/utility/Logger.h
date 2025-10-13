@@ -6,6 +6,8 @@ class Logger
 {
 public:
 
+	/* --------- public関数 --------- */
+
 	void Initialize();
 
 	void Update();
@@ -15,7 +17,9 @@ public:
 
 private:
 
-	//ログファイル
+	/* --------- private変数 --------- */
+
+	// ログファイル
 	std::ofstream logstream;
 
 };

@@ -13,8 +13,13 @@ class DirectXBasic
 {
 public:
 
-	// namespace省略
+	/* --------- namespace省略 --------- */
+
 	template <class T> using Comptr = Microsoft::WRL::ComPtr<T>;
+
+public:
+
+	/* --------- public関数 --------- */
 
 	/// <summary>
 	/// デクストラクタ
@@ -92,7 +97,12 @@ public:
 	/// <param name="index">インデックス</param>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-	/* ----- ゲッター ----- */
+	/// <summary>
+	/// SRVの総数を1加算
+	/// </summary>
+	void IncrementSRVCount() { SRVCount++; };
+
+	/* --------- ゲッター --------- */
 
 	/// <summary>
 	/// デバイスのゲッター
@@ -123,7 +133,14 @@ public:
 	uint32_t GetRTVHeapSize() { return descriptorSizeRTV; };
 	uint32_t GetDSVHeapSize() { return descriptorSizeDSV; };
 
+	/// <summary>
+	/// SRV総数のゲッター
+	/// </summary>
+	int32_t GetSRVCount() { return SRVCount; };
+
 private:
+
+	/* --------- private関数 --------- */
 
 	/// <summary>
 	/// デバイスの生成
@@ -190,6 +207,10 @@ private:
 	/// </summary>
 	void ImGuiIni();
 
+private:
+
+	/* --------- private変数 --------- */
+
 	// WindowsApi
 	WindowsApi* winApi_ = nullptr;
 
@@ -254,6 +275,9 @@ private:
 	Comptr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
 
 	std::unique_ptr<FixFPS> fixFps_;
+
+	//SRV総数記録用
+	int32_t SRVCount{};
 
 };
 
