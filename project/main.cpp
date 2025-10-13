@@ -1520,7 +1520,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//ゲームの処理
 
-		transform.rotate.x += input->GetPadKey().lRx;
+		transform.rotate.x += static_cast<float>((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / 100000.0f);
 		if (input->TriggerKeyDown(DIK_SPACE)) {
 			drawPlane = !drawPlane;
 		}
@@ -1612,7 +1612,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		transformationMatrixDataSuzanne->World = worldMatrixSuzanne;
 
 		//開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-		ImGui::Begin("ImGui");
+		/*ImGui::Begin("ImGui");
 		if (ImGui::TreeNode("Sprite")) {
 			ImGui::Checkbox("drawSprite", &drawSprite);
 			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSprite.scale), -5, 5);
@@ -1698,14 +1698,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				playSound = true;
 			}
 			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("Key")) {
+		}*/
+		/*if (ImGui::TreeNode("Key")) {
 			ImGui::Text("PushKey : %d", input->PushKey(DIK_SPACE));
 			ImGui::Text("TriggerKey : %d", input->TriggerKey(DIK_SPACE));
-			ImGui::Text("Gamepad RightJoy : %d", input->GetPadKey().lRx);
+			ImGui::Text("Gamepad RightJoy : %ld", input->GetPadKey().lRx);
+			ImGui::Text("Gamepad RightJoy : %ld", ((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / static_cast <LONG>(10000.0)));
 			ImGui::TreePop();
 		}
-		ImGui::End();
+		ImGui::End();*/
 
 		if (playSound) {
 			//音声再生
