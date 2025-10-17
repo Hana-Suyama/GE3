@@ -1311,9 +1311,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sprite->Update();
 		sprite2->Update();
 		//transform.rotate.x += static_cast<float>((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / 100000.0f);
-		if (input->TriggerKeyDown(DIK_SPACE)) {
+		/*if (input->TriggerKeyDown(DIK_SPACE)) {
 			drawPlane = !drawPlane;
-		}
+		}*/
 
 		//transform.rotate.x += input->GetPadKey().lRx;
 		//if (input->TriggerKeyDown(DIK_SPACE)) {
