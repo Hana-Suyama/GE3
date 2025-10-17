@@ -33,7 +33,7 @@ public:
 	/// <summary>
 	///	DirectX基盤のゲッター
 	/// </summary>
-	DirectXBasic* GetDirectXBasic() { return directXBasic_; };
+	DirectXBasic* GetDirectXBasic() const { return directXBasic_; };
 
 private:
 

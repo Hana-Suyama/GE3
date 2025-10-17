@@ -1,10 +1,16 @@
 #include "Sprite.h"
 #include "../../../externals/DirectXTex/DirectXTex.h"
 
-void Sprite::Initialize(SpriteBasic* spriteBasic)
+using namespace MyMath;
+
+void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath)
 {
 
 	spriteBasic_ = spriteBasic;
+
+	textureManager_ = textureManager;
+
+	textureIndex = textureManager_->GetTextureIndexByFilePath(textureFilePath);
 
 	CreateVertexResource();
 
@@ -18,14 +24,51 @@ void Sprite::Initialize(SpriteBasic* spriteBasic)
 
 	CreateTransform();
 
-	TextureUpload();
-
-	CreateSRV();
+	AdjustTextureSize();
 
 }
 
 void Sprite::Update()
 {
+	//スプライト用の頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+
+	float left = 0.0f - anchorPoint_.x;
+	float right = 1.0f - anchorPoint_.x;
+	float top = 0.0f - anchorPoint_.y;
+	float bottom = 1.0f - anchorPoint_.y;
+
+	//左右反転
+	if (isFlipX_) {
+		left = -left;
+		right = -right;
+	}
+	//上下反転
+	if (isFlipY_) {
+		top = -top;
+		bottom = -bottom;
+	}
+
+	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureIndex);
+	float tex_left = textureLeftTop_.x / metadata.width;
+	float tex_right = (textureLeftTop_.x + textureSize_.x) / metadata.width;
+	float tex_top = textureLeftTop_.y / metadata.height;
+	float tex_bottom = (textureLeftTop_.y + textureSize_.y) / metadata.height;
+
+	vertexData[0].position = { left, bottom, 0.0f, 1.0f };//左下
+	vertexData[0].texcoord = { tex_left, tex_bottom };
+	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[1].position = { left, top, 0.0f, 1.0f };//左上
+	vertexData[1].texcoord = { tex_left, tex_top };
+	vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[2].position = { right, bottom, 0.0f, 1.0f };//右下
+	vertexData[2].texcoord = { tex_right, tex_bottom };
+	vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[3].position = { right, top, 0.0f, 1.0f };//右上
+	vertexData[3].texcoord = { tex_right, tex_top };
+	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
+
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 	Matrix4x4 viewMatrix = MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsApi::kClientWidth), float(WindowsApi::kClientHeight), 0.0f, 100.0f);
@@ -42,8 +85,9 @@ void Sprite::Update()
 
 void Sprite::Draw()
 {
-	//Spriteは常にuvCheckerにする
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
+
+	//テクスチャを指定
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureHandleGPU(textureIndex));
 	//Spriteの描画。変更が必要なものだけ変更する
 	spriteBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);	//VBVを設定
 	//TransformationMatrixCBufferの場所を設定
@@ -73,22 +117,7 @@ void Sprite::CreateVertexResource()
 
 void Sprite::CreateVertexData()
 {
-	//スプライト用の頂点リソースにデータを書き込む
-	VertexData* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-	vertexData[0].position = { 0.0f, 360.0f, 0.0f, 1.0f };//左下
-	vertexData[0].texcoord = { 0.0f, 1.0f };
-	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
-	vertexData[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };//左上
-	vertexData[1].texcoord = { 0.0f, 0.0f };
-	vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
-	vertexData[2].position = { 640.0f, 360.0f, 0.0f, 1.0f };//右下
-	vertexData[2].texcoord = { 1.0f, 1.0f };
-	vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
-	vertexData[3].position = { 640.0f, 0.0f, 0.0f, 1.0f };//右上
-	vertexData[3].texcoord = { 1.0f, 0.0f };
-	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
+	
 }
 
 void Sprite::CreateMaterialResource()
@@ -151,29 +180,14 @@ void Sprite::CreateTransform()
 	};
 }
 
-void Sprite::TextureUpload()
+void Sprite::AdjustTextureSize()
 {
-	//Textureを読んで転送する
-	mipImages = spriteBasic_->GetDirectXBasic()->LoadTexture("resources/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	textureResource = spriteBasic_->GetDirectXBasic()->CreateTextureResource(metadata);
-	intermediateResource = spriteBasic_->GetDirectXBasic()->UploadTextureData(textureResource.Get(), mipImages);
+	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureIndex);
+
+	textureSize_.x = static_cast<float>(metadata.width);
+	textureSize_.y = static_cast<float>(metadata.height);
+
+	transform.scale.x = textureSize_.x;
+	transform.scale.y = textureSize_.y;
 }
 
-void Sprite::CreateSRV()
-{
-	//metaDataを基にSRVの設定
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metadata.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;	//2Dテクスチャ
-	srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
-	//SRVを作成するDescriptorHeapの場所を決める
-	//先頭はImGuiが使っているのでその次を使う
-	spriteBasic_->GetDirectXBasic()->IncrementSRVCount();
-	textureSrvHandleCPU = spriteBasic_->GetDirectXBasic()->GetCPUDescriptorHandle(spriteBasic_->GetDirectXBasic()->GetSRVDescHeap().Get(), spriteBasic_->GetDirectXBasic()->GetSRVHeapSize(), 1);
-	textureSrvHandleGPU = spriteBasic_->GetDirectXBasic()->GetGPUDescriptorHandle(spriteBasic_->GetDirectXBasic()->GetSRVDescHeap().Get(), spriteBasic_->GetDirectXBasic()->GetSRVHeapSize(), 1);
-	//SRVの生成
-	spriteBasic_->GetDirectXBasic()->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
-}

@@ -1,4 +1,5 @@
 #include "DebugCamera.h"
+using namespace MyMath;
 
 void DebugCamera::Initialize(const int32_t clientWidth, const int32_t clientHeight) {
 

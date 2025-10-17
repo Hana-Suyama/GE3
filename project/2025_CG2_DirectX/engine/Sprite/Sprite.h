@@ -5,6 +5,7 @@
 #include "../../../Material.h"
 #include "../../../TransformationMatrix.h"
 #include "SpriteBasic.h"
+#include "../../../TextureManager.h"
 
 struct Transform {
 	Vector3 scale;
@@ -28,7 +29,9 @@ public:
 	///	初期化
 	/// </summary>
 	/// <param name="spriteBasic">Spriteの基盤</param>
-	void Initialize(SpriteBasic* spriteBasic);
+	/// <param name="textureManager">テクスチャマネージャー</param>
+	/// <param name="textureFilePath">テクスチャのファイルパス</param>
+	void Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath);
 
 	/// <summary>
 	///	更新
@@ -39,6 +42,99 @@ public:
 	///	描画
 	/// </summary>
 	void Draw();
+
+	/* --------- ゲッター --------- */
+
+	/// <summary>
+	///	トランスフォームのゲッター
+	/// </summary>
+	const struct Transform& GetTransform() const { return transform; }
+
+	/// <summary>
+	///	色のゲッター
+	/// </summary>
+	const Vector4& GetColor() const { return materialData->color; }
+
+	/// <summary>
+	///	アンカーポイントのゲッター
+	/// </summary>
+	const Vector2& GetAnchorPoint() const { return anchorPoint_; }
+
+	/// <summary>
+	///	左右反転のゲッター
+	/// </summary>
+	const bool& GetIsFlipX() const { return isFlipX_; }
+
+	/// <summary>
+	///	上下反転のゲッター
+	/// </summary>
+	const bool& GetIsFlipY() const { return isFlipY_; }
+
+	/// <summary>
+	///	テクスチャ左上座標のゲッター
+	/// </summary>
+	const Vector2& GetTextureLeftTop() const { return textureLeftTop_; }
+
+	/// <summary>
+	///	テクスチャ切り出しサイズのゲッター
+	/// </summary>
+	const Vector2& GetTextureSize() const { return textureSize_; }
+
+	/* --------- セッター --------- */
+
+	/// <summary>
+	///	座標のセッター
+	/// </summary>
+	/// <param name="spriteBasic">移動</param>
+	void SetTranslate(const Vector3& translate) { transform.translate = translate; }
+
+	/// <summary>
+	///	回転のセッター
+	/// </summary>
+	/// <param name="spriteBasic">回転</param>
+	void SetRotate(const Vector3& rotate) { transform.rotate = rotate; }
+
+	/// <summary>
+	///	スケールのセッター
+	/// </summary>
+	/// <param name="spriteBasic">スケール</param>
+	void SetScale(const Vector3& scale) { transform.scale = scale; }
+
+	/// <summary>
+	///	色のセッター
+	/// </summary>
+	/// <param name="spriteBasic">色</param>
+	void SetColor(const Vector4& color) { materialData->color = color; };
+
+	/// <summary>
+	///	アンカーポイントのセッター
+	/// </summary>
+	/// <param name="anchorPoint">アンカーポイントの座標(0.0f~1.0f)</param>
+	void SetAnchorPoint(const Vector2& anchorPoint) { anchorPoint_ = anchorPoint; }
+
+	/// <summary>
+	///	左右反転のセッター
+	/// </summary>
+	/// <param name="isFlipX">左右反転するかどうか</param>
+	void SetIsFlipX(const bool& isFlipX) { isFlipX_ = isFlipX; }
+
+	/// <summary>
+	///	上下反転のセッター
+	/// </summary>
+	/// <param name="isFlipY">上下反転するかどうか</param>
+	void SetIsFlipY(const bool& isFlipY) { isFlipY_ = isFlipY; }
+
+	/// <summary>
+	///	テクスチャ左上座標のセッター
+	/// </summary>
+	/// <param name="leftTop">左上に指定する座標</param>
+	void SetTextureLeftTop(const Vector2& leftTop) { textureLeftTop_ = leftTop; }
+
+	/// <summary>
+	///	テクスチャ切り出しサイズのセッター
+	/// </summary>
+	/// <param name="textureSize">切り出すサイズの指定</param>
+	void SetTextureSize(const Vector2& textureSize) { textureSize_ = textureSize; }
 
 private:
 
@@ -75,14 +171,9 @@ private:
 	void CreateTransform();
 
 	/// <summary>
-	///	テクスチャをアップロード
+	///	スケールを切り出しサイズに合わせる
 	/// </summary>
-	void TextureUpload();
-
-	/// <summary>
-	///	SRVを作成
-	/// </summary>
-	void CreateSRV();
+	void AdjustTextureSize();
 
 private:
 
@@ -90,22 +181,33 @@ private:
 
 	// Sprite基盤のポインタ
 	SpriteBasic* spriteBasic_ = nullptr;
+	// テクスチャマネージャのポインタ
+	TextureManager* textureManager_ = nullptr;
+
+	// テクスチャの番号
+	uint32_t textureIndex = 0;
 
 	// 頂点リソース
 	Comptr<ID3D12Resource> vertexResource = nullptr;
 	// 頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 
-	// テクスチャリソース
-	Comptr<ID3D12Resource> textureResource = nullptr;
-	// テクスチャのSRVハンドル
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU{};
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU{};
-
 	// Transform
 	struct Transform transform{};
 	// UVTransform
 	struct Transform uvTransform{};
+	// アンカーポイント(0.0f~1.0f)
+	Vector2 anchorPoint_ = { 0.0f, 0.0f };
+
+	// 左右反転
+	bool isFlipX_ = false;
+	// 上下反転
+	bool isFlipY_ = false;
+
+	// テクスチャ左上座標
+	Vector2 textureLeftTop_ = { 0.0f, 0.0f };
+	// テクスチャ切り出しサイズ
+	Vector2 textureSize_{};
 
 	// 座標変換行列
 	TransformationMatrix* transformationMatrixData = nullptr;
@@ -121,12 +223,6 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 	// インデックスリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
-
-	// ミップイメージ
-	DirectX::ScratchImage mipImages;
-	
-	// 中間リソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
 
 };
 

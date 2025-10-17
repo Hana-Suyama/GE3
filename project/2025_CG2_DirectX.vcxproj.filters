@@ -75,7 +75,7 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
       <Filter>externals\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\MyMath.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\utility\Math\MyMath.cpp">
       <Filter>ソース ファイル\engine\utility</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\debug\DebugCamera.cpp">
@@ -104,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp">
       <Filter>ソース ファイル\engine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,7 +141,7 @@
     <ClInclude Include="2025_CG2_DirectX\engine\debug\DebugCamera.h">
       <Filter>ヘッダー ファイル\engine\debug</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\MyMath.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\MyMath.h">
       <Filter>ヘッダー ファイル\engine\utility</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\input.h">
@@ -173,6 +176,24 @@
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h">
       <Filter>ヘッダー ファイル\engine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector3.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix3x3.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix4x4.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector4.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

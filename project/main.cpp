@@ -15,7 +15,7 @@
 #include <wrl.h>
 #include <xaudio2.h>
 #include "2025_CG2_DirectX/engine/Input.h"
-#include "2025_CG2_DirectX/engine/utility/MyMath.h"
+#include "2025_CG2_DirectX/engine/utility/Math/MyMath.h"
 #include "externals/imgui/imgui.h"
 #include "externals/imgui/imgui_impl_dx12.h"
 #include "externals/imgui/imgui_impl_win32.h"
@@ -28,6 +28,8 @@
 #include "2025_CG2_DirectX/engine/Sprite/SpriteBasic.h"
 #include "VertexData.h"
 #include "2025_CG2_DirectX/engine/Sprite/Sprite.h"
+#include "TextureManager.h"
+using namespace MyMath;
 
 #pragma comment(lib, "Dbghelp.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -374,6 +376,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	directXBasic = new DirectXBasic();
 	directXBasic->Initialize(logger, winApi);
 
+	//テクスチャマネージャの初期化
+	TextureManager* textureManager = nullptr;
+	textureManager = new TextureManager();
+	textureManager->Initialize(directXBasic);
+
 	//XAudioエンジンのインスタンスを生成
 	HRESULT hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(hr));
@@ -394,11 +401,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SpriteBasic* spriteBasic = nullptr;
 	spriteBasic = new SpriteBasic();
 	spriteBasic->Initialize(directXBasic, logger);
-
-	//sprite
-	Sprite* sprite = nullptr;
-	sprite = new Sprite();
-	sprite->Initialize(spriteBasic);
 
 	////モデル読み込み
 	//ModelData modelData = LoadObjFile("resources", "plane.obj");
@@ -1029,6 +1031,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//カメラ用変数を作る
 	struct Transform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -10.0f } };
 
+	textureManager->LoadTexture("resources/uvChecker.png");
+	textureManager->LoadTexture("resources/monsterBall.png");
+	textureManager->LoadTexture("resources/checkerBoard.png");
+
+	//sprite
+	Sprite* sprite = nullptr;
+	sprite = new Sprite();
+	sprite->Initialize(spriteBasic, textureManager, "resources/uvChecker.png");
+
+	Sprite* sprite2 = nullptr;
+	sprite2 = new Sprite();
+	sprite2->Initialize(spriteBasic, textureManager, "resources/monsterBall.png");
+
 	////Textureを読んで転送する
 	//DirectX::ScratchImage mipImages = directXBasic->LoadTexture("resources/uvChecker.png");
 	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
@@ -1246,6 +1261,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	bool playSound = false;
 
+	Vector3 spritePosition{};
+	Vector3 spriteRotation{};
+	Vector3 spriteScale = sprite->GetTransform().scale;
+	Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector2 spriteAnchor{};
+	Vector2 spriteLeftTop{};
+	Vector2 spriteSize = { spriteScale.x, spriteScale.y };
+	bool spriteFlipX = false;
+	bool spriteFlipY = false;
+
+	Vector3 spritePosition2{};
+	Vector3 spriteRotation2{};
+	Vector3 spriteScale2 = sprite2->GetTransform().scale;
+	Vector4 spriteColor2 = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector2 spriteAnchor2{};
+	Vector2 spriteLeftTop2{};
+	Vector2 spriteSize2 = { spriteScale2.x, spriteScale2.y };
+	bool spriteFlipX2 = false;
+	bool spriteFlipY2 = false;
+
 	//ウィンドウの×ボタンが押されるまでループ
 	while (true) {
 		
@@ -1274,6 +1309,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//ゲームの処理
 
 		sprite->Update();
+		sprite2->Update();
 
 		//transform.rotate.x += input->GetPadKey().lRx;
 		//if (input->TriggerKeyDown(DIK_SPACE)) {
@@ -1360,100 +1396,142 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//transformationMatrixDataSuzanne->World = worldMatrixSuzanne;
 
 		////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-		//ImGui::Begin("ImGui");
-		//if (ImGui::TreeNode("Sprite")) {
-		//	ImGui::Checkbox("drawSprite", &drawSprite);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSprite.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSprite.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSprite.translate), 0, 1000);
-		//	ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("plane.obj")) {
-		//	ImGui::Checkbox("drawPlane", &drawPlane);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transform.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transform.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transform.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDatas[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Sphere")) {
-		//	ImGui::Checkbox("drawSphere", &drawSphere);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSphere.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSphere.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Utah Teapot")) {
-		//	ImGui::Checkbox("drawTeapot", &drawTeapot);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformTeapot.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformTeapot.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformTeapot.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDatasTeapot[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Stanford Bunny")) {
-		//	ImGui::Checkbox("drawTeapot", &drawBunny);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformBunny.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformBunny.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformBunny.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDatasBunny[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Multi Mesh")) {
-		//	ImGui::Checkbox("drawMultiMesh", &drawMultiMesh);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMesh.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMesh.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMesh.translate), -5, 5);
-		//	ImGui::Combo("Ligting 1", &materialDatasMultiMesh[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::Combo("Ligting 2", &materialDatasMultiMesh[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Multi Material")) {
-		//	ImGui::Checkbox("drawMultiMaterial", &drawMultiMaterial);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMaterial.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMaterial.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMaterial.translate), -5, 5);
-		//	ImGui::Combo("Ligting 1", &materialDatasMultiMaterial[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::Combo("Ligting 2", &materialDatasMultiMaterial[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::DragFloat2("UVTranslate 1", &uvTransformMultiMaterial1.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale 1", &uvTransformMultiMaterial1.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate 1", &uvTransformMultiMaterial1.rotate.z);
-		//	ImGui::DragFloat2("UVTranslate 2", &uvTransformMultiMaterial2.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale 2", &uvTransformMultiMaterial2.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate 2", &uvTransformMultiMaterial2.rotate.z);
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Suzanne")) {
-		//	ImGui::Checkbox("drawSuzanne", &drawSuzanne);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSuzanne.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSuzanne.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSuzanne.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDatasSuzanne[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Lighting")) {
-		//	ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
-		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
-		//	ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Sound")) {
-		//	if (ImGui::Button("play")) {
-		//		playSound = true;
-		//	}
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Key")) {
-		//	ImGui::Text("PushKey : %d", input->PushKey(DIK_SPACE));
-		//	ImGui::Text("TriggerKey : %d", input->TriggerKey(DIK_SPACE));
-		//	ImGui::Text("Gamepad RightJoy : %d", input->GetPadKey().lRx);
-		//	ImGui::TreePop();
-		//}
-		//ImGui::End();
+		ImGui::Begin("ImGui");
+		if (ImGui::TreeNode("Sprite")) {
+			//ImGui::Checkbox("drawSprite", &drawSprite);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale), 0, 1000);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition), 0, 1000);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor));
+			ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor), -0.5f, 1.5f);
+			ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop), 0.0f, 1000.0f);
+			ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize), 0.0f, 1000.0f);
+			ImGui::Checkbox("FlipX", &spriteFlipX);
+			ImGui::Checkbox("FlipY", &spriteFlipY);
+			/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sprite2")) {
+			//ImGui::Checkbox("drawSprite", &drawSprite);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale2), 0, 1000);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation2), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition2), 0, 1000);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor2));
+			ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor2), -0.5f, 1.5f);
+			ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop2), 0.0f, 1000.0f);
+			ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize2), 0.0f, 1000.0f);
+			ImGui::Checkbox("FlipX", &spriteFlipX2);
+			ImGui::Checkbox("FlipY", &spriteFlipY2);
+			/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
+			ImGui::TreePop();
+		}
+		/*if (ImGui::TreeNode("plane.obj")) {
+			ImGui::Checkbox("drawPlane", &drawPlane);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transform.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transform.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transform.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatas[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sphere")) {
+			ImGui::Checkbox("drawSphere", &drawSphere);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSphere.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSphere.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Utah Teapot")) {
+			ImGui::Checkbox("drawTeapot", &drawTeapot);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformTeapot.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformTeapot.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformTeapot.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatasTeapot[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Stanford Bunny")) {
+			ImGui::Checkbox("drawTeapot", &drawBunny);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformBunny.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformBunny.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformBunny.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatasBunny[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Multi Mesh")) {
+			ImGui::Checkbox("drawMultiMesh", &drawMultiMesh);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMesh.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMesh.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMesh.translate), -5, 5);
+			ImGui::Combo("Ligting 1", &materialDatasMultiMesh[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::Combo("Ligting 2", &materialDatasMultiMesh[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Multi Material")) {
+			ImGui::Checkbox("drawMultiMaterial", &drawMultiMaterial);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMaterial.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMaterial.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMaterial.translate), -5, 5);
+			ImGui::Combo("Ligting 1", &materialDatasMultiMaterial[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::Combo("Ligting 2", &materialDatasMultiMaterial[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::DragFloat2("UVTranslate 1", &uvTransformMultiMaterial1.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale 1", &uvTransformMultiMaterial1.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate 1", &uvTransformMultiMaterial1.rotate.z);
+			ImGui::DragFloat2("UVTranslate 2", &uvTransformMultiMaterial2.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale 2", &uvTransformMultiMaterial2.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate 2", &uvTransformMultiMaterial2.rotate.z);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Suzanne")) {
+			ImGui::Checkbox("drawSuzanne", &drawSuzanne);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSuzanne.scale), -5, 5);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSuzanne.rotate), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSuzanne.translate), -5, 5);
+			ImGui::Combo("Ligting", &materialDatasSuzanne[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::TreePop();
+		}*/
+		if (ImGui::TreeNode("Lighting")) {
+			ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
+			ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+		/*if (ImGui::TreeNode("Sound")) {
+			if (ImGui::Button("play")) {
+				playSound = true;
+			}
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Key")) {
+			ImGui::Text("PushKey : %d", input->PushKey(DIK_SPACE));
+			ImGui::Text("TriggerKey : %d", input->TriggerKey(DIK_SPACE));
+			ImGui::Text("Gamepad RightJoy : %d", input->GetPadKey().lRx);
+			ImGui::TreePop();
+		}*/
+		ImGui::End();
+
+		sprite->SetTranslate(spritePosition);
+		sprite->SetRotate(spriteRotation);
+		sprite->SetScale(spriteScale);
+		sprite->SetColor(spriteColor);
+		sprite->SetAnchorPoint(spriteAnchor);
+		sprite->SetTextureLeftTop(spriteLeftTop);
+		sprite->SetTextureSize(spriteSize);
+		sprite->SetIsFlipX(spriteFlipX);
+		sprite->SetIsFlipY(spriteFlipY);
+
+		sprite2->SetTranslate(spritePosition2);
+		sprite2->SetRotate(spriteRotation2);
+		sprite2->SetScale(spriteScale2);
+		sprite2->SetColor(spriteColor2);
+		sprite2->SetAnchorPoint(spriteAnchor2);
+		sprite2->SetTextureLeftTop(spriteLeftTop2);
+		sprite2->SetTextureSize(spriteSize2);
+		sprite2->SetIsFlipX(spriteFlipX2);
+		sprite2->SetIsFlipY(spriteFlipY2);
 
 		if (playSound) {
 			//音声再生
@@ -1486,6 +1564,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 		sprite->Draw();
+		sprite2->Draw();
 
 		//for (int32_t i = 0; i < modelData.mesh.size(); i++) {
 		//	//VBVを設定
@@ -1620,6 +1699,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//WindowsApiの終了処理
 	winApi->Finalize();
 
+	delete sprite2;
 	delete sprite;
 	delete spriteBasic;
 	//入力解放
@@ -1628,6 +1708,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	xAudio2.Reset();
 	//音声データ解放
 	SoundUnload(&soundData1);
+	delete textureManager;
 	delete directXBasic;
 	delete winApi;
 
