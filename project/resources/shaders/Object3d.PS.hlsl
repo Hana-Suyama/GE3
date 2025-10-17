@@ -40,9 +40,12 @@ PixelShaderOutput main(VertexShaderOutput input)
     {
         float cos = saturate(dot(normalize(input.normal), -gDirectionalLight.direction));
         if (input.falseUV) {
-            output.color = gMaterial.color * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+            output.color.rgb = gMaterial.color.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            output.color.a = gMaterial.color.a;
+            
         } else {
-            output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
         
     } else if (gMaterial.enableLighting == HalfLambert){//Lightingする場合
@@ -50,9 +53,11 @@ PixelShaderOutput main(VertexShaderOutput input)
         float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
         
         if (input.falseUV){
-            output.color = gMaterial.color * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+            output.color.rgb = gMaterial.color.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            output.color.a = gMaterial.color.a;
         } else{
-            output.color = gMaterial.color * textureColor * gDirectionalLight.color * cos * gDirectionalLight.intensity;
+            output.color.rgb = gMaterial.color.rgb * textureColor.rgb * gDirectionalLight.color.rgb * cos * gDirectionalLight.intensity;
+            output.color.a = gMaterial.color.a * textureColor.a;
         }
     }else{//Lightingしない場合
         if (input.falseUV){

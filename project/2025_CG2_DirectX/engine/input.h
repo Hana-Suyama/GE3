@@ -14,14 +14,22 @@ struct enumDeviceData
 
 class Input
 {
-public: //静的メンバ関数
+public:
+
+	/* --------- 静的メンバ関数 --------- */
+
 	//ゲームパッド
 	static BOOL CALLBACK DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef);
 
 public:
 
-	// namespace省略
+	/* --------- namespace省略 --------- */
+
 	template <class T> using Comptr = Microsoft::WRL::ComPtr<T>;
+
+public:
+
+	/* --------- public関数 --------- */
 
 	//初期化
 	void Initialize(WindowsApi* winApi);
@@ -44,6 +52,8 @@ public:
 	DIJOYSTATE GetPadKey() { return padKey; };
 
 private:
+
+	/* --------- private変数 --------- */
 
 	// WindowsApi
 	WindowsApi* winApi = nullptr;

@@ -43,6 +43,12 @@
     <Filter Include="ヘッダー ファイル\engine\utility">
       <UniqueIdentifier>{3993bd16-d47a-47b2-b48f-6af1380b0c3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\engine\Sprite">
+      <UniqueIdentifier>{faa04207-dfbb-49f1-a429-9980cd22e01e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Sprite">
+      <UniqueIdentifier>{f86782a2-1335-43ea-aaf1-4cb99f9faab9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -69,7 +75,7 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
       <Filter>externals\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\MyMath.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\utility\Math\MyMath.cpp">
       <Filter>ソース ファイル\engine\utility</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\debug\DebugCamera.cpp">
@@ -92,6 +98,15 @@
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\FixFPS.cpp">
       <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Sprite\Sprite.cpp">
+      <Filter>ソース ファイル\engine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp">
+      <Filter>ソース ファイル\engine\Sprite</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureManager.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -126,7 +141,7 @@
     <ClInclude Include="2025_CG2_DirectX\engine\debug\DebugCamera.h">
       <Filter>ヘッダー ファイル\engine\debug</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\MyMath.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\MyMath.h">
       <Filter>ヘッダー ファイル\engine\utility</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\input.h">
@@ -146,6 +161,39 @@
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\FixFPS.h">
       <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformationMatrix.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h">
+      <Filter>ヘッダー ファイル\engine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h">
+      <Filter>ヘッダー ファイル\engine\Sprite</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector3.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix3x3.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix4x4.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector4.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

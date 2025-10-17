@@ -13,8 +13,13 @@ class DirectXBasic
 {
 public:
 
-	// namespace省略
+	/* --------- namespace省略 --------- */
+
 	template <class T> using Comptr = Microsoft::WRL::ComPtr<T>;
+
+public:
+
+	/* --------- public関数 --------- */
 
 	/// <summary>
 	/// デクストラクタ
@@ -92,38 +97,47 @@ public:
 	/// <param name="index">インデックス</param>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
-	/* ----- ゲッター ----- */
+	/* --------- ゲッター --------- */
 
 	/// <summary>
 	/// デバイスのゲッター
 	/// </summary>
-	ID3D12Device* GetDevice() { return device.Get(); };
+	ID3D12Device* GetDevice() const { return device.Get(); };
 
 	/// <summary>
 	/// コマンドリストのゲッター
 	/// </summary>
-	ID3D12GraphicsCommandList* GetCommandList() { return commandList.Get(); };
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); };
 
 	/// <summary>
 	/// フェンスイベントのゲッター
 	/// </summary>
-	HANDLE GetFenceEvent() { return fenceEvent; };
+	HANDLE GetFenceEvent() const { return fenceEvent; };
 
 	/// <summary>
 	/// ディスクリプタヒープのゲッター
 	/// </summary>
-	Comptr<ID3D12DescriptorHeap> GetSRVDescHeap() { return srvDescriptorHeap; };
-	Comptr<ID3D12DescriptorHeap> GetRTVDescHeap() { return rtvDescriptorHeap; };
-	Comptr<ID3D12DescriptorHeap> GetDSVDescHeap() { return dsvDescriptorHeap; };
+	Comptr<ID3D12DescriptorHeap> GetSRVDescHeap() const { return srvDescriptorHeap; };
+	Comptr<ID3D12DescriptorHeap> GetRTVDescHeap() const { return rtvDescriptorHeap; };
+	Comptr<ID3D12DescriptorHeap> GetDSVDescHeap() const { return dsvDescriptorHeap; };
 
 	/// <summary>
 	/// ディスクリプタサイズのゲッター
 	/// </summary>
-	uint32_t GetSRVHeapSize() { return descriptorSizeSRV; };
-	uint32_t GetRTVHeapSize() { return descriptorSizeRTV; };
-	uint32_t GetDSVHeapSize() { return descriptorSizeDSV; };
+	const uint32_t GetSRVHeapSize() const { return descriptorSizeSRV; };
+	const uint32_t GetRTVHeapSize() const { return descriptorSizeRTV; };
+	const uint32_t GetDSVHeapSize() const { return descriptorSizeDSV; };
+
+public:
+
+	/* --------- public変数(定数) --------- */
+
+	//SRVの上限数
+	const int32_t kMaxSRV = 128;
 
 private:
+
+	/* --------- private関数 --------- */
 
 	/// <summary>
 	/// デバイスの生成
@@ -189,6 +203,10 @@ private:
 	/// ImGuiの初期化
 	/// </summary>
 	void ImGuiIni();
+
+private:
+
+	/* --------- private変数 --------- */
 
 	// WindowsApi
 	WindowsApi* winApi_ = nullptr;
