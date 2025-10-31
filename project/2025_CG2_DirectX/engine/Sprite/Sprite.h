@@ -6,12 +6,7 @@
 #include "../../../TransformationMatrix.h"
 #include "SpriteBasic.h"
 #include "../../../TextureManager.h"
-
-struct Transform {
-	Vector3 scale;
-	Vector3 rotate;
-	Vector3 translate;
-};
+#include "../../../Transform.h"
 
 class Sprite
 {

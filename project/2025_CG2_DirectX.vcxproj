@@ -171,6 +171,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\utility\StringUtility.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\Sprite.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp" />
+    <ClCompile Include="ModelManager.cpp" />
+    <ClCompile Include="Object3D.cpp" />
+    <ClCompile Include="Object3DBasic.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -216,7 +219,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Material.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h" />
+    <ClInclude Include="ModelManager.h" />
+    <ClInclude Include="Object3D.h" />
+    <ClInclude Include="Object3DBasic.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformationMatrix.h" />
     <ClInclude Include="VertexData.h" />
   </ItemGroup>

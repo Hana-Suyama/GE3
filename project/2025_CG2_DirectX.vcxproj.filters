@@ -49,6 +49,12 @@
     <Filter Include="ヘッダー ファイル\engine\Sprite">
       <UniqueIdentifier>{f86782a2-1335-43ea-aaf1-4cb99f9faab9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\engine\Object3D">
+      <UniqueIdentifier>{68949c73-0b35-4aff-88c0-ab60d7331d3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Object3D">
+      <UniqueIdentifier>{89f64086-b7d8-4748-b12b-dae37a43e8bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -106,6 +112,15 @@
       <Filter>ソース ファイル\engine\Sprite</Filter>
     </ClCompile>
     <ClCompile Include="TextureManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Object3D.cpp">
+      <Filter>ソース ファイル\engine\Object3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Object3DBasic.cpp">
+      <Filter>ソース ファイル\engine\Object3D</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -193,6 +208,18 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="TextureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Object3D.h">
+      <Filter>ヘッダー ファイル\engine\Object3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Object3DBasic.h">
+      <Filter>ヘッダー ファイル\engine\Object3D</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
