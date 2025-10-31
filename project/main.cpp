@@ -704,6 +704,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//WindowsApiの終了処理
 	winApi->Finalize();
 
+	delete object3dTeapot;
 	delete object3d;
 	delete sprite2;
 	delete sprite;
