@@ -60,7 +60,7 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_
 
 bool SRVManager::AllocateRimitChack(uint32_t index)
 {
-	if (index > kMaxSRV) {
+	if (index < kMaxSRV) {
 		return true;
 	} else {
 		return false;

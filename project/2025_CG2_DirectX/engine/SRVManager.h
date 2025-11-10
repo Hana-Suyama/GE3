@@ -29,7 +29,7 @@ public:
 	uint32_t Allocate();
 
 	//SRVの上限数
-	const int32_t kMaxSRV = 128;
+	const uint32_t kMaxSRV = 128;
 
 private:
 	DirectXBasic* directXBasic_ = nullptr;

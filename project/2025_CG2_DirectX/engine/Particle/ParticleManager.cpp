@@ -3,6 +3,15 @@
 
 using namespace MyMath;
 
+ParticleManager::~ParticleManager()
+{
+	//敵の解放
+	for (Particle* particle : particles_) {
+		delete particle;
+	}
+	particles_.clear();
+}
+
 void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvManager, Logger* logger, TextureManager* textureManager, std::string textureFilePath, Camera* camera)
 {
 	directXBasic_ = directXBasic;
@@ -273,8 +282,8 @@ void ParticleManager::Emit(Vector3 position)
 		Particle* particle = new Particle();
 		particle->Initialize(directXBasic_);
 		particle->transform.translate = position;
-		particle->velocity_.x = (cosf(DEGtoRAD((rand() % 360))) * 1.0f);
-		particle->velocity_.y = (sinf(DEGtoRAD((rand() % 360))) * 1.0f);
+		particle->velocity_.x = (cosf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
+		particle->velocity_.y = (sinf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
 		particle->velocity_ = Normalize(particle->velocity_);
 		particles_.push_back(particle);
 		intervl = 5;

@@ -12,6 +12,9 @@ public:
 	template <class T> using Comptr = Microsoft::WRL::ComPtr<T>;
 
 public:
+
+	~ParticleManager();
+
 	void Initialize(DirectXBasic* directXBasic, SRVManager* srvManager, Logger* logger, TextureManager* textureManager, std::string textureFilePath, Camera* camera);
 
 	/// <summary>
