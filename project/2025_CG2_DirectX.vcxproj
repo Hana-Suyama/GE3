@@ -149,6 +149,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\DirectXBasic.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Camera\Camera.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -171,10 +172,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\utility\StringUtility.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\Sprite.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp" />
-    <ClCompile Include="ModelManager.cpp" />
-    <ClCompile Include="Object3D.cpp" />
-    <ClCompile Include="Object3DBasic.cpp" />
-    <ClCompile Include="TextureManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Model\ModelManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3D.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3DBasic.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\Particle.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\SRVManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -202,6 +206,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector2.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector3.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector4.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Camera\Camera.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -219,10 +224,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Material.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h" />
-    <ClInclude Include="ModelManager.h" />
-    <ClInclude Include="Object3D.h" />
-    <ClInclude Include="Object3DBasic.h" />
-    <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Model\ModelManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3D.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3DBasic.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\Particle.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\SRVManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\TextureManager.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformationMatrix.h" />
     <ClInclude Include="VertexData.h" />

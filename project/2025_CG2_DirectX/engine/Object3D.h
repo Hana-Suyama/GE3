@@ -1,8 +1,9 @@
 #pragma once
 #include "Object3DBasic.h"
-#include "ModelManager.h"
+#include "2025_CG2_DirectX/engine/Model/ModelManager.h"
 #include "TransformationMatrix.h"
 #include "Transform.h"
+#include "2025_CG2_DirectX/engine/Camera/Camera.h"
 
 class Object3D
 {
@@ -67,6 +68,8 @@ public:
 	/// <param name="spriteBasic">スケール</param>
 	void SetScale(const Vector3& scale) { transform.scale = scale; }
 
+	void SetCamera(Camera* camera) { camera_ = camera; }
+
 private:
 
 	/* --------- private関数 --------- */
@@ -97,5 +100,7 @@ private:
 	struct Transform transform { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	
 	bool isDraw_ = true;
+
+	Camera* camera_ = nullptr;
 };
 

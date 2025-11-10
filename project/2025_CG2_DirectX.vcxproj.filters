@@ -55,6 +55,27 @@
     <Filter Include="ヘッダー ファイル\engine\Object3D">
       <UniqueIdentifier>{89f64086-b7d8-4748-b12b-dae37a43e8bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Camera">
+      <UniqueIdentifier>{278c79f9-c9e1-47d7-950c-92eb55c36210}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\Camera">
+      <UniqueIdentifier>{2bff4c44-1f69-4a87-a359-918b5bdf41e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{b2b0ab50-6fd7-4ac0-a3ec-977b77415f55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\Model">
+      <UniqueIdentifier>{3c3a4292-9a73-4522-8408-88790e51561a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Model">
+      <UniqueIdentifier>{53a9334c-25a6-4035-845a-b831bb56efc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\Particle">
+      <UniqueIdentifier>{6d6f5532-ccc9-4beb-920e-59483b32173d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Particle">
+      <UniqueIdentifier>{4f1e747c-a66f-4f9a-a6a5-8992b1cb5352}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -111,22 +132,38 @@
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp">
       <Filter>ソース ファイル\engine\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="TextureManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Object3D.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3D.cpp">
       <Filter>ソース ファイル\engine\Object3D</Filter>
     </ClCompile>
-    <ClCompile Include="Object3DBasic.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3DBasic.cpp">
       <Filter>ソース ファイル\engine\Object3D</Filter>
     </ClCompile>
-    <ClCompile Include="ModelManager.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="2025_CG2_DirectX\engine\Camera\Camera.cpp">
+      <Filter>ソース ファイル\engine\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Model\ModelManager.cpp">
+      <Filter>ソース ファイル\engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\Particle.cpp">
+      <Filter>ソース ファイル\engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleManager.cpp">
+      <Filter>ソース ファイル\engine\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\SRVManager.cpp">
+      <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\TextureManager.cpp">
+      <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\Object3d.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Object3d.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Object3d.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -207,20 +244,32 @@
     <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector4.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="TextureManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Object3D.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3D.h">
       <Filter>ヘッダー ファイル\engine\Object3D</Filter>
     </ClInclude>
-    <ClInclude Include="Object3DBasic.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3DBasic.h">
       <Filter>ヘッダー ファイル\engine\Object3D</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelManager.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Camera\Camera.h">
+      <Filter>ヘッダー ファイル\engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Model\ModelManager.h">
+      <Filter>ヘッダー ファイル\engine\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\Particle.h">
+      <Filter>ヘッダー ファイル\engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleManager.h">
+      <Filter>ヘッダー ファイル\engine\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\SRVManager.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\TextureManager.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -229,6 +278,8 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\Object3d.hlsli" />
+    <None Include="resources\shaders\Object3d.hlsli">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

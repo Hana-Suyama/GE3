@@ -222,14 +222,9 @@ void DirectXBasic::CreateAllDiscriptorHeap()
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
 	rtvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
-	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
-	srvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRV, true);
-
 	//DSV用のヒープでディスクリプタの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
 	dsvDescriptorHeap = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1, false);
 
-	//DescriptorSizeを取得しておく
-	descriptorSizeSRV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	descriptorSizeRTV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 	descriptorSizeDSV = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
@@ -352,17 +347,17 @@ void DirectXBasic::CreateDSV()
 
 void DirectXBasic::ImGuiIni()
 {
-	//ImGuiの初期化
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApi_->GetHwnd());
-	ImGui_ImplDX12_Init(device.Get(),
-		swapChainDesc.BufferCount,
-		rtvDesc.Format,
-		srvDescriptorHeap.Get(),
-		GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0),
-		GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0));
+	////ImGuiの初期化
+	//IMGUI_CHECKVERSION();
+	//ImGui::CreateContext();
+	//ImGui::StyleColorsDark();
+	//ImGui_ImplWin32_Init(winApi_->GetHwnd());
+	//ImGui_ImplDX12_Init(device.Get(),
+	//	swapChainDesc.BufferCount,
+	//	rtvDesc.Format,
+	//	srvDescriptorHeap.Get(),
+	//	GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0),
+	//	GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0));
 }
 
 void DirectXBasic::PreDraw()
@@ -395,8 +390,8 @@ void DirectXBasic::PreDraw()
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
 	//描画用のDescriptorHeapの設定
-	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
-	commandList->SetDescriptorHeaps(1, descriptorHeaps);
+	/*ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap.Get() };
+	commandList->SetDescriptorHeaps(1, descriptorHeaps);*/
 
 	commandList->RSSetViewports(1, &viewport);	//Viewportを設定
 	commandList->RSSetScissorRects(1, &scissorRect);	//Scissorを設定

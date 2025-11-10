@@ -1,7 +1,7 @@
 #pragma once
-#include "2025_CG2_DirectX/engine/DirectXBasic.h"
-#include "VertexData.h"
-#include "TextureManager.h"
+#include "../DirectXBasic.h"
+#include "../../../VertexData.h"
+#include "../TextureManager.h"
 
 struct MaterialData {
 	std::string textureFilePath;

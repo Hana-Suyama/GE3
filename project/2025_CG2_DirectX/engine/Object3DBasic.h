@@ -1,5 +1,6 @@
 #pragma once
 #include "2025_CG2_DirectX/engine/DirectXBasic.h"
+#include "2025_CG2_DirectX/engine/Camera/Camera.h"
 
 
 class Object3DBasic
@@ -26,12 +27,16 @@ public:
 	/// </summary>
 	void Object3DPreDraw();
 
+	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
+
 	/* --------- ゲッター --------- */
 
 	/// <summary>
 	///	DirectX基盤のゲッター
 	/// </summary>
 	DirectXBasic* GetDirectXBasic() const { return directXBasic_; };
+
+	Camera* GetDefaultCamera() const { return defaultCamera_; }
 
 private:
 
@@ -65,6 +70,8 @@ private:
 	///	グラフィックスパイプラインステート
 	/// </summary>
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+
+	Camera* defaultCamera_ = nullptr;
 
 };
 

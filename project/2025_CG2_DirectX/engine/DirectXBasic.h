@@ -97,6 +97,11 @@ public:
 	/// <param name="index">インデックス</param>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(ID3D12DescriptorHeap* descriptorHeap, uint32_t descriptorSize, uint32_t index);
 
+	/// <summary>
+	/// ディスクリプタヒープの生成
+	/// </summary>
+	Comptr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
+
 	/* --------- ゲッター --------- */
 
 	/// <summary>
@@ -117,14 +122,14 @@ public:
 	/// <summary>
 	/// ディスクリプタヒープのゲッター
 	/// </summary>
-	Comptr<ID3D12DescriptorHeap> GetSRVDescHeap() const { return srvDescriptorHeap; };
+	//Comptr<ID3D12DescriptorHeap> GetSRVDescHeap() const { return srvDescriptorHeap; };
 	Comptr<ID3D12DescriptorHeap> GetRTVDescHeap() const { return rtvDescriptorHeap; };
 	Comptr<ID3D12DescriptorHeap> GetDSVDescHeap() const { return dsvDescriptorHeap; };
 
 	/// <summary>
 	/// ディスクリプタサイズのゲッター
 	/// </summary>
-	const uint32_t GetSRVHeapSize() const { return descriptorSizeSRV; };
+	//const uint32_t GetSRVHeapSize() const { return descriptorSizeSRV; };
 	const uint32_t GetRTVHeapSize() const { return descriptorSizeRTV; };
 	const uint32_t GetDSVHeapSize() const { return descriptorSizeDSV; };
 
@@ -132,8 +137,7 @@ public:
 
 	/* --------- public変数(定数) --------- */
 
-	//SRVの上限数
-	const int32_t kMaxSRV = 128;
+	
 
 private:
 
@@ -153,11 +157,6 @@ private:
 	/// スワップチェーンの生成
 	/// </summary>
 	void CreateSwapChain();
-
-	/// <summary>
-	/// ディスクリプタヒープの生成
-	/// </summary>
-	Comptr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 	/// <summary>
 	/// 全てのディスクリプタヒープの作成生成
@@ -260,14 +259,11 @@ private:
 	Logger* logger_;
 
 	//ディスクリプターのサイズ
-	uint32_t descriptorSizeSRV;
 	uint32_t descriptorSizeRTV;
 	uint32_t descriptorSizeDSV;
 
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
 	Comptr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
-	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
-	Comptr<ID3D12DescriptorHeap> srvDescriptorHeap = nullptr;
 	//DSV用のヒープでディスクリプタの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
 	Comptr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
 

@@ -1,5 +1,5 @@
 #include "ModelManager.h"
-#include "Material.h"
+#include "../../../Material.h"
 
 void ModelManager::Initialize(DirectXBasic* directXBasic, TextureManager* textureManager)
 {
@@ -83,7 +83,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	for (auto& mesh : newModel.meshes) {
 		//テクスチャファイルが読み込まれていなかったら読み込む
 		textureManager_->LoadTexture(mesh.material.textureFilePath);
-		mesh.material.textureIndex = textureManager_->GetTextureIndexByFilePath(mesh.material.textureFilePath);
+		//mesh.material.textureIndex = textureManager_->GetTextureIndexByFilePath(mesh.material.textureFilePath);
 	}
 
 	modelDatas.push_back(newModel);

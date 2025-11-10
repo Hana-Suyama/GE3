@@ -13,20 +13,30 @@ void Object3D::Initialize(Object3DBasic* object3DBasic, ModelManager* modelManag
 
 	modelData = modelManager->GetModelPointer(modelManager->GetModelIndexByFilePath(modelFilePath));
 
+	camera_ = object3DBasic_->GetDefaultCamera();
+
 }
 
 void Object3D::Update(struct Transform cameraTransform)
 {
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
-	Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
+	/*Matrix4x4 cameraMatrix = MakeAffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate);
 	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WindowsApi::kClientWidth) / float(WindowsApi::kClientHeight), 0.1f, 100.0f);
+	Matrix4x4 projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(WindowsApi::kClientWidth) / float(WindowsApi::kClientHeight), 0.1f, 100.0f);*/
 	Matrix4x4 worldViewProjectionMatrix;
 	//if (useDebugcamera) {
 	//	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(debugcamera->GetViewMatrix(), debugcamera->GetProjectionMatrix()));
 	//} else {
-		worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	//	worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 	//}
+
+	if (camera_) {
+		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+	} else {
+		worldViewProjectionMatrix = worldMatrix;
+	}
+
 	transformationMatrixData->WVP = worldViewProjectionMatrix;
 	transformationMatrixData->World = worldMatrix;
 }
@@ -35,7 +45,7 @@ void Object3D::Draw()
 {
 	if (isDraw_) {
 		for (auto& mesh : modelData->meshes) {
-			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetTextureHandleGPU(mesh.material.textureIndex));
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetSrvHandleGPU(mesh.material.textureFilePath));
 			//VBVを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &mesh.vertexBufferView);
 			//wvp用のCBufferの場所を設定

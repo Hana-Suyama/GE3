@@ -5,7 +5,7 @@
 #include "../../../Material.h"
 #include "../../../TransformationMatrix.h"
 #include "SpriteBasic.h"
-#include "../../../TextureManager.h"
+#include "../TextureManager.h"
 #include "../../../Transform.h"
 
 class Sprite
@@ -218,6 +218,8 @@ private:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 	// インデックスリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+
+	std::string textureFilePath_;
 
 };
 

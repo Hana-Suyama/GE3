@@ -10,7 +10,9 @@ void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager
 
 	textureManager_ = textureManager;
 
-	textureIndex = textureManager_->GetTextureIndexByFilePath(textureFilePath);
+	//textureIndex = textureManager_->GetTextureIndexByFilePath(textureFilePath);
+
+	textureFilePath_ = textureFilePath;
 
 	CreateVertexResource();
 
@@ -50,7 +52,7 @@ void Sprite::Update()
 		bottom = -bottom;
 	}
 
-	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureFilePath_);
 	float tex_left = textureLeftTop_.x / metadata.width;
 	float tex_right = (textureLeftTop_.x + textureSize_.x) / metadata.width;
 	float tex_top = textureLeftTop_.y / metadata.height;
@@ -87,7 +89,7 @@ void Sprite::Draw()
 {
 
 	//テクスチャを指定
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetTextureHandleGPU(textureIndex));
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
 	//Spriteの描画。変更が必要なものだけ変更する
 	spriteBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);	//VBVを設定
 	//TransformationMatrixCBufferの場所を設定
@@ -182,7 +184,7 @@ void Sprite::CreateTransform()
 
 void Sprite::AdjustTextureSize()
 {
-	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureIndex);
+	const DirectX::TexMetadata& metadata = textureManager_->GetMetaData(textureFilePath_);
 
 	textureSize_.x = static_cast<float>(metadata.width);
 	textureSize_.y = static_cast<float>(metadata.height);
