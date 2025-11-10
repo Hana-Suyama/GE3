@@ -1,6 +1,6 @@
 #include "Object3D.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
+#include "../../Material.h"
+#include "../../TransformationMatrix.h"
 
 using namespace MyMath;
 

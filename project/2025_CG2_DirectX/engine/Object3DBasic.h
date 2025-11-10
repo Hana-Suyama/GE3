@@ -1,6 +1,6 @@
 #pragma once
-#include "2025_CG2_DirectX/engine/DirectXBasic.h"
-#include "2025_CG2_DirectX/engine/Camera/Camera.h"
+#include "DirectXBasic.h"
+#include "Camera/Camera.h"
 
 
 class Object3DBasic

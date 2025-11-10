@@ -1,9 +1,9 @@
 #pragma once
 #include "Object3DBasic.h"
-#include "2025_CG2_DirectX/engine/Model/ModelManager.h"
-#include "TransformationMatrix.h"
-#include "Transform.h"
-#include "2025_CG2_DirectX/engine/Camera/Camera.h"
+#include "Model/ModelManager.h"
+#include "../../TransformationMatrix.h"
+#include "../../Transform.h"
+#include "Camera/Camera.h"
 
 class Object3D
 {
