@@ -61,15 +61,15 @@ private:
 
 	struct TextureData {
 		// テクスチャリソース
-		Comptr<ID3D12Resource> textureResource = nullptr;
-		uint32_t srvIndex;
+		Comptr<ID3D12Resource> textureResource_ = nullptr;
+		uint32_t srvIndex_;
 		// テクスチャのSRVハンドル
-		D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU{};
-		D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU{};
+		D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_{};
+		D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_{};
 		// メタデータ
-		DirectX::TexMetadata metadata;
+		DirectX::TexMetadata metadata_;
 		// 中間リソース
-		Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_;
 	};
 
 	/// <summary>
@@ -79,9 +79,9 @@ private:
 
 	SRVManager* srvManager_ = nullptr;
 
-	std::unordered_map<std::string, TextureData> textureDatas;
+	std::unordered_map<std::string, TextureData> textureDatas_;
 
 	//SRVインデックスを何番から使うか。0番をImGuiに使っているため1番から始める
-	const uint32_t kSRVIndexTop = 1;
+	const uint32_t kSRVIndexTop_ = 1;
 };
 

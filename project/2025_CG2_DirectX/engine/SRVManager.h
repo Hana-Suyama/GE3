@@ -11,7 +11,15 @@ public:
 	template <class T> using Comptr = Microsoft::WRL::ComPtr<T>;
 
 public:
-	void Initialize(DirectXBasic* dxBasic);
+
+	/* --------- public関数 --------- */
+
+	/// <summary>
+	///	初期化
+	/// </summary>
+	/// <param name="directXBasic">DirectXの基盤</param>
+	void Initialize(DirectXBasic* directXBasic);
+
 
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
@@ -29,17 +37,17 @@ public:
 	uint32_t Allocate();
 
 	//SRVの上限数
-	const uint32_t kMaxSRV = 128;
+	const uint32_t kMaxSRV_ = 128;
 
 private:
 	DirectXBasic* directXBasic_ = nullptr;
 
-	uint32_t descriptorSize;
+	uint32_t descriptorSize_;
 
 	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
-	Comptr<ID3D12DescriptorHeap> descriptorHeap = nullptr;
+	Comptr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
 
-	uint32_t useIndex = 0;
+	uint32_t useIndex_ = 0;
 
 };
 

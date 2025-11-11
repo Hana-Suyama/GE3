@@ -42,12 +42,12 @@ public:
 	/// <summary>
 	/// ウィンドウハンドルのゲッター
 	/// </summary>
-	HWND GetHwnd() const { return hwnd; }
+	HWND GetHwnd() const { return hwnd_; }
 
 	/// <summary>
 	/// hInstanceのゲッター
 	/// </summary>
-	HINSTANCE GetHInstance() const { return wndClass.hInstance; }
+	HINSTANCE GetHInstance() const { return wndClass_.hInstance; }
 
 
 private:
@@ -55,10 +55,10 @@ private:
 	/* --------- private変数 --------- */
 
 	// ウィンドウハンドル
-	HWND hwnd = nullptr;
+	HWND hwnd_ = nullptr;
 
 	// ウィンドウクラスの設定
-	WNDCLASS wndClass{};
+	WNDCLASS wndClass_{};
 
 
 };

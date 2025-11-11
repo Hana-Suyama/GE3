@@ -20,7 +20,7 @@ void Logger::Initialize()
 	//時刻を使ってファイル名を決定
 	std::string logFilePath = std::string("logs/") + dateString + ".log";
 	//ファイルを作って書き込み準備
-	logstream.open(logFilePath);
+	logstream_.open(logFilePath);
 
 }
 
@@ -30,7 +30,7 @@ void Logger::Update()
 }
 
 void Logger::Log(const std::string& message) {
-	logstream << message << std::endl;
+	logstream_ << message << std::endl;
 	OutputDebugStringA(message.c_str());
 }
 

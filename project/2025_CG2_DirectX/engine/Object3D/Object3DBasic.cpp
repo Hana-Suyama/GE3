@@ -2,22 +2,22 @@
 
 void Object3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
 {
-	//引数のDirectX基盤ポインタを記録
+	// 引数のDirectX基盤ポインタを記録
 	directXBasic_ = directXBasic;
 
-	//引数のロガーポインタを記録
+	// 引数のロガーポインタを記録
 	logger_ = logger;
 
-	//PSOを作成
+	// PSOを作成
 	CreatePSO();
 }
 
 void Object3DBasic::Object3DPreDraw()
 {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());	//PSOを設定
-	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
+	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());	//PSOを設定
+	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
@@ -76,7 +76,7 @@ void Object3DBasic::CreatePSO()
 	//バイナリを元に生成
 	hr = directXBasic_->GetDevice()->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&rootSignature));
+		IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 
 	//InputLayout
@@ -138,7 +138,7 @@ void Object3DBasic::CreatePSO()
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();//RootSignature
+	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
 	vertexShaderBlob->GetBufferSize() };//VertexShader
@@ -160,6 +160,6 @@ void Object3DBasic::CreatePSO()
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	//実際に生成
 	hr = directXBasic_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-		IID_PPV_ARGS(&graphicsPipelineState));
+		IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 }

@@ -29,9 +29,9 @@
 #include "VertexData.h"
 #include "2025_CG2_DirectX/engine/Sprite/Sprite.h"
 #include "2025_CG2_DirectX/engine/TextureManager.h"
-#include "2025_CG2_DirectX/engine/Object3DBasic.h"
+#include "2025_CG2_DirectX/engine/Object3D/Object3DBasic.h"
 #include "2025_CG2_DirectX/engine/Model/ModelManager.h"
-#include "2025_CG2_DirectX/engine/Object3D.h"
+#include "2025_CG2_DirectX/engine/Object3D/Object3D.h"
 #include "2025_CG2_DirectX/engine/SRVManager.h"
 #include "2025_CG2_DirectX/engine/Particle/ParticleManager.h"
 using namespace MyMath;
@@ -307,11 +307,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//sprite
 	Sprite* sprite = nullptr;
 	sprite = new Sprite();
-	sprite->Initialize(spriteBasic, textureManager, "resources/uvChecker.png");
+	sprite->Initialize(spriteBasic, textureManager);
+	sprite->SetTextureFilePath("resources/uvChecker.png");
 
 	Sprite* sprite2 = nullptr;
 	sprite2 = new Sprite();
-	sprite2->Initialize(spriteBasic, textureManager, "resources/monsterBall.png");
+	sprite2->Initialize(spriteBasic, textureManager);
+	sprite2->SetTextureFilePath("resources/monsterBall.png");
 
 	Object3D* object3d = nullptr;
 	object3d = new Object3D();
@@ -407,8 +409,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		sprite->Update();
 		sprite2->Update();
 
-		object3d->Update(cameraTransform);
-		object3dTeapot->Update(cameraTransform);
+		object3d->Update();
+		object3dTeapot->Update();
 
 		////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 		//ImGui::Begin("ImGui");

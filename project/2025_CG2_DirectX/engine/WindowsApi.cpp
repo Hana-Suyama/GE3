@@ -8,16 +8,16 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 void WindowsApi::Initialize(){
 
 	//ウィンドウプロシージャ
-	wndClass.lpfnWndProc = WindowProc;
+	wndClass_.lpfnWndProc = WindowProc;
 	//ウィンドウクラス名(なんでも良い)
-	wndClass.lpszClassName = L"CG2WindowClass";
+	wndClass_.lpszClassName = L"CG2WindowClass";
 	//インスタンスハンドル
-	wndClass.hInstance = GetModuleHandle(nullptr);
+	wndClass_.hInstance = GetModuleHandle(nullptr);
 	//カーソル
-	wndClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wndClass_.hCursor = LoadCursor(nullptr, IDC_ARROW);
 
 	//ウィンドウクラスを登録する
-	RegisterClass(&wndClass);
+	RegisterClass(&wndClass_);
 
 	//ウィンドウサイズを表す構造体にクライアント領域を入れる
 	RECT wrc = { 0, 0, kClientWidth, kClientHeight };
@@ -26,8 +26,8 @@ void WindowsApi::Initialize(){
 	AdjustWindowRect(&wrc, WS_OVERLAPPEDWINDOW, false);
 
 	//ウィンドウの生成
-	hwnd = CreateWindow(
-		wndClass.lpszClassName,		//利用するクラス名
+	hwnd_ = CreateWindow(
+		wndClass_.lpszClassName,		//利用するクラス名
 		L"CG2",					//タイトルバーの文字(何でも良い)
 		WS_OVERLAPPEDWINDOW,	//よく見るウィンドウスタイル
 		CW_USEDEFAULT,			//表示X座標(Windowsに任せる)
@@ -36,11 +36,11 @@ void WindowsApi::Initialize(){
 		wrc.bottom - wrc.top,	//ウィンドウ縦幅
 		nullptr,				//親ウィンドウハンドル
 		nullptr,				//メニューハンドル
-		wndClass.hInstance,			//インスタンスハンドル
+		wndClass_.hInstance,			//インスタンスハンドル
 		nullptr);				//オプション
 
 	//ウィンドウを表示する
-	ShowWindow(hwnd, SW_SHOW);
+	ShowWindow(hwnd_, SW_SHOW);
 
 	// システムタイマーの分解能を上げる
 	timeBeginPeriod(1);
@@ -48,7 +48,7 @@ void WindowsApi::Initialize(){
 }
 
 void WindowsApi::Finalize(){
-	CloseWindow(hwnd);
+	CloseWindow(hwnd_);
 }
 
 bool WindowsApi::ProcessMessage()

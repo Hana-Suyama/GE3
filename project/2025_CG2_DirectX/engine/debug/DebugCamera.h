@@ -14,9 +14,9 @@ public:
 
 	void Update(const BYTE key[256]);
 
-	Matrix4x4 GetViewMatrix() { return viewMatrix; }
+	Matrix4x4 GetViewMatrix() { return viewMatrix_; }
 
-	Matrix4x4 GetProjectionMatrix() { return projectionMatrix; }
+	Matrix4x4 GetProjectionMatrix() { return projectionMatrix_; }
 
 private:
 	//累積回転行列
@@ -25,13 +25,13 @@ private:
 	Vector3 translation_ = { 0, 0, 0 };
 	Vector3 targetTranslation_ = { 0, 0, 0 };
 	//ビュー行列
-	Matrix4x4 viewMatrix;
+	Matrix4x4 viewMatrix_;
 	//射影行列
-	Matrix4x4 projectionMatrix;
+	Matrix4x4 projectionMatrix_;
 
 	//カメラ速度
-	const float speed = 0.3f;
+	const float speed_ = 0.3f;
 
-	const Vector3 kOffset{ 0.0f, 0.0f, -10.0f };
+	const Vector3 kOffset_{ 0.0f, 0.0f, -10.0f };
 };
 

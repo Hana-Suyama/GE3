@@ -56,9 +56,9 @@ public:
 	/// <param name="filePath">ファイルパス</param>
 	uint32_t GetModelIndexByFilePath(const std::string& filePath);
 
-	ModelData* GetModelPointer(uint32_t index) { return &modelDatas.at(index); }
+	ModelData* GetModelPointer(uint32_t index) { return &modelDatas_.at(index); }
 
-	TextureManager* GetTextureManager() { return textureManager_; }
+	TextureManager* GetTextureManager() const { return textureManager_; }
 
 private:
 
@@ -75,9 +75,9 @@ private:
 	// テクスチャマネージャのポインタ
 	TextureManager* textureManager_ = nullptr;
 
-	std::vector<ModelData> modelDatas;
+	std::vector<ModelData> modelDatas_;
 
 	//モデルデータの読み込み上限数
-	const uint32_t kModelMax = 128;
+	const uint32_t kModelMax_ = 128;
 };
 

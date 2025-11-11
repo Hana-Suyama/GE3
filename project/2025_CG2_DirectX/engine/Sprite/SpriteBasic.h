@@ -61,12 +61,12 @@ private:
 	/// <summary>
 	///	ルートシグネチャ
 	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 
 	/// <summary>
 	///	グラフィックスパイプラインステート
 	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 
 };
 

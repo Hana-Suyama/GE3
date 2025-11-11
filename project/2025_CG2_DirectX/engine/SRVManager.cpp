@@ -1,27 +1,27 @@
 #include "SRVManager.h"
 
-void SRVManager::Initialize(DirectXBasic* dxBasic)
+void SRVManager::Initialize(DirectXBasic* directXBasic)
 {
-	directXBasic_ = dxBasic;
+	directXBasic_ = directXBasic;
 
 	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
-	descriptorHeap = directXBasic_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRV, true);
+	descriptorHeap_ = directXBasic_->CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRV_, true);
 
 	//DescriptorSizeを取得しておく
-	descriptorSize = directXBasic_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorSize_ = directXBasic_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE SRVManager::GetCPUDescriptorHandle(uint32_t index)
 {
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap->GetCPUDescriptorHandleForHeapStart();
-	handleCPU.ptr += (descriptorSize * index);
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU = descriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	handleCPU.ptr += (descriptorSize_ * index);
 	return handleCPU;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE SRVManager::GetGPUDescriptorHandle(uint32_t index)
 {
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap->GetGPUDescriptorHandleForHeapStart();
-	handleGPU.ptr += (descriptorSize * index);
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU = descriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+	handleGPU.ptr += (descriptorSize_ * index);
 	return handleGPU;
 }
 
@@ -49,7 +49,7 @@ void SRVManager::CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource*
 
 void SRVManager::PreDraw()
 {
-	ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap.Get() };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { descriptorHeap_.Get() };
 	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
@@ -60,7 +60,7 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_
 
 bool SRVManager::AllocateRimitChack(uint32_t index)
 {
-	if (index < kMaxSRV) {
+	if (index < kMaxSRV_) {
 		return true;
 	} else {
 		return false;
@@ -69,8 +69,8 @@ bool SRVManager::AllocateRimitChack(uint32_t index)
 
 uint32_t SRVManager::Allocate()
 {
-	int index = useIndex;
+	int index = useIndex_;
 
-	useIndex++;
+	useIndex_++;
 	return index;
 }

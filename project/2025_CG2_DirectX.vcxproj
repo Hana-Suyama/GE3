@@ -173,8 +173,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\Sprite.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Model\ModelManager.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\Object3D.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\Object3DBasic.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3D\Object3D.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3D\Object3DBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\Particle.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\SRVManager.cpp" />
@@ -225,8 +225,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Model\ModelManager.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\Object3D.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\Object3DBasic.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3D\Object3D.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3D\Object3DBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\Particle.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\SRVManager.h" />

@@ -3,8 +3,8 @@ using namespace MyMath;
 
 void DebugCamera::Initialize(const int32_t clientWidth, const int32_t clientHeight) {
 
-	viewMatrix = MakeIdentity4x4();
-	projectionMatrix = MakePerspectiveFovMatrix(0.45f, float(clientWidth) / float(clientHeight), 0.1f, 100.0f);
+	viewMatrix_ = MakeIdentity4x4();
+	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(clientWidth) / float(clientHeight), 0.1f, 100.0f);
 	matRot_ = MakeIdentity4x4();
 }
 
@@ -16,42 +16,42 @@ void DebugCamera::Update(const BYTE key[256]) {
 
 	if (key[DIK_UP]) {
 		//カメラ移動ベクトル
-		Vector3 move = { 0, speed, 0 };
+		Vector3 move = { 0, speed_, 0 };
 		move = TransformNormal(move, cameraMatrix);
 
 		targetTranslation_ += move;
 	}
 
 	if (key[DIK_LEFT]) {
-		Vector3 move = { -speed, 0, 0 };
+		Vector3 move = { -speed_, 0, 0 };
 		move = TransformNormal(move, cameraMatrix);
 
 		targetTranslation_ += move;
 	}
 
 	if (key[DIK_RIGHT]) {
-		Vector3 move = { speed, 0, 0 };
+		Vector3 move = { speed_, 0, 0 };
 		move = TransformNormal(move, cameraMatrix);
 
 		targetTranslation_ += move;
 	}
 
 	if (key[DIK_DOWN]) {
-		Vector3 move = { 0, -speed, 0 };
+		Vector3 move = { 0, -speed_, 0 };
 		move = TransformNormal(move, cameraMatrix);
 
 		targetTranslation_ += move;
 	}
 
 	if (key[DIK_W]) {
-		Vector3 move = { 0, 0, speed };
+		Vector3 move = { 0, 0, speed_ };
 		move = TransformNormal(move, cameraMatrix);
 
 		targetTranslation_ += move;
 	}
 
 	if (key[DIK_S]) {
-		Vector3 move = { 0, 0, -speed };
+		Vector3 move = { 0, 0, -speed_ };
 		move = TransformNormal(move, cameraMatrix);
 
 		targetTranslation_ += move;
@@ -63,27 +63,27 @@ void DebugCamera::Update(const BYTE key[256]) {
 	float Zrotate = 0.0f;
 
 	if (key[DIK_A]) {
-		Xrotate += -speed;
+		Xrotate += -speed_;
 	}
 
 	if (key[DIK_D]) {
-		Xrotate += speed;
+		Xrotate += speed_;
 	}
 
 	if (key[DIK_Q]) {
-		Yrotate += -speed;
+		Yrotate += -speed_;
 	}
 
 	if (key[DIK_E]) {
-		Yrotate += speed;
+		Yrotate += speed_;
 	}
 
 	if (key[DIK_Z]) {
-		Zrotate += -speed;
+		Zrotate += -speed_;
 	}
 
 	if (key[DIK_C]) {
-		Zrotate += speed;
+		Zrotate += speed_;
 	}
 
 	//追加回転分の回転行列を生成
@@ -95,9 +95,9 @@ void DebugCamera::Update(const BYTE key[256]) {
 	//累積の回転行列を合成
 	matRot_ = Multiply(matRotDelta, matRot_);
 
-	Vector3 offset = TransformNormal(kOffset, matRot_);
+	Vector3 offset = TransformNormal(kOffset_, matRot_);
 
 	translation_ = targetTranslation_ + offset;
 	
-	viewMatrix = Inverse(cameraMatrix);
+	viewMatrix_ = Inverse(cameraMatrix);
 }

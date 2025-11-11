@@ -25,8 +25,7 @@ public:
 	/// </summary>
 	/// <param name="spriteBasic">Spriteの基盤</param>
 	/// <param name="textureManager">テクスチャマネージャー</param>
-	/// <param name="textureFilePath">テクスチャのファイルパス</param>
-	void Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath);
+	void Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager);
 
 	/// <summary>
 	///	更新
@@ -43,12 +42,12 @@ public:
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
-	const struct Transform& GetTransform() const { return transform; }
+	const struct Transform& GetTransform() const { return transform_; }
 
 	/// <summary>
 	///	色のゲッター
 	/// </summary>
-	const Vector4& GetColor() const { return materialData->color; }
+	const Vector4& GetColor() const { return materialData_->color; }
 
 	/// <summary>
 	///	アンカーポイントのゲッター
@@ -81,25 +80,25 @@ public:
 	///	座標のセッター
 	/// </summary>
 	/// <param name="spriteBasic">移動</param>
-	void SetTranslate(const Vector3& translate) { transform.translate = translate; }
+	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 
 	/// <summary>
 	///	回転のセッター
 	/// </summary>
 	/// <param name="spriteBasic">回転</param>
-	void SetRotate(const Vector3& rotate) { transform.rotate = rotate; }
+	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 
 	/// <summary>
 	///	スケールのセッター
 	/// </summary>
 	/// <param name="spriteBasic">スケール</param>
-	void SetScale(const Vector3& scale) { transform.scale = scale; }
+	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 
 	/// <summary>
 	///	色のセッター
 	/// </summary>
 	/// <param name="spriteBasic">色</param>
-	void SetColor(const Vector4& color) { materialData->color = color; };
+	void SetColor(const Vector4& color) { materialData_->color = color; };
 
 	/// <summary>
 	///	アンカーポイントのセッター
@@ -130,6 +129,12 @@ public:
 	/// </summary>
 	/// <param name="textureSize">切り出すサイズの指定</param>
 	void SetTextureSize(const Vector2& textureSize) { textureSize_ = textureSize; }
+
+	/// <summary>
+	///	テクスチャパスのセッター
+	/// </summary>
+	/// <param name="textureFilePath">テクスチャのファイルパス</param>
+	void SetTextureFilePath(std::string textureFilePath);
 
 private:
 
@@ -180,17 +185,17 @@ private:
 	TextureManager* textureManager_ = nullptr;
 
 	// テクスチャの番号
-	uint32_t textureIndex = 0;
+	uint32_t textureIndex_ = 0;
 
 	// 頂点リソース
-	Comptr<ID3D12Resource> vertexResource = nullptr;
+	Comptr<ID3D12Resource> vertexResource_ = nullptr;
 	// 頂点バッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 
 	// Transform
-	struct Transform transform{};
+	struct Transform transform_{};
 	// UVTransform
-	struct Transform uvTransform{};
+	struct Transform uvTransform_{};
 	// アンカーポイント(0.0f~1.0f)
 	Vector2 anchorPoint_ = { 0.0f, 0.0f };
 
@@ -205,20 +210,21 @@ private:
 	Vector2 textureSize_{};
 
 	// 座標変換行列
-	TransformationMatrix* transformationMatrixData = nullptr;
+	TransformationMatrix* transformationMatrixData_ = nullptr;
 	// 座標変換行列リソース
-	Comptr<ID3D12Resource> transformationMatrixResource = nullptr;
+	Comptr<ID3D12Resource> transformationMatrixResource_ = nullptr;
 
 	// マテリアル
-	Material* materialData = nullptr;
+	Material* materialData_ = nullptr;
 	// マテリアルリソース
-	Comptr<ID3D12Resource> materialResource = nullptr;
+	Comptr<ID3D12Resource> materialResource_ = nullptr;
 
 	// インデックスバッファビュー
-	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	// インデックスリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 
+	// テクスチャのファイルパス
 	std::string textureFilePath_;
 
 };

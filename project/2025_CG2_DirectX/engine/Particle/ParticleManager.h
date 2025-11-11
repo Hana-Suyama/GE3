@@ -49,19 +49,19 @@ private:
 	/// <summary>
 	///	ルートシグネチャ
 	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 
 	/// <summary>
 	///	グラフィックスパイプラインステート
 	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 
 	TextureManager* textureManager_;
 
 	// 頂点リソース
-	Comptr<ID3D12Resource> vertexResource = nullptr;
+	Comptr<ID3D12Resource> vertexResource_ = nullptr;
 	// 頂点バッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 
 	std::string textureFilePath_;
 
@@ -69,7 +69,7 @@ private:
 
 	Camera* camera_ = nullptr;
 
-	uint32_t intervl = 5;
+	uint32_t intervl_ = 5;
 
 };
 

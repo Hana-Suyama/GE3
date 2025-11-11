@@ -1,9 +1,9 @@
 #pragma once
 #include "Object3DBasic.h"
-#include "Model/ModelManager.h"
-#include "../../TransformationMatrix.h"
-#include "../../Transform.h"
-#include "Camera/Camera.h"
+#include "../Model/ModelManager.h"
+#include "../../../TransformationMatrix.h"
+#include "../../../Transform.h"
+#include "../Camera/Camera.h"
 
 class Object3D
 {
@@ -28,7 +28,7 @@ public:
 	/// <summary>
 	///	更新
 	/// </summary>
-	void Update(struct Transform cameraTransform);
+	void Update();
 
 	/// <summary>
 	///	描画
@@ -45,7 +45,7 @@ public:
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
-	const struct Transform& GetTransform() const { return transform; }
+	const struct Transform& GetTransform() const { return transform_; }
 
 
 	/* --------- セッター --------- */
@@ -53,21 +53,25 @@ public:
 	/// <summary>
 	///	座標のセッター
 	/// </summary>
-	/// <param name="spriteBasic">移動</param>
-	void SetTranslate(const Vector3& translate) { transform.translate = translate; }
+	/// <param name="translate">移動</param>
+	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
 
 	/// <summary>
 	///	回転のセッター
 	/// </summary>
-	/// <param name="spriteBasic">回転</param>
-	void SetRotate(const Vector3& rotate) { transform.rotate = rotate; }
+	/// <param name="rotate">回転</param>
+	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
 
 	/// <summary>
 	///	スケールのセッター
 	/// </summary>
-	/// <param name="spriteBasic">スケール</param>
-	void SetScale(const Vector3& scale) { transform.scale = scale; }
+	/// <param name="scale">スケール</param>
+	void SetScale(const Vector3& scale) { transform_.scale = scale; }
 
+	/// <summary>
+	///	カメラのセッター
+	/// </summary>
+	/// <param name="camera">カメラ</param>
 	void SetCamera(Camera* camera) { camera_ = camera; }
 
 private:
@@ -89,18 +93,20 @@ private:
 	ModelManager* modelManager_ = nullptr;
 
 	// WVPリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	// WVPデータ書き込み用
-	TransformationMatrix* transformationMatrixData = nullptr;
+	TransformationMatrix* transformationMatrixData_ = nullptr;
 
 	// 描画するモデルのポインタ
-	ModelData* modelData = nullptr;
+	ModelData* modelData_ = nullptr;
 
 	// トランスフォーム
-	struct Transform transform { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	struct Transform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	
+	// 表示フラグ
 	bool isDraw_ = true;
 
+	// カメラ
 	Camera* camera_ = nullptr;
 };
 

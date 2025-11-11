@@ -12,16 +12,16 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 {
 	// 同じモデルが読み込まれていたら読み込まない
 	auto it = std::find_if(
-		modelDatas.begin(),
-		modelDatas.end(),
+		modelDatas_.begin(),
+		modelDatas_.end(),
 		[&](ModelData& modelData) {return modelData.filePath == directoryPath + "/" + filename; }
 	);
-	if (it != modelDatas.end()) {
+	if (it != modelDatas_.end()) {
 		return;
 	}
 
 	// モデル上限を超えて読み込もうとしたら止める
-	assert(modelDatas.size() < kModelMax);
+	assert(modelDatas_.size() < kModelMax_);
 
 	// 新しく追加する空のモデルデータを作成
 	ModelData newModel;
@@ -86,18 +86,18 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 		//mesh.material.textureIndex = textureManager_->GetTextureIndexByFilePath(mesh.material.textureFilePath);
 	}
 
-	modelDatas.push_back(newModel);
+	modelDatas_.push_back(newModel);
 }
 
 uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 {
 	auto it = std::find_if(
-		modelDatas.begin(),
-		modelDatas.end(),
+		modelDatas_.begin(),
+		modelDatas_.end(),
 		[&](ModelData& modelData) {return modelData.filePath == filePath; }
 	);
-	if (it != modelDatas.end()) {
-		uint32_t modelIndex = static_cast<uint32_t>(std::distance(modelDatas.begin(), it));
+	if (it != modelDatas_.end()) {
+		uint32_t modelIndex = static_cast<uint32_t>(std::distance(modelDatas_.begin(), it));
 		return modelIndex;
 	}
 

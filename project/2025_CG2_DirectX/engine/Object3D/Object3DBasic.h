@@ -1,6 +1,6 @@
 #pragma once
-#include "DirectXBasic.h"
-#include "Camera/Camera.h"
+#include "../DirectXBasic.h"
+#include "../Camera/Camera.h"
 
 
 class Object3DBasic
@@ -27,8 +27,6 @@ public:
 	/// </summary>
 	void Object3DPreDraw();
 
-	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
-
 	/* --------- ゲッター --------- */
 
 	/// <summary>
@@ -36,7 +34,19 @@ public:
 	/// </summary>
 	DirectXBasic* GetDirectXBasic() const { return directXBasic_; };
 
+	/// <summary>
+	///	デフォルトカメラのゲッター
+	/// </summary>
 	Camera* GetDefaultCamera() const { return defaultCamera_; }
+
+	/* --------- セッター --------- */
+
+	/// <summary>
+	///	カメラのセッター
+	/// </summary>
+	/// <param name="camera">カメラ</param>
+	void SetDefaultCamera(Camera* camera) { defaultCamera_ = camera; }
+
 
 private:
 
@@ -51,27 +61,20 @@ private:
 
 	/* --------- private変数 --------- */
 
-	/// <summary>
-	///	DirectX基盤のポインタ
-	/// </summary>
+	// DirectX基盤のポインタ
 	DirectXBasic* directXBasic_ = nullptr;
 
-	/// <summary>
-	///	ロガー
-	/// </summary>
+	// ロガー
 	Logger* logger_ = nullptr;
 
-	/// <summary>
-	///	ルートシグネチャ
-	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature = nullptr;
-
-	/// <summary>
-	///	グラフィックスパイプラインステート
-	/// </summary>
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState = nullptr;
-
+	// デフォルトカメラのポインタ
 	Camera* defaultCamera_ = nullptr;
+
+	// ルートシグネチャ
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
+
+	// グラフィックスパイプラインステート
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 
 };
 

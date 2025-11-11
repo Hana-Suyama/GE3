@@ -32,17 +32,17 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	CreatePSO();
 
 	//Sprite用の頂点リソースを作る
-	vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点4つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
 	//1頂点当たりのサイズ
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//スプライト用の頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
-	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
 	vertexData[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };//左下
 	vertexData[0].texcoord = { 0.0f, 1.0f };
@@ -66,7 +66,7 @@ void ParticleManager::Update(Vector3 EmitPos)
 	
 
 	for (Particle* particle : particles_) {
-		Matrix4x4 worldMatrix = MakeAffineMatrix(particle->transform.scale, particle->transform.rotate, particle->transform.translate);
+		Matrix4x4 worldMatrix = MakeAffineMatrix(particle->transform_.scale, particle->transform_.rotate, particle->transform_.translate);
 		Matrix4x4 worldViewProjectionMatrix;
 		if (camera_) {
 			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -75,16 +75,16 @@ void ParticleManager::Update(Vector3 EmitPos)
 			worldViewProjectionMatrix = worldMatrix;
 		}
 
-		particle->transformationMatrixData->WVP = worldViewProjectionMatrix;
-		particle->transformationMatrixData->World = worldMatrix;
+		particle->transformationMatrixData_->WVP = worldViewProjectionMatrix;
+		particle->transformationMatrixData_->World = worldMatrix;
 
-		particle->limit--;
-		particle->transform.translate += particle->velocity_ * particle->speed_;
+		particle->limit_--;
+		particle->transform_.translate += particle->velocity_ * particle->speed_;
 	}
 
 	//デスフラグの立った敵を削除
 	particles_.remove_if([](Particle* particle) {
-		if (particle->limit  < 0) {
+		if (particle->limit_ < 0) {
 			delete particle;
 			return true;
 		}
@@ -96,22 +96,22 @@ void ParticleManager::Update(Vector3 EmitPos)
 void ParticleManager::Draw()
 {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
-	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature.Get());
-	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState.Get());	//PSOを設定
+	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
+	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());	//PSOを設定
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	//テクスチャを指定
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
 	//Spriteの描画。変更が必要なものだけ変更する
-	directXBasic_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);	//VBVを設定
+	directXBasic_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);	//VBVを設定
 	for (Particle* particle : particles_) {
 		//TransformationMatrixCBufferの場所を設定
-		directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particle->transformationMatrixResource->GetGPUVirtualAddress());
+		directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particle->transformationMatrixResource_->GetGPUVirtualAddress());
 		//マテリアルCBufferの場所を設定
-		directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, particle->materialResource->GetGPUVirtualAddress());
+		directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, particle->materialResource_->GetGPUVirtualAddress());
 		//IBVを設定
-		directXBasic_->GetCommandList()->IASetIndexBuffer(&particle->indexBufferView);
+		directXBasic_->GetCommandList()->IASetIndexBuffer(&particle->indexBufferView_);
 		//描画！(DrawCall/ドローコール)
 		//if (drawSprite) {
 		directXBasic_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
@@ -174,7 +174,7 @@ void ParticleManager::CreatePSO()
 	//バイナリを元に生成
 	hr = directXBasic_->GetDevice()->CreateRootSignature(0,
 		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
-		IID_PPV_ARGS(&rootSignature));
+		IID_PPV_ARGS(&rootSignature_));
 	assert(SUCCEEDED(hr));
 
 	//InputLayout
@@ -236,7 +236,7 @@ void ParticleManager::CreatePSO()
 	assert(pixelShaderBlob != nullptr);
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
-	graphicsPipelineStateDesc.pRootSignature = rootSignature.Get();//RootSignature
+	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
 	graphicsPipelineStateDesc.VS = { vertexShaderBlob->GetBufferPointer(),
 	vertexShaderBlob->GetBufferSize() };//VertexShader
@@ -258,35 +258,35 @@ void ParticleManager::CreatePSO()
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	//実際に生成
 	hr = directXBasic_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-		IID_PPV_ARGS(&graphicsPipelineState));
+		IID_PPV_ARGS(&graphicsPipelineState_));
 	assert(SUCCEEDED(hr));
 }
 
 void ParticleManager::CreateVertexResource()
 {
 	//Sprite用の頂点リソースを作る
-	vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
-	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点4つ分のサイズ
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
 	//1頂点当たりのサイズ
-	vertexBufferView.StrideInBytes = sizeof(VertexData);
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 }
 
 void ParticleManager::Emit(Vector3 position)
 {
-	intervl--;
-	if (intervl <= 0) {
+	intervl_--;
+	if (intervl_ <= 0) {
 		Particle* particle = new Particle();
 		particle->Initialize(directXBasic_);
-		particle->transform.translate = position;
+		particle->transform_.translate = position;
 		particle->velocity_.x = (cosf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
 		particle->velocity_.y = (sinf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
 		particle->velocity_ = Normalize(particle->velocity_);
 		particles_.push_back(particle);
-		intervl = 5;
+		intervl_ = 5;
 	}
 	
 }

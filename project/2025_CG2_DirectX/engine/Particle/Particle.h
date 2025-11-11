@@ -21,23 +21,23 @@ public:
 
 	DirectXBasic* directXBasic_ = nullptr;
 	// WVPリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	// WVPデータ書き込み用
-	TransformationMatrix* transformationMatrixData = nullptr;
+	TransformationMatrix* transformationMatrixData_ = nullptr;
 
-	int32_t limit = 120;
+	int32_t limit_ = 120;
 	// トランスフォーム
-	struct Transform transform { { 0.5f, 0.5f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	struct Transform transform_ { { 0.5f, 0.5f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 
 	// マテリアル
-	Material* materialData = nullptr;
+	Material* materialData_ = nullptr;
 	// マテリアルリソース
-	Comptr<ID3D12Resource> materialResource = nullptr;
+	Comptr<ID3D12Resource> materialResource_ = nullptr;
 
 	// インデックスバッファビュー
-	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
 	// インデックスリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
 
 	Vector3 velocity_{};
 	float speed_ = 0.03f;

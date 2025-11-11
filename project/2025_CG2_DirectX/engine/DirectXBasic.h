@@ -100,6 +100,9 @@ public:
 	/// <summary>
 	/// ディスクリプタヒープの生成
 	/// </summary>
+	/// <param name="heapType">ヒープの種類</param>
+	/// <param name="numDescriptors">numDescriptors</param>
+	/// <param name="shaderVisible">shaderVisible</param>
 	Comptr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
 	/* --------- ゲッター --------- */
@@ -107,37 +110,29 @@ public:
 	/// <summary>
 	/// デバイスのゲッター
 	/// </summary>
-	ID3D12Device* GetDevice() const { return device.Get(); };
+	ID3D12Device* GetDevice() const { return device_.Get(); };
 
 	/// <summary>
 	/// コマンドリストのゲッター
 	/// </summary>
-	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); };
+	ID3D12GraphicsCommandList* GetCommandList() const { return commandList_.Get(); };
 
 	/// <summary>
 	/// フェンスイベントのゲッター
 	/// </summary>
-	HANDLE GetFenceEvent() const { return fenceEvent; };
+	HANDLE GetFenceEvent() const { return fenceEvent_; };
 
 	/// <summary>
 	/// ディスクリプタヒープのゲッター
 	/// </summary>
-	//Comptr<ID3D12DescriptorHeap> GetSRVDescHeap() const { return srvDescriptorHeap; };
-	Comptr<ID3D12DescriptorHeap> GetRTVDescHeap() const { return rtvDescriptorHeap; };
-	Comptr<ID3D12DescriptorHeap> GetDSVDescHeap() const { return dsvDescriptorHeap; };
+	Comptr<ID3D12DescriptorHeap> GetRTVDescHeap() const { return rtvDescriptorHeap_; };
+	Comptr<ID3D12DescriptorHeap> GetDSVDescHeap() const { return dsvDescriptorHeap_; };
 
 	/// <summary>
 	/// ディスクリプタサイズのゲッター
 	/// </summary>
-	//const uint32_t GetSRVHeapSize() const { return descriptorSizeSRV; };
-	const uint32_t GetRTVHeapSize() const { return descriptorSizeRTV; };
-	const uint32_t GetDSVHeapSize() const { return descriptorSizeDSV; };
-
-public:
-
-	/* --------- public変数(定数) --------- */
-
-	
+	const uint32_t GetRTVHeapSize() const { return descriptorSizeRTV_; };
+	const uint32_t GetDSVHeapSize() const { return descriptorSizeDSV_; };
 
 private:
 
@@ -210,63 +205,64 @@ private:
 	// WindowsApi
 	WindowsApi* winApi_ = nullptr;
 
-	//デバイス
-	Comptr<ID3D12Device> device = nullptr;
+	// デバイス
+	Comptr<ID3D12Device> device_ = nullptr;
 
-	//DXGIファクトリー
-	Comptr<IDXGIFactory7> dxgiFactory = nullptr;
+	// DXGIファクトリー
+	Comptr<IDXGIFactory7> dxgiFactory_ = nullptr;
 
-	//コマンドリスト
-	Comptr<ID3D12GraphicsCommandList> commandList = nullptr;
-	//コマンドキュー
-	Comptr<ID3D12CommandQueue> commandQueue = nullptr;
-	//コマンドアロケータ
-	Comptr<ID3D12CommandAllocator> commandAllocator = nullptr;
+	// コマンドリスト
+	Comptr<ID3D12GraphicsCommandList> commandList_ = nullptr;
+	// コマンドキュー
+	Comptr<ID3D12CommandQueue> commandQueue_ = nullptr;
+	// コマンドアロケータ
+	Comptr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
 
-	//スワップチェーン
-	Comptr<IDXGISwapChain4> swapChain = nullptr;
-	DXGI_SWAP_CHAIN_DESC1 swapChainDesc{};
-	Comptr<ID3D12Resource> swapChainResources[2] = { nullptr };
+	// スワップチェーン
+	Comptr<IDXGISwapChain4> swapChain_ = nullptr;
+	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};
+	Comptr<ID3D12Resource> swapChainResources_[2] = { nullptr };
 
-	//フェンス
-	Microsoft::WRL::ComPtr<ID3D12Fence> fence = nullptr;
-	uint64_t fenceValue;
-	HANDLE fenceEvent;
+	// フェンス
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
+	uint64_t fenceValue_;
+	HANDLE fenceEvent_;
 
-	//バリア
+	// バリア
 	D3D12_RESOURCE_BARRIER barrier{};
 
-	//デプスステンシルリソース
-	Comptr<ID3D12Resource> depthStencilResource = nullptr;
+	// デプスステンシルリソース
+	Comptr<ID3D12Resource> depthStencilResource_ = nullptr;
 
-	//RTV
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles[2];
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+	// RTV
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 
-	//DXCコンパイラー
-	IDxcCompiler3* dxcCompiler = nullptr;
-	IDxcUtils* dxcUtils = nullptr;
+	// DXCコンパイラー
+	IDxcCompiler3* dxcCompiler_ = nullptr;
+	IDxcUtils* dxcUtils_ = nullptr;
 
-	//インクルードハンドラー
-	IDxcIncludeHandler* includeHandler = nullptr;
+	// インクルードハンドラー
+	IDxcIncludeHandler* includeHandler_ = nullptr;
 
-	//シザー矩形
-	D3D12_RECT scissorRect{};
-	//ビューポート
-	D3D12_VIEWPORT viewport{};
+	// シザー矩形
+	D3D12_RECT scissorRect_{};
+	// ビューポート
+	D3D12_VIEWPORT viewport_{};
 
-	//ロガー
+	// ロガー
 	Logger* logger_;
 
-	//ディスクリプターのサイズ
-	uint32_t descriptorSizeRTV;
-	uint32_t descriptorSizeDSV;
+	// ディスクリプターのサイズ
+	uint32_t descriptorSizeRTV_;
+	uint32_t descriptorSizeDSV_;
 
-	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
-	Comptr<ID3D12DescriptorHeap> rtvDescriptorHeap = nullptr;
-	//DSV用のヒープでディスクリプタの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
-	Comptr<ID3D12DescriptorHeap> dsvDescriptorHeap = nullptr;
+	// RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
+	Comptr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
+	// DSV用のヒープでディスクリプタの数は1。DSVはShader内で触るものではないので、ShaderVisibleはfalse
+	Comptr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
 
+	// FPS固定システム
 	std::unique_ptr<FixFPS> fixFps_;
 
 };
