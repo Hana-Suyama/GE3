@@ -43,20 +43,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	//SRVの生成
 	directXBasic_->GetDevice()->CreateShaderResourceView(newTex.textureResource_.Get(), &srvDesc, newTex.textureSrvHandleCPU_);
 
-	//textureDatas.insert(newTex);
-
 }
-
-//uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
-//{
-//	if (textureDatas.contains(filePath)) {
-//		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas.begin(), it));
-//		return textureIndex;
-//	}
-//
-//	assert(0);
-//	return 0;
-//}
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath)
 {

@@ -25,7 +25,7 @@ public:
 	/// </summary>
 	/// <param name="spriteBasic">Spriteの基盤</param>
 	/// <param name="textureManager">テクスチャマネージャー</param>
-	void Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager);
+	void Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath);
 
 	/// <summary>
 	///	更新

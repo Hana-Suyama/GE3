@@ -118,6 +118,12 @@ public:
 	ID3D12GraphicsCommandList* GetCommandList() const { return commandList_.Get(); };
 
 	/// <summary>
+	/// コマンドキューのゲッター
+	/// </summary>
+	ID3D12CommandQueue* GetCommandQueue() const { return commandQueue_.Get(); };
+
+
+	/// <summary>
 	/// フェンスイベントのゲッター
 	/// </summary>
 	HANDLE GetFenceEvent() const { return fenceEvent_; };
@@ -133,6 +139,18 @@ public:
 	/// </summary>
 	const uint32_t GetRTVHeapSize() const { return descriptorSizeRTV_; };
 	const uint32_t GetDSVHeapSize() const { return descriptorSizeDSV_; };
+
+	/// <summary>
+	/// スワップチェーンデスクのゲッター
+	/// </summary>
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() const { return swapChainDesc_; };
+
+	UINT GetSwapChainDescBufferCount() const { return swapChainDesc_.BufferCount; };
+
+	/// <summary>
+	/// RTVデスクのゲッター
+	/// </summary>
+	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() const { return rtvDesc_; };
 
 private:
 
@@ -192,11 +210,6 @@ private:
 	/// デプスステンシルビューの生成
 	/// </summary>
 	void CreateDSV();
-
-	/// <summary>
-	/// ImGuiの初期化
-	/// </summary>
-	void ImGuiIni();
 
 private:
 

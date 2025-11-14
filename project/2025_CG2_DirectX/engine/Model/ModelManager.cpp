@@ -106,7 +106,7 @@ uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 }
 
 
-ModelData ModelManager::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+ModelManager::ModelData ModelManager::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
 
 	ModelData modelData;	//構築するModelData
 	std::vector<Vector4> positions;	//位置
@@ -202,7 +202,7 @@ ModelData ModelManager::LoadObjFile(const std::string& directoryPath, const std:
 }
 
 
-MaterialData ModelManager::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName) {
+ModelManager::MaterialData ModelManager::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName) {
 	MaterialData materialData;	//構築するMaterialData
 	std::string line;	//ファイルから読んだ1行を格納するもの
 	std::ifstream file(directoryPath + "/" + filename);	//ファイルを開く

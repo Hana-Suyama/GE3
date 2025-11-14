@@ -3,30 +3,33 @@
 #include "../../../VertexData.h"
 #include "../TextureManager.h"
 
-struct MaterialData {
-	std::string textureFilePath;
-	uint32_t textureIndex;
-};
 
-struct Mesh {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
-	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
-};
-
-struct ModelData {
-	std::vector<Mesh> meshes;
-	std::string mtlFileName;
-	//ファイルパス
-	std::string filePath;
-};
 
 class ModelManager
 {
+public:
+	struct MaterialData {
+		std::string textureFilePath;
+		uint32_t textureIndex;
+	};
+
+	struct Mesh {
+		std::vector<VertexData> vertices;
+		MaterialData material;
+		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
+		D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
+	};
+
+	struct ModelData {
+		std::vector<Mesh> meshes;
+		std::string mtlFileName;
+		//ファイルパス
+		std::string filePath;
+	};
+
 public:
 
 	/* --------- namespace省略 --------- */

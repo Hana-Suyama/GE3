@@ -32,28 +32,16 @@ public:
 	void LoadTexture(const std::string& filePath);
 
 	/// <summary>
-	///	テクスチャの要素番号を返す
+	///	ファイルパスからGPUハンドルを取得
 	/// </summary>
-	/// <param name="filePath">ファイルパス</param>
-	//uint32_t GetTextureIndexByFilePath(const std::string& filePath);
-
-	/// <summary>
-	///	要素番号からGPUハンドルを返す
-	/// </summary>
-	/// <param name="textureIndex">テクスチャの番号</param>
+	/// <param name="filePath">テクスチャのファイルパス</param>
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvHandleGPU(const std::string& filePath);
 
 	/// <summary>
-	///	メタデータを取得
+	///	ファイルパスからメタデータを取得
 	/// </summary>
-	/// <param name="textureIndex">テクスチャの番号</param>
+	/// <param name="filePath">テクスチャのファイルパス</param>
 	const DirectX::TexMetadata& GetMetaData(const std::string& filePath);
-
-	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvIndex(const std::string& filePath);
-
-	/* --------- ゲッター --------- */
-
-	//const D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandleGPU(const int32_t index) const { return textureDatas.at(index).textureSrvHandleGPU; };
 
 private:
 
@@ -72,16 +60,14 @@ private:
 		Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_;
 	};
 
-	/// <summary>
-	///	DirectX基盤のポインタ
-	/// </summary>
+	// DirectX基盤のポインタ
 	DirectXBasic* directXBasic_ = nullptr;
 
+	// SRVマネージャーのポインタ
 	SRVManager* srvManager_ = nullptr;
 
+	// テクスチャデータのmap
 	std::unordered_map<std::string, TextureData> textureDatas_;
 
-	//SRVインデックスを何番から使うか。0番をImGuiに使っているため1番から始める
-	const uint32_t kSRVIndexTop_ = 1;
 };
 

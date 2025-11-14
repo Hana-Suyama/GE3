@@ -1,15 +1,16 @@
 #include "ParticleManager.h"
 #include "../../../VertexData.h"
+#include "../../../TransformationMatrix.h"
 
 using namespace MyMath;
 
 ParticleManager::~ParticleManager()
 {
-	//敵の解放
-	for (Particle* particle : particles_) {
-		delete particle;
-	}
-	particles_.clear();
+	////敵の解放
+	//for (Particle* particle : particles_) {
+	//	delete particle;
+	//}
+	//particles_.clear();
 }
 
 void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvManager, Logger* logger, TextureManager* textureManager, std::string textureFilePath, Camera* camera)
@@ -57,39 +58,92 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	vertexData[3].texcoord = { 1.0f, 0.0f };
 	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
 
+	//Sprite用のindexリソース
+	indexResource_ = directXBasic_->CreateBufferResource(sizeof(uint32_t) * 6);
+	//リソースの先頭のアドレスから使う
+	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
+	//使用するリソースのサイズはインデックス6つ分のサイズ
+	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
+	//インデックスはuint32_tとする
+	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
+	//Sprite用インデックスリソースにデータを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	indexData[0] = 0;
+	indexData[1] = 1;
+	indexData[2] = 2;
+	indexData[3] = 1;
+	indexData[4] = 3;
+	indexData[5] = 2;
+
+	//Sprite用のマテリアルリソースを作る
+	materialResource_ = directXBasic_->CreateBufferResource(sizeof(Material));
+	//Sprite用のマテリアルにデータを書き込む
+	//書き込むためのアドレスを取得
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+	//白
+	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	//SpriteはLightingしないのでfalseを設定する
+	materialData_->enableLighting = Light::None;
+	//UVTransformを単位行列で初期化
+	materialData_->uvTransform = MakeIdentity4x4();
+
+
+	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(TransformationMatrix) * kNumInstance);
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		instancingData[index].WVP = MakeIdentity4x4();
+		instancingData[index].World = MakeIdentity4x4();
+	}
+
+	srvIndex_ = srvManager_->Allocate();
+	srvManager_->CreateSRVforStructuredBuffer(srvIndex_, instancingResource_.Get(), kNumInstance, sizeof(TransformationMatrix));
+	
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		transforms[index].scale = { 1.0f, 1.0f, 1.0f };
+		transforms[index].rotate = { 0.0f, -3.14f ,0.0f };
+		transforms[index].translate = { index * 0.1f, index * 0.1f, index * 0.1f };
+	}
 }
 
 void ParticleManager::Update(Vector3 EmitPos)
 {
 
-	Emit(EmitPos);
-	
-
-	for (Particle* particle : particles_) {
-		Matrix4x4 worldMatrix = MakeAffineMatrix(particle->transform_.scale, particle->transform_.rotate, particle->transform_.translate);
-		Matrix4x4 worldViewProjectionMatrix;
-		if (camera_) {
-			const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-			worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
-		} else {
-			worldViewProjectionMatrix = worldMatrix;
-		}
-
-		particle->transformationMatrixData_->WVP = worldViewProjectionMatrix;
-		particle->transformationMatrixData_->World = worldMatrix;
-
-		particle->limit_--;
-		particle->transform_.translate += particle->velocity_ * particle->speed_;
+	for (uint32_t index = 0; index < kNumInstance; ++index) {
+		Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
+		instancingData[index].WVP = worldViewProjectionMatrix;
+		instancingData[index].World = worldMatrix;
 	}
 
-	//デスフラグの立った敵を削除
-	particles_.remove_if([](Particle* particle) {
-		if (particle->limit_ < 0) {
-			delete particle;
-			return true;
-		}
-		return false;
-		});
+	//Emit(EmitPos);
+	//
+
+	//for (Particle* particle : particles_) {
+	//	Matrix4x4 worldMatrix = MakeAffineMatrix(particle->transform_.scale, particle->transform_.rotate, particle->transform_.translate);
+	//	Matrix4x4 worldViewProjectionMatrix;
+	//	if (camera_) {
+	//		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+	//		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+	//	} else {
+	//		worldViewProjectionMatrix = worldMatrix;
+	//	}
+
+	//	particle->transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	//	particle->transformationMatrixData_->World = worldMatrix;
+
+	//	particle->limit_--;
+	//	particle->transform_.translate += particle->velocity_ * particle->speed_;
+	//}
+
+	////デスフラグの立った敵を削除
+	//particles_.remove_if([](Particle* particle) {
+	//	if (particle->limit_ < 0) {
+	//		delete particle;
+	//		return true;
+	//	}
+	//	return false;
+	//	});
 	
 }
 
@@ -103,24 +157,34 @@ void ParticleManager::Draw()
 
 	//テクスチャを指定
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
+	//テクスチャを指定
+	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(srvIndex_));
 	//Spriteの描画。変更が必要なものだけ変更する
 	directXBasic_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);	//VBVを設定
-	for (Particle* particle : particles_) {
-		//TransformationMatrixCBufferの場所を設定
-		directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particle->transformationMatrixResource_->GetGPUVirtualAddress());
-		//マテリアルCBufferの場所を設定
-		directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, particle->materialResource_->GetGPUVirtualAddress());
-		//IBVを設定
-		directXBasic_->GetCommandList()->IASetIndexBuffer(&particle->indexBufferView_);
-		//描画！(DrawCall/ドローコール)
-		//if (drawSprite) {
-		directXBasic_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
-		//}
-	}
+	//for (Particle* particle : particles_) {
+	//	//TransformationMatrixCBufferの場所を設定
+	//	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(1, particle->transformationMatrixResource_->GetGPUVirtualAddress());
+	//	//マテリアルCBufferの場所を設定
+	//	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, particle->materialResource_->GetGPUVirtualAddress());
+	//	//IBVを設定
+	//	directXBasic_->GetCommandList()->IASetIndexBuffer(&particle->indexBufferView_);
+	//	//描画！(DrawCall/ドローコール)
+	//	//if (drawSprite) {
+	//	directXBasic_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+	//	//}
+	//}
+
+	//マテリアルCBufferの場所を設定
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	//IBVを設定
+	directXBasic_->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+	//描画！(DrawCall/ドローコール)
+	directXBasic_->GetCommandList()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
 }
 
 void ParticleManager::CreatePSO()
 {
+
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
 	descriptionRootSignature.Flags =
@@ -137,9 +201,10 @@ void ParticleManager::CreatePSO()
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;	//レジスタ番号0とバインド
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//CBVを使う
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//CBVを使う
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;	//VertexShaderで使う
-	rootParameters[1].Descriptor.ShaderRegister = 0;	//レジスタ番号0を使う
+	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRange;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange);
 	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//DescriptorTableを使う
 	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
 	rootParameters[2].DescriptorTable.pDescriptorRanges = descriptorRange;	//Tableの中身の配列を指定
@@ -227,11 +292,11 @@ void ParticleManager::CreatePSO()
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Object3D.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Particle.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Object3D.PS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Particle.PS.hlsl",
 		L"ps_6_0", logger_);
 	assert(pixelShaderBlob != nullptr);
 
@@ -277,7 +342,7 @@ void ParticleManager::CreateVertexResource()
 
 void ParticleManager::Emit(Vector3 position)
 {
-	intervl_--;
+	/*intervl_--;
 	if (intervl_ <= 0) {
 		Particle* particle = new Particle();
 		particle->Initialize(directXBasic_);
@@ -287,6 +352,6 @@ void ParticleManager::Emit(Vector3 position)
 		particle->velocity_ = Normalize(particle->velocity_);
 		particles_.push_back(particle);
 		intervl_ = 5;
-	}
+	}*/
 	
 }

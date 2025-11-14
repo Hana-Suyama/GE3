@@ -4,9 +4,6 @@
 #include <string>
 #include <format>
 
-#include "../../externals/imgui/imgui.h"
-#include "../../externals/imgui/imgui_impl_dx12.h"
-#include "../../externals/imgui/imgui_impl_win32.h"
 #include "utility/StringUtility.h"
 
 #pragma comment(lib, "d3d12.lib")
@@ -62,9 +59,6 @@ void DirectXBasic::Initialize(Logger* logger, WindowsApi* winApi)
 
 	//DSVの生成
 	CreateDSV();
-
-	//ImGui
-	ImGuiIni();
 
 }
 
@@ -343,21 +337,6 @@ void DirectXBasic::CreateDSV()
 	//DSVHeapの先頭にDSVをつくる
 	device_->CreateDepthStencilView(depthStencilResource_.Get(), &dsvDesc, GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV_, 0));
 
-}
-
-void DirectXBasic::ImGuiIni()
-{
-	////ImGuiの初期化
-	//IMGUI_CHECKVERSION();
-	//ImGui::CreateContext();
-	//ImGui::StyleColorsDark();
-	//ImGui_ImplWin32_Init(winApi_->GetHwnd());
-	//ImGui_ImplDX12_Init(device.Get(),
-	//	swapChainDesc.BufferCount,
-	//	rtvDesc.Format,
-	//	srvDescriptorHeap.Get(),
-	//	GetCPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0),
-	//	GetGPUDescriptorHandle(srvDescriptorHeap.Get(), descriptorSizeSRV, 0));
 }
 
 void DirectXBasic::PreDraw()

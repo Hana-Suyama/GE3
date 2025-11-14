@@ -16,9 +16,6 @@
 #include <xaudio2.h>
 #include "2025_CG2_DirectX/engine/Input.h"
 #include "2025_CG2_DirectX/engine/utility/Math/MyMath.h"
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
 #include "2025_CG2_DirectX/engine/Debug/DebugCamera.h"
 #include "2025_CG2_DirectX/engine/WindowsApi.h"
 #include "2025_CG2_DirectX/engine/DirectXBasic.h"
@@ -34,6 +31,7 @@
 #include "2025_CG2_DirectX/engine/Object3D/Object3D.h"
 #include "2025_CG2_DirectX/engine/SRVManager.h"
 #include "2025_CG2_DirectX/engine/Particle/ParticleManager.h"
+#include "2025_CG2_DirectX/engine/debug/ImGui/ImGuiManager.h"
 using namespace MyMath;
 
 #pragma comment(lib, "Dbghelp.lib")
@@ -237,6 +235,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	srvManager = new SRVManager();
 	srvManager->Initialize(directXBasic);
 
+	ImGuiManager* imguiManager = nullptr;
+	imguiManager = new ImGuiManager();
+	imguiManager->Initialize(winApi, directXBasic, srvManager);
+
 	//テクスチャマネージャの初期化
 	TextureManager* textureManager = nullptr;
 	textureManager = new TextureManager();
@@ -303,17 +305,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	modelManager->LoadModel("resources", "plane.obj");
 	modelManager->LoadModel("resources", "teapot.obj");
+	modelManager->LoadModel("resources", "fence.obj");
 
 	//sprite
 	Sprite* sprite = nullptr;
 	sprite = new Sprite();
-	sprite->Initialize(spriteBasic, textureManager);
-	sprite->SetTextureFilePath("resources/uvChecker.png");
+	sprite->Initialize(spriteBasic, textureManager, "resources/uvChecker.png");
 
 	Sprite* sprite2 = nullptr;
 	sprite2 = new Sprite();
-	sprite2->Initialize(spriteBasic, textureManager);
-	sprite2->SetTextureFilePath("resources/monsterBall.png");
+	sprite2->Initialize(spriteBasic, textureManager, "resources/monsterBall.png");
 
 	Object3D* object3d = nullptr;
 	object3d = new Object3D();
@@ -321,7 +322,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Object3D* object3dTeapot = nullptr;
 	object3dTeapot = new Object3D();
-	object3dTeapot->Initialize(object3DBasic, modelManager, "resources/teapot.obj");
+	object3dTeapot->Initialize(object3DBasic, modelManager, "resources/fence.obj");
 
 	//DirectionalLight用のリソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = directXBasic->CreateBufferResource(sizeof(DirectionalLight));
@@ -370,7 +371,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 planeScale = object3d->GetTransform().scale;
 
 	Vector3 teapotPosition{};
-	Vector3 teapotRotation{};
+	Vector3 teapotRotation{0.3f, 3.14f, 0.0f};
 	Vector3 teapotScale = object3dTeapot->GetTransform().scale;
 
 	Vector3 EmitterPosition{};
@@ -384,9 +385,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			break;
 		}
 		 
-		/*ImGui_ImplDX12_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();*/
+		imguiManager->UpdateBegin();
 
 		input->Update();
 
@@ -412,40 +411,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		object3d->Update();
 		object3dTeapot->Update();
 
+#ifdef USE_IMGUI
 		////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-		//ImGui::Begin("ImGui");
-		//if (ImGui::TreeNode("Sprite")) {
-		//	//ImGui::Checkbox("drawSprite", &drawSprite);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale), 0, 1000);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition), 0, 1000);
-		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor));
-		//	ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor), -0.5f, 1.5f);
-		//	ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop), 0.0f, 1000.0f);
-		//	ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize), 0.0f, 1000.0f);
-		//	ImGui::Checkbox("FlipX", &spriteFlipX);
-		//	ImGui::Checkbox("FlipY", &spriteFlipY);
-		//	/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Sprite2")) {
-		//	//ImGui::Checkbox("drawSprite", &drawSprite);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale2), 0, 1000);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation2), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition2), 0, 1000);
-		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor2));
-		//	ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor2), -0.5f, 1.5f);
-		//	ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop2), 0.0f, 1000.0f);
-		//	ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize2), 0.0f, 1000.0f);
-		//	ImGui::Checkbox("FlipX", &spriteFlipX2);
-		//	ImGui::Checkbox("FlipY", &spriteFlipY2);
-		//	/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
-		//	ImGui::TreePop();
-		//}
+		ImGui::Begin("ImGui");
+		if (ImGui::TreeNode("Sprite")) {
+			//ImGui::Checkbox("drawSprite", &drawSprite);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale), 0, 1000);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition), 0, 1000);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor));
+			ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor), -0.5f, 1.5f);
+			ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop), 0.0f, 1000.0f);
+			ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize), 0.0f, 1000.0f);
+			ImGui::Checkbox("FlipX", &spriteFlipX);
+			ImGui::Checkbox("FlipY", &spriteFlipY);
+			/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sprite2")) {
+			//ImGui::Checkbox("drawSprite", &drawSprite);
+			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale2), 0, 1000);
+			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation2), -5, 5);
+			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition2), 0, 1000);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor2));
+			ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor2), -0.5f, 1.5f);
+			ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop2), 0.0f, 1000.0f);
+			ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize2), 0.0f, 1000.0f);
+			ImGui::Checkbox("FlipX", &spriteFlipX2);
+			ImGui::Checkbox("FlipY", &spriteFlipY2);
+			/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
+			ImGui::TreePop();
+		}
 		//if (ImGui::TreeNode("plane.obj")) {
 		//	//ImGui::Checkbox("drawPlane", &drawPlane);
 		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&planeScale), -5, 5);
@@ -547,7 +547,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//	ImGui::Text("Gamepad RightJoy : %ld", ((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / static_cast <LONG>(10000.0)));
 		//	ImGui::TreePop();
 		//}*/
-		//ImGui::End();
+		ImGui::End();
+#endif
 
 		if (input->PushKey(DIK_A)) {
 			cameraTransform.translate.x -= 0.05f;
@@ -617,8 +618,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		directionalLightData->direction = Normalize(directionalLightData->direction);
 
-		
-
 		/*Matrix4x4 uvTransformMatrixMultiMaterial1 = MakeScaleMatrix(uvTransformMultiMaterial1.scale);
 		uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeRotateZMatrix(uvTransformMultiMaterial1.rotate.z));
 		uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeTranslateMatrix(uvTransformMultiMaterial1.translate));
@@ -629,8 +628,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeTranslateMatrix(uvTransformMultiMaterial2.translate));
 		materialDatasMultiMaterial[1]->uvTransform = uvTransformMatrixMultiMaterial2;*/
 
-		//ImGuiの内部コマンドを生成する
-		//ImGui::Render();
+		imguiManager->UpdateEnd();
 
 		directXBasic->PreDraw();
 		srvManager->PreDraw();
@@ -647,105 +645,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//object3d->Draw();
 
-		//object3dTeapot->Draw();
+		object3dTeapot->Draw();
 
 		particleManager->Draw();
-
-		////球の描画。変更が必要なものだけ変更する
-		//directXBasic->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewSphere);	//VBVを設定
-		////TransformationMatrixCBufferの場所を設定
-		//directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSphere->GetGPUVirtualAddress());
-		////マテリアルCBufferの場所を設定
-		//directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourceSphere->GetGPUVirtualAddress());
-		////IBVを設定
-		//directXBasic->GetCommandList()->IASetIndexBuffer(&indexBufferViewSphere);
-		//if (drawSphere) {
-		//	directXBasic->GetCommandList()->DrawIndexedInstanced(vertexTotalNumber, 1, 0, 0, 0);
-		//}
-
-		//for (int32_t i = 0; i < modelDataTeapot.mesh.size(); i++) {
-		//	//Utah Teapotのテクスチャ
-		//	directXBasic->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandlesTeapotGPU[i]);
-		//	//Utah Teapotの描画。変更が必要なものだけ変更する
-		//	directXBasic->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewsTeapot[i]);	//VBVを設定
-		//	//TransformationMatrixCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceTeapot->GetGPUVirtualAddress());
-		//	//マテリアルCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourcesTeapot[i]->GetGPUVirtualAddress());
-		//	//IBVを設定
-		//	directXBasic->GetCommandList()->IASetIndexBuffer(&indexBufferViewsTeapot[i]);
-		//	if (drawTeapot) {
-		//		directXBasic->GetCommandList()->DrawIndexedInstanced(UINT(modelDataTeapot.mesh[i].vertices.size()), 1, 0, 0, 0);
-		//	}
-		//}
-
-		//for (int32_t i = 0; i < modelDataBunny.mesh.size(); i++) {
-		//	//Stanford Bunnyのテクスチャ
-		//	directXBasic->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandlesBunnyGPU[i]);
-		//	//Stanford Bunnyの描画。変更が必要なものだけ変更する
-		//	directXBasic->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewsBunny[i]);	//VBVを設定
-		//	//TransformationMatrixCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceBunny->GetGPUVirtualAddress());
-		//	//マテリアルCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourcesBunny[i]->GetGPUVirtualAddress());
-		//	//IBVを設定
-		//	directXBasic->GetCommandList()->IASetIndexBuffer(&indexBufferViewsBunny[i]);
-		//	if (drawBunny) {
-		//		directXBasic->GetCommandList()->DrawIndexedInstanced(UINT(modelDataBunny.mesh[i].vertices.size()), 1, 0, 0, 0);
-		//	}
-		//}
-
-		//for (int32_t i = 0; i < modelDataMultiMesh.mesh.size(); i++) {
-		//	//Multi Meshのテクスチャ
-		//	directXBasic->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandlesMultiMeshGPU[i]);
-		//	//Multi Meshの描画。変更が必要なものだけ変更する
-		//	directXBasic->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewsMultiMesh[i]);	//VBVを設定
-		//	//TransformationMatrixCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceMultiMesh->GetGPUVirtualAddress());
-		//	//マテリアルCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourcesMultiMesh[i]->GetGPUVirtualAddress());
-		//	//IBVを設定
-		//	directXBasic->GetCommandList()->IASetIndexBuffer(&indexBufferViewsMultiMesh[i]);
-		//	if (drawMultiMesh) {
-		//		directXBasic->GetCommandList()->DrawIndexedInstanced(UINT(modelDataMultiMesh.mesh[i].vertices.size()), 1, 0, 0, 0);
-		//	}
-		//}
-
-		//for (int32_t i = 0; i < modelDataMultiMaterial.mesh.size(); i++) {
-		//	//Multi Meshのテクスチャ
-		//	directXBasic->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandlesMultiMaterialGPU[i]);
-		//	//Multi Meshの描画。変更が必要なものだけ変更する
-		//	directXBasic->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewsMultiMaterial[i]);	//VBVを設定
-		//	//TransformationMatrixCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceMultiMaterial->GetGPUVirtualAddress());
-		//	//マテリアルCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourcesMultiMaterial[i]->GetGPUVirtualAddress());
-		//	//IBVを設定
-		//	directXBasic->GetCommandList()->IASetIndexBuffer(&indexBufferViewsMultiMaterial[i]);
-		//	if (drawMultiMaterial) {
-		//		directXBasic->GetCommandList()->DrawIndexedInstanced(UINT(modelDataMultiMaterial.mesh[i].vertices.size()), 1, 0, 0, 0);
-		//	}
-		//}
-
-		//for (int32_t i = 0; i < modelDataSuzanne.mesh.size(); i++) {
-		//	//Suzanneはテクスチャなし
-		//	//Suzanneの描画。変更が必要なものだけ変更する
-		//	directXBasic->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferViewsSuzanne[i]);	//VBVを設定
-		//	//TransformationMatrixCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResourceSuzanne->GetGPUVirtualAddress());
-		//	//マテリアルCBufferの場所を設定
-		//	directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResourcesSuzanne[i]->GetGPUVirtualAddress());
-		//	//IBVを設定
-		//	directXBasic->GetCommandList()->IASetIndexBuffer(&indexBufferViewsSuzanne[i]);
-		//	if (drawSuzanne) {
-		//		directXBasic->GetCommandList()->DrawIndexedInstanced(UINT(modelDataSuzanne.mesh[i].vertices.size()), 1, 0, 0, 0);
-		//	}
-		//}
-
 		
-
-		//実際のcommandListのImGuiの描画コマンドを積む
-		//ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), directXBasic->GetCommandList());
+		imguiManager->Draw();
 
 		directXBasic->PostDraw();
 		
@@ -757,10 +661,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//COMの終了処理
 	CoUninitialize();
 
-	////ImGuiの終了処理
-	//ImGui_ImplDX12_Shutdown();
-	//ImGui_ImplWin32_Shutdown();
-	//ImGui::DestroyContext();
+	imguiManager->Finalize();
 
 	//解放処理
 	delete debugcamera;
@@ -784,6 +685,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	SoundUnload(&soundData1);
 	delete modelManager;
 	delete textureManager;
+	delete imguiManager;
 	delete srvManager;
 	delete directXBasic;
 	delete winApi;

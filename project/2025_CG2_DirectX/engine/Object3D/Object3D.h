@@ -98,7 +98,7 @@ private:
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 
 	// 描画するモデルのポインタ
-	ModelData* modelData_ = nullptr;
+	ModelManager::ModelData* modelData_ = nullptr;
 
 	// トランスフォーム
 	struct Transform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };

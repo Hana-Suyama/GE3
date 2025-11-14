@@ -326,3 +326,5 @@ FodyWeavers.xsd
 
 *.dmp
 /Dumps
+
+imgui.ini

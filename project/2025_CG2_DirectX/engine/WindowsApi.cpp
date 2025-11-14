@@ -1,9 +1,11 @@
 #include "WindowsApi.h"
-#include "../../externals/imgui/imgui.h"
+#include "debug/ImGui/ImGuiManager.h"
 
 #pragma comment(lib, "winmm.lib")
 
+#ifdef USE_IMGUI
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 
 void WindowsApi::Initialize(){
 
@@ -71,9 +73,11 @@ bool WindowsApi::ProcessMessage()
 //ウィンドウプロシージャ
 LRESULT CALLBACK WindowsApi::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
+#ifdef USE_IMGUI
 	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
 		return true;
 	}
+#endif
 
 	//メッセージに応じてゲーム固有の処理を行う
 	switch (msg) {

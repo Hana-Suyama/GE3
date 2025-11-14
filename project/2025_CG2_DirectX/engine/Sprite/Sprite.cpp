@@ -3,12 +3,14 @@
 
 using namespace MyMath;
 
-void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager)
+void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath)
 {
 
 	spriteBasic_ = spriteBasic;
 
 	textureManager_ = textureManager;
+
+	textureFilePath_ = textureFilePath;
 
 	//textureIndex = textureManager_->GetTextureIndexByFilePath(textureFilePath);
 

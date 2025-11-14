@@ -2,6 +2,8 @@
 #include "../Camera/Camera.h"
 #include "../TextureManager.h"
 #include "Particle.h"
+#include "../../../Material.h"
+#include "../../../TransformationMatrix.h"
 
 class ParticleManager
 {
@@ -65,11 +67,30 @@ private:
 
 	std::string textureFilePath_;
 
-	std::list<Particle*> particles_;
+	//std::list<Particle*> particles_;
 
 	Camera* camera_ = nullptr;
 
 	uint32_t intervl_ = 5;
+
+	static const uint32_t kNumInstance = 10;
+	// インスタンシング用リソース
+	Comptr<ID3D12Resource> instancingResource_ = nullptr;
+
+	struct Transform transforms[kNumInstance];
+	TransformationMatrix* instancingData = nullptr;
+	uint32_t srvIndex_ = 0;
+
+	// インデックスバッファビュー
+	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
+	// インデックスリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
+	
+	// マテリアル
+	Material* materialData_ = nullptr;
+	// マテリアルリソース
+	Comptr<ID3D12Resource> materialResource_ = nullptr;
+
 
 };
 

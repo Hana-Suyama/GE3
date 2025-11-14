@@ -12,6 +12,13 @@ public:
 
 public:
 
+	/* --------- 定数 --------- */
+
+	//SRVの上限数
+	const uint32_t kMaxSRV_ = 128;
+
+public:
+
 	/* --------- public関数 --------- */
 
 	/// <summary>
@@ -20,33 +27,69 @@ public:
 	/// <param name="directXBasic">DirectXの基盤</param>
 	void Initialize(DirectXBasic* directXBasic);
 
-
-	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
-	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
-
-	void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels);
-
-	void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
-
+	/// <summary>
+	///	ヒープをセット
+	/// </summary>
 	void PreDraw();
 
+	/// <summary>
+	///	Texture2D用のSRVを生成
+	/// </summary>
+	void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format, UINT MipLevels);
+
+	/// <summary>
+	///	StructuredBuffer用のSRVを生成
+	/// </summary>
+	void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
+
+	/// <summary>
+	///	SRVヒープをセット
+	/// </summary>
 	void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex);
 
+	/// <summary>
+	///	SRV確保可能チェック
+	/// </summary>
+	/// <param name="index">テクスチャ枚数</param>
 	bool AllocateRimitChack(uint32_t index);
 
+	/// <summary>
+	///	SRVインデックスを確保
+	/// </summary>
 	uint32_t Allocate();
 
-	//SRVの上限数
-	const uint32_t kMaxSRV_ = 128;
+	/// <summary>
+	/// SRVのCPUディスクリプタハンドルを取得
+	/// </summary>
+	/// <param name="index">インデックス</param>
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUDescriptorHandle(uint32_t index);
+
+	/// <summary>
+	/// SRVのGPUディスクリプタハンドルを取得
+	/// </summary>
+	/// <param name="index">インデックス</param>
+	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUDescriptorHandle(uint32_t index);
+
+	/* --------- ゲッター --------- */
+
+	/// <summary>
+	/// ディスクリプタヒープのゲッター
+	/// </summary>
+	ID3D12DescriptorHeap* GetDescriptorHeap() const { return descriptorHeap_.Get(); };
 
 private:
+
+	/* --------- private変数 --------- */
+
+	// DirectX基盤のポインタ
 	DirectXBasic* directXBasic_ = nullptr;
 
+	// SRV用のヒープ
+	Comptr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
+	// ディスクリプターのサイズ
 	uint32_t descriptorSize_;
 
-	//SRV用のヒープでディスクリプタの数は128。SRVはShader内で触るものなので、ShaderVisibleはtrue
-	Comptr<ID3D12DescriptorHeap> descriptorHeap_ = nullptr;
-
+	// 使われているSRVインデックス
 	uint32_t useIndex_ = 0;
 
 };
