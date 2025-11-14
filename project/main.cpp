@@ -346,7 +346,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	bool playSound = false;
 
-	Vector3 spritePosition{};
+	Vector3 spritePosition{100.0f, 100.0f, 0.0f};
 	Vector3 spriteRotation{};
 	Vector3 spriteScale = sprite->GetTransform().scale;
 	Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -413,39 +413,41 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 #ifdef USE_IMGUI
 		////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
+		ImGui::SetNextWindowSize({500.0f, 100.0f});
 		ImGui::Begin("ImGui");
-		if (ImGui::TreeNode("Sprite")) {
-			//ImGui::Checkbox("drawSprite", &drawSprite);
-			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale), 0, 1000);
-			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation), -5, 5);
-			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition), 0, 1000);
-			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor));
-			ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor), -0.5f, 1.5f);
-			ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop), 0.0f, 1000.0f);
-			ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize), 0.0f, 1000.0f);
-			ImGui::Checkbox("FlipX", &spriteFlipX);
-			ImGui::Checkbox("FlipY", &spriteFlipY);
-			/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
-			ImGui::TreePop();
-		}
-		if (ImGui::TreeNode("Sprite2")) {
-			//ImGui::Checkbox("drawSprite", &drawSprite);
-			ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale2), 0, 1000);
-			ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation2), -5, 5);
-			ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition2), 0, 1000);
-			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor2));
-			ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor2), -0.5f, 1.5f);
-			ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop2), 0.0f, 1000.0f);
-			ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize2), 0.0f, 1000.0f);
-			ImGui::Checkbox("FlipX", &spriteFlipX2);
-			ImGui::Checkbox("FlipY", &spriteFlipY2);
-			/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-			ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-			ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
-			ImGui::TreePop();
-		}
+		ImGui::SliderFloat2("Position", reinterpret_cast<float*>(&spritePosition), 0, 1000, "%5.1f");
+		//if (ImGui::TreeNode("Sprite")) {
+		//	//ImGui::Checkbox("drawSprite", &drawSprite);
+		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale), 0, 1000);
+		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation), -5, 5);
+		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition), 0, 1000);
+		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor));
+		//	ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor), -0.5f, 1.5f);
+		//	ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop), 0.0f, 1000.0f);
+		//	ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize), 0.0f, 1000.0f);
+		//	ImGui::Checkbox("FlipX", &spriteFlipX);
+		//	ImGui::Checkbox("FlipY", &spriteFlipY);
+		//	/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
+		//	ImGui::TreePop();
+		//}
+		//if (ImGui::TreeNode("Sprite2")) {
+		//	//ImGui::Checkbox("drawSprite", &drawSprite);
+		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale2), 0, 1000);
+		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation2), -5, 5);
+		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition2), 0, 1000);
+		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor2));
+		//	ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor2), -0.5f, 1.5f);
+		//	ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop2), 0.0f, 1000.0f);
+		//	ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize2), 0.0f, 1000.0f);
+		//	ImGui::Checkbox("FlipX", &spriteFlipX2);
+		//	ImGui::Checkbox("FlipY", &spriteFlipY2);
+		//	/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
+		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
+		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
+		//	ImGui::TreePop();
+		//}
 		//if (ImGui::TreeNode("plane.obj")) {
 		//	//ImGui::Checkbox("drawPlane", &drawPlane);
 		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&planeScale), -5, 5);
@@ -579,7 +581,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		camera->SetTranslate(cameraTransform.translate);
 		camera->SetRotate(cameraTransform.rotate);
 
-		spritePosition.x += 3.0f;
+		//spritePosition.x += 3.0f;
 		sprite->SetTranslate(spritePosition);
 		sprite->SetRotate(spriteRotation);
 		sprite->SetScale(spriteScale);
@@ -638,16 +640,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//directionalLight用のCBufferの場所を設定
 		directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
-		/*sprite->Draw();
-		sprite2->Draw();*/
+		sprite->Draw();
+		//sprite2->Draw();
 
 		object3DBasic->Object3DPreDraw();
 
 		//object3d->Draw();
 
-		object3dTeapot->Draw();
+		//object3dTeapot->Draw();
 
-		particleManager->Draw();
+		//particleManager->Draw();
 		
 		imguiManager->Draw();
 
