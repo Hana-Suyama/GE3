@@ -4,6 +4,33 @@
 #include "Particle.h"
 #include "../../../Material.h"
 #include "../../../TransformationMatrix.h"
+#include <random>
+
+struct Particle {
+	struct Transform transform;
+	Vector3 velocity;
+	Vector4 color;
+	float lifeTime;
+	float currentTime;
+};
+
+struct ParticleForGPU {
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+	Vector4 color;
+};
+
+struct Emitter {
+	struct Transform transform;
+	uint32_t count;
+	float frequency;
+	float frequencyTime;
+};
+
+struct AccelerationField {
+	Vector3 acceleration;
+	MyMath::AABB area;
+};
 
 class ParticleManager
 {
@@ -22,7 +49,7 @@ public:
 	/// <summary>
 	///	更新
 	/// </summary>
-	void Update(Vector3 EmitPos);
+	void Update(Vector3 EmitPos, std::mt19937& randomEngine);
 
 	/// <summary>
 	///	描画
@@ -36,7 +63,11 @@ public:
 
 	void CreateVertexResource();
 
-	void Emit(Vector3 position);
+	std::list<Particle> Emit(const Emitter& emitter, std::mt19937& randomEngine);
+
+	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate);
+
+	bool IsCollision(const MyMath::AABB& aabb, const Vector3& point);
 
 private:
 	DirectXBasic* directXBasic_ = nullptr;
@@ -73,12 +104,13 @@ private:
 
 	uint32_t intervl_ = 5;
 
-	static const uint32_t kNumInstance = 10;
+	static const uint32_t kNumMaxInstance = 100;
+	uint32_t numInstance = 0;
 	// インスタンシング用リソース
 	Comptr<ID3D12Resource> instancingResource_ = nullptr;
 
-	struct Transform transforms[kNumInstance];
-	TransformationMatrix* instancingData = nullptr;
+	std::list<Particle> particles;
+	ParticleForGPU* instancingData = nullptr;
 	uint32_t srvIndex_ = 0;
 
 	// インデックスバッファビュー
@@ -91,6 +123,9 @@ private:
 	// マテリアルリソース
 	Comptr<ID3D12Resource> materialResource_ = nullptr;
 
+	const float kDeltaTime = 1.0f / 60.0f;
 
+	Emitter emitter{};
+	AccelerationField accelerationField;
 };
 

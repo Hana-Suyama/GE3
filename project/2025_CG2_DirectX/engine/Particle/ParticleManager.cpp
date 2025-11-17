@@ -1,6 +1,8 @@
 #include "ParticleManager.h"
 #include "../../../VertexData.h"
 #include "../../../TransformationMatrix.h"
+#include <numbers>
+#include "../debug/ImGui/ImGuiManager.h"
 
 using namespace MyMath;
 
@@ -27,8 +29,6 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 
 	//引数のロガーポインタを記録
 	logger_ = logger;
-
-	srand((unsigned)time(NULL));
 
 	CreatePSO();
 
@@ -89,32 +89,96 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	materialData_->uvTransform = MakeIdentity4x4();
 
 
-	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(TransformationMatrix) * kNumInstance);
+	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 		instancingData[index].WVP = MakeIdentity4x4();
 		instancingData[index].World = MakeIdentity4x4();
+		instancingData[index].color = Vector4( 1.0f, 1.0f, 1.0f, 1.0f );
 	}
 
 	srvIndex_ = srvManager_->Allocate();
-	srvManager_->CreateSRVforStructuredBuffer(srvIndex_, instancingResource_.Get(), kNumInstance, sizeof(TransformationMatrix));
+	srvManager_->CreateSRVforStructuredBuffer(srvIndex_, instancingResource_.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
 	
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		transforms[index].scale = { 1.0f, 1.0f, 1.0f };
-		transforms[index].rotate = { 0.0f, -3.14f ,0.0f };
-		transforms[index].translate = { index * 0.1f, index * 0.1f, index * 0.1f };
-	}
+	/*for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+		particles[index] = MakeNewParticle(randomEngine);
+	}*/
+
+	emitter.count = 3;
+	emitter.frequency = 0.5f;
+	emitter.frequencyTime = 0.0f;
+
+	emitter.transform.translate = { 0.0f, 0.0f, 0.0f };
+	emitter.transform.rotate = { 0.0f, 0.0f, 0.0f };
+	emitter.transform.scale = { 1.0f, 1.0f, 1.0f };
+
+	accelerationField.acceleration = { 15.0f, 0.0f, 0.0f };
+	accelerationField.area.min = { -1.0f, -1.0f, -1.0f };
+	accelerationField.area.max = { 1.0f, 1.0f, 1.0f };
+	
 }
 
-void ParticleManager::Update(Vector3 EmitPos)
+void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 {
 
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		Matrix4x4 worldMatrix = MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
-		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
-		instancingData[index].WVP = worldViewProjectionMatrix;
-		instancingData[index].World = worldMatrix;
+	emitter.frequencyTime += kDeltaTime;
+	if (emitter.frequency <= emitter.frequencyTime) {
+		particles.splice(particles.end(), Emit(emitter, randomEngine));
+		emitter.frequencyTime -= emitter.frequency;
 	}
+
+#ifdef USE_IMGUI
+	ImGui::Begin("Particle");
+	if (ImGui::Button("Add Particle")) {
+		particles.splice(particles.end(), Emit(emitter, randomEngine));
+	}
+	ImGui::End();
+
+	ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
+#endif
+
+	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, camera_->GetViewMatrix());
+	billboardMatrix.m[3][0] = 0.0f;
+	billboardMatrix.m[3][1] = 0.0f;
+	billboardMatrix.m[3][2] = 0.0f;
+
+	numInstance = 0;
+
+	for (std::list<Particle>::iterator particleIterator = particles.begin();
+		particleIterator != particles.end();) {
+
+		if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
+			particleIterator = particles.erase(particleIterator);
+			continue;
+		}
+
+		//Matrix4x4 worldMatrix = MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
+
+		Matrix4x4 worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
+		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
+
+		if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
+			(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;
+		}
+		(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
+		(*particleIterator).currentTime += kDeltaTime;
+
+		if (numInstance < kNumMaxInstance) {
+			instancingData[numInstance].WVP = worldViewProjectionMatrix;
+			instancingData[numInstance].World = worldMatrix;
+			instancingData[numInstance].color = (*particleIterator).color;
+
+			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+			instancingData[numInstance].color.w = alpha;
+
+			++numInstance;
+		}
+
+		++particleIterator;
+	}
+
+		
 
 	//Emit(EmitPos);
 	//
@@ -179,7 +243,7 @@ void ParticleManager::Draw()
 	//IBVを設定
 	directXBasic_->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 	//描画！(DrawCall/ドローコール)
-	directXBasic_->GetCommandList()->DrawIndexedInstanced(6, kNumInstance, 0, 0, 0);
+	directXBasic_->GetCommandList()->DrawIndexedInstanced(6, numInstance, 0, 0, 0);
 }
 
 void ParticleManager::CreatePSO()
@@ -287,7 +351,7 @@ void ParticleManager::CreatePSO()
 	//Depthの機能を有効化する
 	depthStencilDesc.DepthEnable = true;
 	//書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	//比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
@@ -340,18 +404,61 @@ void ParticleManager::CreateVertexResource()
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 }
 
-void ParticleManager::Emit(Vector3 position)
+std::list<Particle> ParticleManager::Emit(const Emitter& emitter, std::mt19937& randomEngine)
 {
-	/*intervl_--;
-	if (intervl_ <= 0) {
-		Particle* particle = new Particle();
-		particle->Initialize(directXBasic_);
-		particle->transform_.translate = position;
-		particle->velocity_.x = (cosf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
-		particle->velocity_.y = (sinf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
-		particle->velocity_ = Normalize(particle->velocity_);
-		particles_.push_back(particle);
-		intervl_ = 5;
-	}*/
+	std::list<Particle> particles;
+	for (uint32_t count = 0; count < emitter.count; ++count) {
+		particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
+	}
+	return particles;
+}
+
+//void ParticleManager::Emit(Vector3 position)
+//{
+//	/*intervl_--;
+//	if (intervl_ <= 0) {
+//		Particle* particle = new Particle();
+//		particle->Initialize(directXBasic_);
+//		particle->transform_.translate = position;
+//		particle->velocity_.x = (cosf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
+//		particle->velocity_.y = (sinf(DEGtoRAD(static_cast<float>(rand() % 360))) * 1.0f);
+//		particle->velocity_ = Normalize(particle->velocity_);
+//		particles_.push_back(particle);
+//		intervl_ = 5;
+//	}*/
+//	
+//}
+
+Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate)
+{
+	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	Particle particle;
+	particle.transform.scale = { 1.0f, 1.0f, 1.0f };
+	particle.transform.rotate = { 0.0f, -3.14f ,0.0f };
+	Vector3 randomTranslate{ distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
+	particle.transform.translate = translate + randomTranslate;
+	particle.velocity = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
 	
+	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
+	particle.color = { distColor(randomEngine),distColor(randomEngine), distColor(randomEngine), 1.0f };
+
+	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
+	particle.lifeTime = distTime(randomEngine);
+	particle.currentTime = 0;
+
+	return particle;
+}
+
+bool ParticleManager::IsCollision(const MyMath::AABB& aabb, const Vector3& point)
+{
+	Vector3 closestPoint{ std::clamp(point.x, aabb.min.x, aabb.max.x),
+		std::clamp(point.y, aabb.min.y, aabb.max.y),
+		std::clamp(point.z, aabb.min.z, aabb.max.z) };
+
+	float distance = Length(closestPoint, point);
+
+	if (distance <= 1.0f) {
+		return true;
+	}
+	return false;
 }

@@ -32,6 +32,7 @@
 #include "2025_CG2_DirectX/engine/SRVManager.h"
 #include "2025_CG2_DirectX/engine/Particle/ParticleManager.h"
 #include "2025_CG2_DirectX/engine/debug/ImGui/ImGuiManager.h"
+#include <random>
 using namespace MyMath;
 
 #pragma comment(lib, "Dbghelp.lib")
@@ -376,6 +377,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 EmitterPosition{};
 
+	std::random_device seedGenerator;
+	std::mt19937 randomEngine(seedGenerator());
+
 	//ウィンドウの×ボタンが押されるまでループ
 	while (true) {
 		
@@ -403,7 +407,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		camera->Update();
 
-		particleManager->Update(EmitterPosition);
+		particleManager->Update(EmitterPosition, randomEngine);
 
 		sprite->Update();
 		sprite2->Update();
@@ -640,7 +644,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//directionalLight用のCBufferの場所を設定
 		directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
-		sprite->Draw();
+		//sprite->Draw();
 		//sprite2->Draw();
 
 		object3DBasic->Object3DPreDraw();
@@ -649,7 +653,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//object3dTeapot->Draw();
 
-		//particleManager->Draw();
+		particleManager->Draw();
 		
 		imguiManager->Draw();
 
