@@ -104,7 +104,7 @@ private:
 
 	uint32_t intervl_ = 5;
 
-	static const uint32_t kNumMaxInstance = 100;
+	static const uint32_t kNumMaxInstance = 1000;
 	uint32_t numInstance = 0;
 	// インスタンシング用リソース
 	Comptr<ID3D12Resource> instancingResource_ = nullptr;
@@ -127,5 +127,7 @@ private:
 
 	Emitter emitter{};
 	AccelerationField accelerationField;
+
+	bool isBillboard = true;
 };
 

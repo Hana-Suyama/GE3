@@ -1,22 +1,17 @@
 #include "Sprite.h"
 #include "../../../externals/DirectXTex/DirectXTex.h"
+#include "..//debug/ImGui/ImGuiManager.h"
 
 using namespace MyMath;
 
 void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath)
 {
-
+	// 引数(ポインタ)をメンバ変数に記録
 	spriteBasic_ = spriteBasic;
-
 	textureManager_ = textureManager;
-
 	textureFilePath_ = textureFilePath;
 
-	//textureIndex = textureManager_->GetTextureIndexByFilePath(textureFilePath);
-
 	CreateVertexResource();
-
-	CreateVertexData();
 
 	CreateMaterialResource();
 
@@ -31,6 +26,93 @@ void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager
 }
 
 void Sprite::Update()
+{
+	// トランスフォームに座標、回転、サイズをセット
+	transform_.translate = { position_.x, position_.y, 0.0f };
+	transform_.rotate = { 0.0f, 0.0f, rotation_ };
+	transform_.scale = { size_.x, size_.y, 1.0f };
+
+	// UVトランスフォームに座標、回転、サイズをセット
+	uvTransform_.translate = { uvPosition_.x, uvPosition_.y, 0.0f };
+	uvTransform_.rotate = { 0.0f, 0.0f, uvRotation_ };
+	uvTransform_.scale = { uvSize_.x, uvSize_.y, 1.0f };
+
+	CreateVertexData();
+
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 viewMatrix = MakeIdentity4x4();
+	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsApi::kClientWidth), float(WindowsApi::kClientHeight), 0.0f, 100.0f);
+	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	transformationMatrixData_->World = worldMatrix;
+
+	//パラメータからUVTransform用の行列を生成する
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform_.scale);
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform_.rotate.z));
+	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform_.translate));
+	materialData_->uvTransform = uvTransformMatrix;
+}
+
+void Sprite::Draw()
+{
+	// 表示フラグがオフなら早期リターン
+	if (!isDraw_) { return; }
+
+	// テクスチャを指定
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
+	// Spriteの描画。変更が必要なものだけ変更する
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);	//VBVを設定
+	// TransformationMatrixCBufferの場所を設定
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
+	// マテリアルCBufferの場所を設定
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+	// IBVを設定
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
+	// 描画！(DrawCall/ドローコール)
+	spriteBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
+
+void Sprite::DebugDraw(std::string rabel)
+{
+#ifdef USE_IMGUI
+	if (ImGui::TreeNode(rabel.c_str())) {
+		ImGui::Checkbox("isDraw", &isDraw_);
+		ImGui::SliderFloat2("Size", reinterpret_cast<float*>(&size_), 0, 1000);
+		ImGui::SliderAngle("Rotate", reinterpret_cast<float*>(&rotation_));
+		ImGui::SliderFloat2("Position", reinterpret_cast<float*>(&position_), 0, 1000);
+		ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&materialData_->color));
+		ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&anchorPoint_), -0.5f, 1.5f);
+		ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&textureLeftTop_), 0.0f, 1000.0f);
+		ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&textureSize_), 0.0f, 1000.0f);
+		ImGui::Checkbox("FlipX", &isFlipX_);
+		ImGui::Checkbox("FlipY", &isFlipY_);
+		ImGui::DragFloat2("UVTranslate", &uvPosition_.x, 0.01f, -10.0f, 10.0f);
+		ImGui::DragFloat2("UVScale", &uvSize_.x, 0.01f, -10.0f, 10.0f);
+		ImGui::SliderAngle("UVRotate", &uvRotation_);
+		ImGui::TreePop();
+	}
+#endif
+}
+
+void Sprite::SetTextureFilePath(std::string textureFilePath)
+{
+	textureFilePath_ = textureFilePath;
+}
+
+void Sprite::CreateVertexResource()
+{
+	// Sprite用の頂点リソースを作る
+	vertexResource_ = spriteBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(VertexData) * 4);
+	// スプライト用頂点バッファビューを作成する
+	// リソースの先頭のアドレスから使う
+	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
+	// 使用するリソースのサイズは頂点4つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	// 1頂点当たりのサイズ
+	vertexBufferView_.StrideInBytes = sizeof(VertexData);
+}
+
+void Sprite::CreateVertexData()
 {
 	//スプライト用の頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
@@ -70,101 +152,46 @@ void Sprite::Update()
 	vertexData[3].position = { right, top, 0.0f, 1.0f };//右上
 	vertexData[3].texcoord = { tex_right, tex_top };
 	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
-
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 viewMatrix = MakeIdentity4x4();
-	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsApi::kClientWidth), float(WindowsApi::kClientHeight), 0.0f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	transformationMatrixData_->WVP = worldViewProjectionMatrix;
-	transformationMatrixData_->World = worldMatrix;
-
-	//パラメータからUVTransform用の行列を生成する
-	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform_.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform_.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform_.translate));
-	materialData_->uvTransform = uvTransformMatrix;
-}
-
-void Sprite::Draw()
-{
-
-	//テクスチャを指定
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
-	//Spriteの描画。変更が必要なものだけ変更する
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);	//VBVを設定
-	//TransformationMatrixCBufferの場所を設定
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
-	//マテリアルCBufferの場所を設定
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	//IBVを設定
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
-	//描画！(DrawCall/ドローコール)
-	//if (drawSprite) {
-	spriteBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
-	//}
-}
-
-void Sprite::SetTextureFilePath(std::string textureFilePath)
-{
-	textureFilePath_ = textureFilePath;
-}
-
-void Sprite::CreateVertexResource()
-{
-	//Sprite用の頂点リソースを作る
-	vertexResource_ = spriteBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(VertexData) * 4);
-	//スプライト用頂点バッファビューを作成する
-	//リソースの先頭のアドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点4つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
-	//1頂点当たりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
-}
-
-void Sprite::CreateVertexData()
-{
-	
 }
 
 void Sprite::CreateMaterialResource()
 {
-	//Sprite用のマテリアルリソースを作る
+	// Sprite用のマテリアルリソースを作る
 	materialResource_ = spriteBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(Material));
-	//Sprite用のマテリアルにデータを書き込む
-	//書き込むためのアドレスを取得
+	// Sprite用のマテリアルにデータを書き込む
+	// 書き込むためのアドレスを取得
 	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-	//白
+	// 白
 	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	//SpriteはLightingしないのでfalseを設定する
+	// SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = Light::None;
-	//UVTransformを単位行列で初期化
+	// UVTransformを単位行列で初期化
 	materialData_->uvTransform = MakeIdentity4x4();
 }
 
 void Sprite::CreateTransformationMatrixResource()
 {
-	//Sprite用のTransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
+	// Sprite用のTransformationMatrix用のリソースを作る。TransformationMatrix 1つ分のサイズを用意する
 	transformationMatrixResource_ = spriteBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(TransformationMatrix));
-	//データを書き込む
-	//書き込むためのアドレスを取得
+	// データを書き込む
+	// 書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
-	//単位行列を書き込んでおく
+	// 単位行列を書き込んでおく
 	transformationMatrixData_->WVP = MakeIdentity4x4();
 	transformationMatrixData_->World = MakeIdentity4x4();
 }
 
 void Sprite::CreateIndexResource()
 {
-	//Sprite用のindexリソース
+	// Sprite用のindexリソース
 	indexResource_ = spriteBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(uint32_t) * 6);
-	//リソースの先頭のアドレスから使う
+	// リソースの先頭のアドレスから使う
 	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズはインデックス6つ分のサイズ
+	// 使用するリソースのサイズはインデックス6つ分のサイズ
 	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	//インデックスはuint32_tとする
+	// インデックスはuint32_tとする
 	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
-	//Sprite用インデックスリソースにデータを書き込む
+	// Sprite用インデックスリソースにデータを書き込む
 	uint32_t* indexData = nullptr;
 	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
 	indexData[0] = 0;
@@ -177,9 +204,10 @@ void Sprite::CreateIndexResource()
 
 void Sprite::CreateTransform()
 {
+	// Transformを作る
 	transform_ = { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 
-	//UVTransform変数を作る
+	// UVTransform変数を作る
 	uvTransform_ = {
 		{ 1.0f, 1.0f, 1.0f },
 		{ 0.0f, 0.0f, 0.0f },
@@ -194,7 +222,7 @@ void Sprite::AdjustTextureSize()
 	textureSize_.x = static_cast<float>(metadata.width);
 	textureSize_.y = static_cast<float>(metadata.height);
 
-	transform_.scale.x = textureSize_.x;
-	transform_.scale.y = textureSize_.y;
+	size_.x = textureSize_.x;
+	size_.y = textureSize_.y;
 }
 

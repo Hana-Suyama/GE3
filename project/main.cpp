@@ -1,4 +1,3 @@
-#define _USE_MATH_DEFINES
 #include "cmath"
 #include <Windows.h>
 #include <cstdint>
@@ -13,7 +12,6 @@
 #include <dxgidebug.h>
 #include <vector>
 #include <wrl.h>
-#include <xaudio2.h>
 #include "2025_CG2_DirectX/engine/Input.h"
 #include "2025_CG2_DirectX/engine/utility/Math/MyMath.h"
 #include "2025_CG2_DirectX/engine/Debug/DebugCamera.h"
@@ -33,11 +31,12 @@
 #include "2025_CG2_DirectX/engine/Particle/ParticleManager.h"
 #include "2025_CG2_DirectX/engine/debug/ImGui/ImGuiManager.h"
 #include <random>
+#include "2025_CG2_DirectX/engine/Audio/XAudio2Basic.h"
+#include "2025_CG2_DirectX/application/GameScene.h"
 using namespace MyMath;
 
 #pragma comment(lib, "Dbghelp.lib")
 #pragma comment(lib, "dxguid.lib")
-#pragma comment(lib, "xaudio2.lib")
 
 struct DirectionalLight {
 	Vector4 color; //!< ライトの色
@@ -45,29 +44,8 @@ struct DirectionalLight {
 	float intensity; //!< 輝度
 };
 
-//チャンクヘッダ
-struct ChunkHeader {
-	char id[4];	//チャンク毎のID
-	int32_t size;	//チャンクのサイズ
-};
-
-//RIFFヘッダチャンク
-struct RiffHeader {
-	ChunkHeader chunk;	//"RIFF"
-	char type[4];	//"WAVE"
-};
-
-//FMTチャンク
-struct FormatChunk {
-	ChunkHeader chunk;	//"fmt"
-	WAVEFORMATEX fmt;	//波形フォーマット
-};
-
-//音声データ
-struct SoundData {
-	WAVEFORMATEX wfex;	//波形フォーマット
-	BYTE* pBuffer;	//バッファの先頭アドレス
-	unsigned int bufferSize;	//バッファのサイズ
+struct CameraForGPU {
+	Vector3 worldPosition;
 };
 
 struct D3DResourceLeakChecker {
@@ -104,108 +82,10 @@ static LONG WINAPI ExportDump(EXCEPTION_POINTERS* exception) {
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-SoundData SoundLoadWave(const char* filename) {
-	//ファイル入力ストリームのインスタンス
-	std::ifstream file;
-	// .wavファイルをバイナリモードで開く
-	file.open(filename, std::ios_base::binary);
-	//ファイルオープン失敗を検出する
-	assert(file.is_open());
-
-	//RIFFヘッダーの読み込み
-	RiffHeader riff;
-	file.read((char*)&riff, sizeof(riff));
-	//ファイルがRIFFかチェック
-	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
-		assert(0);
-	}
-	//タイプがWAVEかチェック
-	if (strncmp(riff.type, "WAVE", 4) != 0) {
-		assert(0);
-	}
-
-	//Formatチャンクの読み込み
-	FormatChunk format = {};
-	//チャンクヘッダーの確認
-	file.read((char*)&format, sizeof(ChunkHeader));
-	if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
-		assert(0);
-	}
-
-	//チャンク本体の読み込み
-	assert(format.chunk.size <= sizeof(format.fmt));
-	file.read((char*)&format.fmt, format.chunk.size);
-
-	//Dataチャンクの読み込み
-	ChunkHeader data;
-	file.read((char*)&data, sizeof(data));
-	//Junkチャンクを検出した場合
-	if (strncmp(data.id, "JUNK", 4) == 0) {
-		//読み取り位置をJUNKチャンクの終わりまで進める
-		file.seekg(data.size, std::ios_base::cur);
-		//再読み込み
-		file.read((char*)&data, sizeof(data));
-	}
-
-	if (strncmp(data.id, "data", 4) != 0) {
-		assert(0);
-	}
-
-	//Dataチャンクのデータ部(波形データ)の読み込み
-	char* pBuffer = new char[data.size];
-	file.read(pBuffer, data.size);
-
-	//Waveファイルを閉じる
-	file.close();
-
-	//returnする為の音声データ
-	SoundData soundData = {};
-
-	soundData.wfex = format.fmt;
-	soundData.pBuffer = reinterpret_cast<BYTE*>(pBuffer);
-	soundData.bufferSize = data.size;
-
-	return soundData;
-
-}
-
-//音声データ解放
-void SoundUnload(SoundData* soundData) {
-	//バッファのメモリを解放
-	delete[] soundData->pBuffer;
-
-	soundData->pBuffer = 0;
-	soundData->bufferSize = 0;
-	soundData->wfex = {};
-}
-
-void SoundPlayWave(IXAudio2* xAudio2, const SoundData& soundData) {
-	HRESULT result;
-
-	//波形フォーマットを元にSourceVoiceの生成
-	IXAudio2SourceVoice* pSourceVoice = nullptr;
-	result = xAudio2->CreateSourceVoice(&pSourceVoice, &soundData.wfex);
-	assert(SUCCEEDED(result));
-
-	//再生する波形データの設定
-	XAUDIO2_BUFFER buf{};
-	buf.pAudioData = soundData.pBuffer;
-	buf.AudioBytes = soundData.bufferSize;
-	buf.Flags = XAUDIO2_END_OF_STREAM;
-
-	//波形データの再生
-	result = pSourceVoice->SubmitSourceBuffer(&buf);
-	result = pSourceVoice->Start();
-}
-
 //Windowsアプリでのエントリーポイント
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	D3DResourceLeakChecker leakCheck;
-
-	//音声関連
-	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
-	IXAudio2MasteringVoice* masterVoice;
 
 	//COMの初期化
 	CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -250,13 +130,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	modelManager = new ModelManager();
 	modelManager->Initialize(directXBasic, textureManager);
 
-	//XAudioエンジンのインスタンスを生成
-	HRESULT hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
-	assert(SUCCEEDED(hr));
-
-	//マスターボイスを生成
-	hr = xAudio2->CreateMasteringVoice(&masterVoice);
-	assert(SUCCEEDED(hr));
+	XAudio2Basic* xaudio2Basic = nullptr;
+	xaudio2Basic = new XAudio2Basic();
+	xaudio2Basic->Initialize();
 
 	//ポインタ
 	Input* input = nullptr;
@@ -282,31 +158,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	object3DBasic->SetDefaultCamera(camera);
 
-	ParticleManager* particleManager = nullptr;
-	particleManager = new ParticleManager();
-	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/uvChecker.png", camera);
-
-	//struct Transform uvTransformMultiMaterial1 {
-	//	{ 1.0f, 1.0f, 1.0f },
-	//	{ 0.0f, 0.0f, 0.0f },
-	//	{ 0.0f, 0.0f, 0.0f },
-	//};
-
-	//struct Transform uvTransformMultiMaterial2 {
-	//	{ 1.0f, 1.0f, 1.0f },
-	//	{ 0.0f, 0.0f, 0.0f },
-	//	{ 0.0f, 0.0f, 0.0f },
-	//};
-
 	//カメラ用変数を作る
-	struct Transform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -10.0f } };
+	struct Transform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -30.0f } };
 
 	textureManager->LoadTexture("resources/uvChecker.png");
 	textureManager->LoadTexture("resources/monsterBall.png");
+	textureManager->LoadTexture("resources/particle.png");
 
 	modelManager->LoadModel("resources", "plane.obj");
 	modelManager->LoadModel("resources", "teapot.obj");
 	modelManager->LoadModel("resources", "fence.obj");
+	modelManager->LoadModel("resources", "player.obj");
+	modelManager->LoadModel("resources", "Block.obj");
+	modelManager->LoadModel("resources", "multiMesh.obj");
+	modelManager->LoadModel("resources", "multiMaterial.obj");
+	modelManager->LoadModel("resources", "bunny.obj");
+	modelManager->LoadModel("resources", "suzanne.obj");
+
+	GameScene* gameScene = nullptr;
+	gameScene = new GameScene();
+	gameScene->Initialize(object3DBasic, modelManager, input, camera);
+
+	ParticleManager* particleManager = nullptr;
+	particleManager = new ParticleManager();
+	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/particle.png", camera);
+
 
 	//sprite
 	Sprite* sprite = nullptr;
@@ -323,7 +199,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Object3D* object3dTeapot = nullptr;
 	object3dTeapot = new Object3D();
-	object3dTeapot->Initialize(object3DBasic, modelManager, "resources/fence.obj");
+	object3dTeapot->Initialize(object3DBasic, modelManager, "resources/teapot.obj");
+
+	Object3D* object3dMultiMesh = nullptr;
+	object3dMultiMesh = new Object3D();
+	object3dMultiMesh->Initialize(object3DBasic, modelManager, "resources/multiMesh.obj");
+
+	Object3D* object3dMultiMaterial = nullptr;
+	object3dMultiMaterial = new Object3D();
+	object3dMultiMaterial->Initialize(object3DBasic, modelManager, "resources/multiMaterial.obj");
+
+	Object3D* object3dBunny = nullptr;
+	object3dBunny = new Object3D();
+	object3dBunny->Initialize(object3DBasic, modelManager, "resources/bunny.obj");
+
+	Object3D* object3dSuzanne = nullptr;
+	object3dSuzanne = new Object3D();
+	object3dSuzanne->Initialize(object3DBasic, modelManager, "resources/suzanne.obj");
 
 	//DirectionalLight用のリソースを作る
 	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = directXBasic->CreateBufferResource(sizeof(DirectionalLight));
@@ -336,8 +228,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	directionalLightData->direction = { 0.0f, -1.0f, 0.0f };
 	directionalLightData->intensity = 1.0f;
 
+	// カメラ位置転送用のリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> cameraForGPUResource = directXBasic->CreateBufferResource(sizeof(CameraForGPU));
+	// データを書き込む
+	CameraForGPU* cameraForGPUData = nullptr;
+	// 書き込むためのアドレスを取得
+	cameraForGPUResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPUData));
+	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
+
 	//音声読み込み
-	SoundData soundData1 = SoundLoadWave("resources/Alarm01.wav");
+	//SoundData soundData1 = xaudio2Basic->LoadSound("resources/Alarm01.wav");
+	xaudio2Basic->LoadSound("resources/Alarm01.wav");
+	xaudio2Basic->LoadSound("resources/Alarm01.wav");
 
 	BYTE beforeKey[256] = {};
 	
@@ -346,34 +248,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	bool useDebugcamera = false;
 
 	bool playSound = false;
-
-	Vector3 spritePosition{100.0f, 100.0f, 0.0f};
-	Vector3 spriteRotation{};
-	Vector3 spriteScale = sprite->GetTransform().scale;
-	Vector4 spriteColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector2 spriteAnchor{};
-	Vector2 spriteLeftTop{};
-	Vector2 spriteSize = { spriteScale.x, spriteScale.y };
-	bool spriteFlipX = false;
-	bool spriteFlipY = false;
-
-	Vector3 spritePosition2{};
-	Vector3 spriteRotation2{};
-	Vector3 spriteScale2 = sprite2->GetTransform().scale;
-	Vector4 spriteColor2 = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Vector2 spriteAnchor2{};
-	Vector2 spriteLeftTop2{};
-	Vector2 spriteSize2 = { spriteScale2.x, spriteScale2.y };
-	bool spriteFlipX2 = false;
-	bool spriteFlipY2 = false;
-
-	Vector3 planePosition{};
-	Vector3 planeRotation{};
-	Vector3 planeScale = object3d->GetTransform().scale;
-
-	Vector3 teapotPosition{};
-	Vector3 teapotRotation{0.3f, 3.14f, 0.0f};
-	Vector3 teapotScale = object3dTeapot->GetTransform().scale;
 
 	Vector3 EmitterPosition{};
 
@@ -405,7 +279,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//ゲームの処理
 
+		//gameScene->Update();
+
+
 		camera->Update();
+
 
 		particleManager->Update(EmitterPosition, randomEngine);
 
@@ -414,58 +292,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		object3d->Update();
 		object3dTeapot->Update();
+		object3dMultiMesh->Update();
+		object3dMultiMaterial->Update();
+		object3dBunny->Update();
+		object3dSuzanne->Update();
 
 #ifdef USE_IMGUI
 		////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-		ImGui::SetNextWindowSize({500.0f, 100.0f});
 		ImGui::Begin("ImGui");
-		ImGui::SliderFloat2("Position", reinterpret_cast<float*>(&spritePosition), 0, 1000, "%5.1f");
-		//if (ImGui::TreeNode("Sprite")) {
-		//	//ImGui::Checkbox("drawSprite", &drawSprite);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale), 0, 1000);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition), 0, 1000);
-		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor));
-		//	ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor), -0.5f, 1.5f);
-		//	ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop), 0.0f, 1000.0f);
-		//	ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize), 0.0f, 1000.0f);
-		//	ImGui::Checkbox("FlipX", &spriteFlipX);
-		//	ImGui::Checkbox("FlipY", &spriteFlipY);
-		//	/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Sprite2")) {
-		//	//ImGui::Checkbox("drawSprite", &drawSprite);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&spriteScale2), 0, 1000);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&spriteRotation2), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&spritePosition2), 0, 1000);
-		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spriteColor2));
-		//	ImGui::SliderFloat2("Anchor", reinterpret_cast<float*>(&spriteAnchor2), -0.5f, 1.5f);
-		//	ImGui::SliderFloat2("LeftTop", reinterpret_cast<float*>(&spriteLeftTop2), 0.0f, 1000.0f);
-		//	ImGui::SliderFloat2("RectSize", reinterpret_cast<float*>(&spriteSize2), 0.0f, 1000.0f);
-		//	ImGui::Checkbox("FlipX", &spriteFlipX2);
-		//	ImGui::Checkbox("FlipY", &spriteFlipY2);
-		//	/*ImGui::DragFloat2("UVTranslate", &uvTransformSprite.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale", &uvTransformSprite.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate", &uvTransformSprite.rotate.z);*/
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("plane.obj")) {
-		//	//ImGui::Checkbox("drawPlane", &drawPlane);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&planeScale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&planeRotation), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&planePosition), -5, 5);
-		//	if(ImGui::Button("SetPlane")) {
-		//		object3d->SetModelData("resources/plane.obj");
-		//	}
-		//	if (ImGui::Button("SetTeapot")) {
-		//		object3d->SetModelData("resources/teapot.obj");
-		//	}
-		//	//ImGui::Combo("Ligting", &materialDatas[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
+		sprite->DebugDraw("Sprite 1");
+		sprite2->DebugDraw("Sprite 2");
+		
+		object3d->DebugDraw("plane");
 		///*if (ImGui::TreeNode("Sphere")) {
 		//	ImGui::Checkbox("drawSphere", &drawSphere);
 		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
@@ -474,78 +312,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//	ImGui::Combo("Ligting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
 		//	ImGui::TreePop();
 		//}*/
-		//if (ImGui::TreeNode("Utah Teapot")) {
-		//	//ImGui::Checkbox("drawTeapot", &drawTeapot);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&teapotScale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&teapotRotation), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&teapotPosition), -5, 5);
-		//	if (ImGui::Button("SetPlane")) {
-		//		object3dTeapot->SetModelData("resources/plane.obj");
-		//	}
-		//	if (ImGui::Button("SetTeapot")) {
-		//		object3dTeapot->SetModelData("resources/teapot.obj");
-		//	}
-		//	//ImGui::Combo("Ligting", &materialDatasTeapot[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Camera")) {
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&cameraTransform.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), -10, 10);
-		//	ImGui::TreePop();
-		//}
-		///*if (ImGui::TreeNode("Stanford Bunny")) {
-		//	ImGui::Checkbox("drawTeapot", &drawBunny);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformBunny.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformBunny.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformBunny.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDatasBunny[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Multi Mesh")) {
-		//	ImGui::Checkbox("drawMultiMesh", &drawMultiMesh);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMesh.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMesh.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMesh.translate), -5, 5);
-		//	ImGui::Combo("Ligting 1", &materialDatasMultiMesh[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::Combo("Ligting 2", &materialDatasMultiMesh[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Multi Material")) {
-		//	ImGui::Checkbox("drawMultiMaterial", &drawMultiMaterial);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformMultiMaterial.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformMultiMaterial.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformMultiMaterial.translate), -5, 5);
-		//	ImGui::Combo("Ligting 1", &materialDatasMultiMaterial[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::Combo("Ligting 2", &materialDatasMultiMaterial[1]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::DragFloat2("UVTranslate 1", &uvTransformMultiMaterial1.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale 1", &uvTransformMultiMaterial1.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate 1", &uvTransformMultiMaterial1.rotate.z);
-		//	ImGui::DragFloat2("UVTranslate 2", &uvTransformMultiMaterial2.translate.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::DragFloat2("UVScale 2", &uvTransformMultiMaterial2.scale.x, 0.01f, -10.0f, 10.0f);
-		//	ImGui::SliderAngle("UVRotate 2", &uvTransformMultiMaterial2.rotate.z);
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Suzanne")) {
-		//	ImGui::Checkbox("drawSuzanne", &drawSuzanne);
-		//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSuzanne.scale), -5, 5);
-		//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSuzanne.rotate), -5, 5);
-		//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSuzanne.translate), -5, 5);
-		//	ImGui::Combo("Ligting", &materialDatasSuzanne[0]->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-		//	ImGui::TreePop();
-		//}
-		//if (ImGui::TreeNode("Lighting")) {
-		//	ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
-		//	ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
-		//	ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
-		//	ImGui::TreePop();
-		//}*/
-		///*if (ImGui::TreeNode("Sound")) {
-		//	if (ImGui::Button("play")) {
-		//		playSound = true;
-		//	}
-		//	ImGui::TreePop();
-		//}*/
+		object3dTeapot->DebugDraw("teapot");
+		object3dBunny->DebugDraw("Bunny");
+		object3dMultiMesh->DebugDraw("MultiMesh");
+		object3dMultiMaterial->DebugDraw("MultiMaterial");
+		object3dSuzanne->DebugDraw("Suzanne");
+		if (ImGui::TreeNode("Camera")) {
+			ImGui::DragFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), 0.1f, -30.0f, 30.0f);
+			ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Lighting")) {
+			ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
+			ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
+			ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+		if (ImGui::TreeNode("Sound")) {
+			if (ImGui::Button("play")) {
+				playSound = true;
+			}
+			ImGui::TreePop();
+		}
 		///*if (ImGui::TreeNode("Key")) {
 		//	ImGui::Text("PushKey : %d", input->PushKey(DIK_SPACE));
 		//	ImGui::Text("TriggerKey : %d", input->TriggerKey(DIK_SPACE));
@@ -556,83 +344,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 #endif
 
-		if (input->PushKey(DIK_A)) {
-			cameraTransform.translate.x -= 0.05f;
-		}
-		if (input->PushKey(DIK_D)) {
-			cameraTransform.translate.x += 0.05f;
-		}
-		if (input->PushKey(DIK_W)) {
-			cameraTransform.translate.y += 0.05f;
-		}
-		if (input->PushKey(DIK_S)) {
-			cameraTransform.translate.y -= 0.05f;
-		}
-
-		if (input->PushKey(DIK_RIGHTARROW)) {
-			EmitterPosition.x += 0.05f;
-		}
-		if (input->PushKey(DIK_LEFTARROW)) {
-			EmitterPosition.x -= 0.05f;
-		}
-		if (input->PushKey(DIK_UPARROW)) {
-			EmitterPosition.y += 0.05f;
-		}
-		if (input->PushKey(DIK_DOWNARROW)) {
-			EmitterPosition.y -= 0.05f;
-		}
-
 		camera->SetTranslate(cameraTransform.translate);
 		camera->SetRotate(cameraTransform.rotate);
 
-		//spritePosition.x += 3.0f;
-		sprite->SetTranslate(spritePosition);
-		sprite->SetRotate(spriteRotation);
-		sprite->SetScale(spriteScale);
-		sprite->SetColor(spriteColor);
-		sprite->SetAnchorPoint(spriteAnchor);
-		sprite->SetTextureLeftTop(spriteLeftTop);
-		sprite->SetTextureSize(spriteSize);
-		sprite->SetIsFlipX(spriteFlipX);
-		sprite->SetIsFlipY(spriteFlipY);
-
-		spritePosition2.y += 3.0f;
-		sprite2->SetTranslate(spritePosition2);
-		sprite2->SetRotate(spriteRotation2);
-		sprite2->SetScale(spriteScale2);
-		sprite2->SetColor(spriteColor2);
-		sprite2->SetAnchorPoint(spriteAnchor2);
-		sprite2->SetTextureLeftTop(spriteLeftTop2);
-		sprite2->SetTextureSize(spriteSize2);
-		sprite2->SetIsFlipX(spriteFlipX2);
-		sprite2->SetIsFlipY(spriteFlipY2);
-
-		planeRotation.x += 0.01f;
-		object3d->SetTranslate(planePosition);
-		object3d->SetRotate(planeRotation);
-		object3d->SetScale(planeScale);
-
-		object3dTeapot->SetTranslate(teapotPosition);
-		object3dTeapot->SetRotate(teapotRotation);
-		object3dTeapot->SetScale(teapotScale);
-
 		if (playSound) {
 			//音声再生
-			SoundPlayWave(xAudio2.Get(), soundData1);
+			xaudio2Basic->PlayAudio("resources/Alarm01.wav");
 			playSound = false;
 		}
 
 		directionalLightData->direction = Normalize(directionalLightData->direction);
 
-		/*Matrix4x4 uvTransformMatrixMultiMaterial1 = MakeScaleMatrix(uvTransformMultiMaterial1.scale);
-		uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeRotateZMatrix(uvTransformMultiMaterial1.rotate.z));
-		uvTransformMatrixMultiMaterial1 = Multiply(uvTransformMatrixMultiMaterial1, MakeTranslateMatrix(uvTransformMultiMaterial1.translate));
-		materialDatasMultiMaterial[0]->uvTransform = uvTransformMatrixMultiMaterial1;
-
-		Matrix4x4 uvTransformMatrixMultiMaterial2 = MakeScaleMatrix(uvTransformMultiMaterial2.scale);
-		uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeRotateZMatrix(uvTransformMultiMaterial2.rotate.z));
-		uvTransformMatrixMultiMaterial2 = Multiply(uvTransformMatrixMultiMaterial2, MakeTranslateMatrix(uvTransformMultiMaterial2.translate));
-		materialDatasMultiMaterial[1]->uvTransform = uvTransformMatrixMultiMaterial2;*/
+		cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
 
 		imguiManager->UpdateEnd();
 
@@ -643,15 +366,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		//directionalLight用のCBufferの場所を設定
 		directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+		directXBasic->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
 
-		//sprite->Draw();
-		//sprite2->Draw();
+		sprite->Draw();
+		sprite2->Draw();
 
 		object3DBasic->Object3DPreDraw();
 
-		//object3d->Draw();
+		//gameScene->Draw();
 
-		//object3dTeapot->Draw();
+		object3d->Draw();
+		object3dTeapot->Draw();
+		object3dMultiMesh->Draw();
+		object3dMultiMaterial->Draw();
+		object3dBunny->Draw();
+		object3dSuzanne->Draw();
 
 		particleManager->Draw();
 		
@@ -676,6 +405,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//WindowsApiの終了処理
 	winApi->Finalize();
 
+	delete object3dSuzanne;
+	delete object3dBunny;
+	delete object3dMultiMaterial;
+	delete object3dMultiMesh;
 	delete object3dTeapot;
 	delete object3d;
 	delete sprite2;
@@ -683,18 +416,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	delete object3DBasic;
 	delete spriteBasic;
 	delete particleManager;
+	gameScene->Finalize();
+	delete gameScene;
 	//入力解放
 	delete input;
-	//XAudio2解放
-	xAudio2.Reset();
 	//音声データ解放
-	SoundUnload(&soundData1);
+	xaudio2Basic->Finalize();
 	delete modelManager;
 	delete textureManager;
 	delete imguiManager;
 	delete srvManager;
 	delete directXBasic;
 	delete winApi;
+	delete xaudio2Basic;
 
 	return 0;
 }

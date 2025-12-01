@@ -166,20 +166,21 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\input.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\Logger.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Input.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Utility\Logger.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\FixFPS.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\Math\MyMath.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Utility\Math\MyMath.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\WindowsApi.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\StringUtility.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Utility\StringUtility.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\Sprite.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Model\ModelManager.cpp" />
@@ -189,6 +190,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\SRVManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\TextureManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\Player.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Model\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -221,11 +225,11 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="2025_CG2_DirectX\engine\debug\DebugCamera.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\DirectXBasic.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix3x3.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix4x4.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector2.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector3.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector4.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix3x3.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix4x4.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector2.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector3.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector4.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\Camera.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
@@ -235,13 +239,14 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="externals\imgui\imstb_rectpack.h" />
     <ClInclude Include="externals\imgui\imstb_textedit.h" />
     <ClInclude Include="externals\imgui\imstb_truetype.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\MyMath.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\input.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\MyMath.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Input.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\WindowsApi.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Logger.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\StringUtility.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Logger.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\StringUtility.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\FixFPS.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\GameScene.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h" />
@@ -252,9 +257,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\SRVManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\TextureManager.h" />
-    <ClInclude Include="Transform.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\Player.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Model\Model.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Transform.h" />
     <ClInclude Include="TransformationMatrix.h" />
     <ClInclude Include="VertexData.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

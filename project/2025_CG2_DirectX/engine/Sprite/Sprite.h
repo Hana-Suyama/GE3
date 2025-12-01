@@ -6,7 +6,7 @@
 #include "../../../TransformationMatrix.h"
 #include "SpriteBasic.h"
 #include "../TextureManager.h"
-#include "../../../Transform.h"
+#include "../utility/Math/Transform.h"
 
 class Sprite
 {
@@ -37,12 +37,37 @@ public:
 	/// </summary>
 	void Draw();
 
+	/// <summary>
+	///	デバッグ描画
+	/// </summary>
+	void DebugDraw(std::string rabel);
+
 	/* --------- ゲッター --------- */
+
+	/// <summary>
+	///	表示フラグのゲッター
+	/// </summary>
+	const bool& GetIsDraw() const { return isDraw_; }
 
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
 	const struct Transform& GetTransform() const { return transform_; }
+
+	/// <summary>
+	///	座標のゲッター
+	/// </summary>
+	const Vector2& GetPosition() const { return position_; }
+
+	/// <summary>
+	///	回転のゲッター
+	/// </summary>
+	const float& GetRotation() const { return rotation_; }
+
+	/// <summary>
+	///	サイズのゲッター
+	/// </summary>
+	const Vector2& GetSize() const { return size_; }
 
 	/// <summary>
 	///	色のゲッター
@@ -77,22 +102,46 @@ public:
 	/* --------- セッター --------- */
 
 	/// <summary>
+	///	表示フラグのセッター
+	/// </summary>
+	/// <param name="isDraw">表示/非表示</param>
+	void SetIsDraw(const bool& isDraw) { isDraw_ = isDraw; }
+
+	/// <summary>
 	///	座標のセッター
 	/// </summary>
-	/// <param name="spriteBasic">移動</param>
-	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+	/// <param name="position">移動</param>
+	void SetPosition(const Vector2& position) { position_ = position; }
 
 	/// <summary>
 	///	回転のセッター
 	/// </summary>
-	/// <param name="spriteBasic">回転</param>
-	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
+	/// <param name="rotate">回転</param>
+	void SetRotate(const float& rotate) { rotation_ = rotate; }
 
 	/// <summary>
-	///	スケールのセッター
+	///	サイズのセッター
 	/// </summary>
-	/// <param name="spriteBasic">スケール</param>
-	void SetScale(const Vector3& scale) { transform_.scale = scale; }
+	/// <param name="size">サイズ</param>
+	void SetSize(const Vector2& size) { size_ = size; }
+
+	/// <summary>
+	///	UVTransform座標のセッター
+	/// </summary>
+	/// <param name="position">移動</param>
+	void SetUVPosition(const Vector2& position) { uvPosition_ = position; }
+
+	/// <summary>
+	///	UVTransform回転のセッター
+	/// </summary>
+	/// <param name="rotate">回転</param>
+	void SetUVRotate(const float& rotate) { uvRotation_ = rotate; }
+
+	/// <summary>
+	///	UVTransformサイズのセッター
+	/// </summary>
+	/// <param name="scale">サイズ</param>
+	void SetUVSize(const Vector2& size) { uvSize_ = size; }
 
 	/// <summary>
 	///	色のセッター
@@ -192,10 +241,29 @@ private:
 	// 頂点バッファビュー
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_{};
 
+	// 表示フラグ
+	bool isDraw_ = false;
+
+	// 座標
+	Vector2 position_{};
+	// 回転
+	float rotation_ = 0.0f;
+	// サイズ
+	Vector2 size_{};
+
+	// UV座標
+	Vector2 uvPosition_{};
+	// UV回転
+	float uvRotation_ = 0.0f;
+	// UVサイズ
+	Vector2 uvSize_{1.0f, 1.0f};
+
 	// Transform
 	struct Transform transform_{};
+
 	// UVTransform
 	struct Transform uvTransform_{};
+
 	// アンカーポイント(0.0f~1.0f)
 	Vector2 anchorPoint_ = { 0.0f, 0.0f };
 

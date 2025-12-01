@@ -14,7 +14,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	auto it = std::find_if(
 		modelDatas_.begin(),
 		modelDatas_.end(),
-		[&](ModelData& modelData) {return modelData.filePath == directoryPath + "/" + filename; }
+		[&](Model& modelData) {return modelData.filePath == directoryPath + "/" + filename; }
 	);
 	if (it != modelDatas_.end()) {
 		return;
@@ -24,7 +24,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	assert(modelDatas_.size() < kModelMax_);
 
 	// 新しく追加する空のモデルデータを作成
-	ModelData newModel;
+	Model newModel;
 	// Objを読み込む
 	newModel = LoadObjFile(directoryPath, filename);
 
@@ -46,19 +46,22 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 		std::memcpy(vertexData, mesh.vertices.data(), sizeof(VertexData) * mesh.vertices.size());
 	}
 
-	// メッシュごとにマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
+	// メッシュごとにデフォルトマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
+	// 現在はファイルから読み込んでおらず全部同じ値なので意味はない
 	for (auto& mesh : newModel.meshes) {
-		mesh.materialResource = directXBasic_->CreateBufferResource(sizeof(Material));
+		mesh.defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
 		//マテリアルにデータを書き込む
 		Material* materialData = nullptr;
 		//書き込むためのアドレスを取得
-		mesh.materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+		mesh.defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
 		//今回は白を書き込んでみる
 		materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		//Lighting有効
 		materialData->enableLighting = Light::HalfLambert;
 		//UVTransformを単位行列で初期化
 		materialData->uvTransform = MyMath::MakeIdentity4x4();
+
+		materialData->shininess = 1.0f;
 	}
 	
 	// メッシュごとにindexリソースを作る
@@ -82,8 +85,13 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	// メッシュごとに使うテクスチャ番号を記録
 	for (auto& mesh : newModel.meshes) {
 		//テクスチャファイルが読み込まれていなかったら読み込む
-		textureManager_->LoadTexture(mesh.material.textureFilePath);
-		//mesh.material.textureIndex = textureManager_->GetTextureIndexByFilePath(mesh.material.textureFilePath);
+		if (mesh.defaultTextureFilePath != "") {
+			textureManager_->LoadTexture(mesh.defaultTextureFilePath);
+		} else {
+			// テクスチャが存在しない場合、white1x1を読み込み割り当てる
+			textureManager_->LoadTexture("resources/white2x2.png");
+			mesh.defaultTextureFilePath = "resources/white2x2.png";
+		}
 	}
 
 	modelDatas_.push_back(newModel);
@@ -94,7 +102,7 @@ uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 	auto it = std::find_if(
 		modelDatas_.begin(),
 		modelDatas_.end(),
-		[&](ModelData& modelData) {return modelData.filePath == filePath; }
+		[&](Model& modelData) {return modelData.filePath == filePath; }
 	);
 	if (it != modelDatas_.end()) {
 		uint32_t modelIndex = static_cast<uint32_t>(std::distance(modelDatas_.begin(), it));
@@ -106,16 +114,16 @@ uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 }
 
 
-ModelManager::ModelData ModelManager::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
+Model ModelManager::LoadObjFile(const std::string& directoryPath, const std::string& filename) {
 
-	ModelData modelData;	//構築するModelData
+	Model modelData;	//構築するModelData
 	std::vector<Vector4> positions;	//位置
 	std::vector<Vector3> normals;	//法線
 	std::vector<Vector2> texcoords;	//テクスチャ座標
 	std::string line;	//ファイルから読んだ1行を格納するもの
 	int32_t meshCount = 0;
 	//0番目のメッシュデータを追加
-	modelData.meshes.push_back(Mesh{});
+	modelData.meshes.push_back(Model::Mesh{});
 
 	std::ifstream file(directoryPath + "/" + filename);	//ファイルを開く
 	assert(file.is_open());	//とりあえず開けなかったら止める
@@ -187,13 +195,13 @@ ModelManager::ModelData ModelManager::LoadObjFile(const std::string& directoryPa
 			if (modelData.meshes[meshCount].vertices.size() != 0) {
 				meshCount++;
 				//空のメッシュデータを追加
-				modelData.meshes.push_back(Mesh{});
+				modelData.meshes.push_back(Model::Mesh{});
 			}
 		} else if (identifier == "usemtl") {
 			std::string materialName;
 			s >> materialName;
 			//基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
-			modelData.meshes[meshCount].material = LoadMaterialTemplateFile(directoryPath, modelData.mtlFileName, materialName);
+			modelData.meshes[meshCount].defaultTextureFilePath = LoadMaterialTemplateFile(directoryPath, modelData.mtlFileName, materialName);
 		}
 
 	}
@@ -202,8 +210,8 @@ ModelManager::ModelData ModelManager::LoadObjFile(const std::string& directoryPa
 }
 
 
-ModelManager::MaterialData ModelManager::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName) {
-	MaterialData materialData;	//構築するMaterialData
+std::string ModelManager::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName) {
+	std::string materialData;	//構築するMaterialData
 	std::string line;	//ファイルから読んだ1行を格納するもの
 	std::ifstream file(directoryPath + "/" + filename);	//ファイルを開く
 	assert(file.is_open());	//とりあえず開けなかったら止める
@@ -232,7 +240,7 @@ ModelManager::MaterialData ModelManager::LoadMaterialTemplateFile(const std::str
 			std::string textureFilename;
 			s >> textureFilename;
 			//連結してファイルパスにする
-			materialData.textureFilePath = directoryPath + "/" + textureFilename;
+			materialData = directoryPath + "/" + textureFilename;
 			return materialData;
 		}
 	}

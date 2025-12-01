@@ -104,15 +104,15 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 		particles[index] = MakeNewParticle(randomEngine);
 	}*/
 
-	emitter.count = 3;
-	emitter.frequency = 0.5f;
+	emitter.count = 10;
+	emitter.frequency = 0.1f;
 	emitter.frequencyTime = 0.0f;
 
 	emitter.transform.translate = { 0.0f, 0.0f, 0.0f };
 	emitter.transform.rotate = { 0.0f, 0.0f, 0.0f };
 	emitter.transform.scale = { 1.0f, 1.0f, 1.0f };
 
-	accelerationField.acceleration = { 15.0f, 0.0f, 0.0f };
+	accelerationField.acceleration = { 0.0f, 15.0f, 0.0f };
 	accelerationField.area.min = { -1.0f, -1.0f, -1.0f };
 	accelerationField.area.max = { 1.0f, 1.0f, 1.0f };
 	
@@ -129,19 +129,22 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 
 #ifdef USE_IMGUI
 	ImGui::Begin("Particle");
-	if (ImGui::Button("Add Particle")) {
+	/*if (ImGui::Button("Add Particle")) {
 		particles.splice(particles.end(), Emit(emitter, randomEngine));
-	}
+	}*/
+	ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
+	ImGui::Checkbox("isBillboard", &isBillboard);
 	ImGui::End();
 
-	ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
+	
 #endif
 
-	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
-	Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, camera_->GetViewMatrix());
-	billboardMatrix.m[3][0] = 0.0f;
-	billboardMatrix.m[3][1] = 0.0f;
-	billboardMatrix.m[3][2] = 0.0f;
+	Matrix4x4 billboardMatrix = MakeIdentity4x4();
+		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
+		billboardMatrix = Multiply(backToFrontMatrix, camera_->GetWorldMatrix());
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
 
 	numInstance = 0;
 
@@ -153,9 +156,10 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 			continue;
 		}
 
-		//Matrix4x4 worldMatrix = MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
-
-		Matrix4x4 worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
+		Matrix4x4 worldMatrix = MakeAffineMatrix((*particleIterator).transform.scale, (*particleIterator).transform.rotate, (*particleIterator).transform.translate);
+		if (isBillboard) {
+			worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
+		}
 		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
 
 		if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
@@ -163,6 +167,8 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 		}
 		(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
 		(*particleIterator).currentTime += kDeltaTime;
+		(*particleIterator).color = { (std::max)((*particleIterator).color.x -= 0.01f, 0.0f), (std::max)((*particleIterator).color.y -= 0.006f, 0.0f), (std::min)((*particleIterator).color.z += 0.004f, 1.0f) };
+
 
 		if (numInstance < kNumMaxInstance) {
 			instancingData[numInstance].WVP = worldViewProjectionMatrix;
@@ -334,7 +340,8 @@ void ParticleManager::CreatePSO()
 	blendDesc.RenderTarget[0].BlendEnable = TRUE;
 	blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
 	blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
-	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	//blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+	blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
 	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
 	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
@@ -433,14 +440,14 @@ Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vect
 {
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
 	Particle particle;
-	particle.transform.scale = { 1.0f, 1.0f, 1.0f };
+	particle.transform.scale = { 3.0f, 3.0f, 1.0f };
 	particle.transform.rotate = { 0.0f, -3.14f ,0.0f };
 	Vector3 randomTranslate{ distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
 	particle.transform.translate = translate + randomTranslate;
 	particle.velocity = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
 	
 	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
-	particle.color = { distColor(randomEngine),distColor(randomEngine), distColor(randomEngine), 1.0f };
+	particle.color = { 0.5f, 0.2f, 0.8f, 1.0f };
 
 	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
 	particle.lifeTime = distTime(randomEngine);

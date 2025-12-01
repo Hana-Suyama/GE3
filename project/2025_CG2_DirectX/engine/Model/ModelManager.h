@@ -2,33 +2,14 @@
 #include "../DirectXBasic.h"
 #include "../../../VertexData.h"
 #include "../TextureManager.h"
+#include "Model.h"
 
 
 
 class ModelManager
 {
 public:
-	struct MaterialData {
-		std::string textureFilePath;
-		uint32_t textureIndex;
-	};
-
-	struct Mesh {
-		std::vector<VertexData> vertices;
-		MaterialData material;
-		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
-		D3D12_INDEX_BUFFER_VIEW indexBufferView{};
-		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
-		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource;
-	};
-
-	struct ModelData {
-		std::vector<Mesh> meshes;
-		std::string mtlFileName;
-		//ファイルパス
-		std::string filePath;
-	};
+	
 
 public:
 
@@ -59,7 +40,7 @@ public:
 	/// <param name="filePath">ファイルパス</param>
 	uint32_t GetModelIndexByFilePath(const std::string& filePath);
 
-	ModelData* GetModelPointer(uint32_t index) { return &modelDatas_.at(index); }
+	Model* GetModelPointer(uint32_t index) { return &modelDatas_.at(index); }
 
 	TextureManager* GetTextureManager() const { return textureManager_; }
 
@@ -68,9 +49,9 @@ private:
 	/* --------- private変数 --------- */
 
 
-	ModelData LoadObjFile(const std::string& directoryPath, const std::string& filename);
+	Model LoadObjFile(const std::string& directoryPath, const std::string& filename);
 
-	MaterialData LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName);
+	std::string LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName);
 
 	//	DirectX基盤のポインタ
 	DirectXBasic* directXBasic_ = nullptr;
@@ -78,7 +59,7 @@ private:
 	// テクスチャマネージャのポインタ
 	TextureManager* textureManager_ = nullptr;
 
-	std::vector<ModelData> modelDatas_;
+	std::vector<Model> modelDatas_;
 
 	//モデルデータの読み込み上限数
 	const uint32_t kModelMax_ = 128;

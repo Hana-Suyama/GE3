@@ -105,22 +105,22 @@
     <ClCompile Include="externals\imgui\imgui_impl_win32.cpp">
       <Filter>externals\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\Math\MyMath.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Utility\Math\MyMath.cpp">
       <Filter>ソース ファイル\engine\utility</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\debug\DebugCamera.cpp">
       <Filter>ソース ファイル\engine\debug</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\input.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Input.cpp">
       <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\WindowsApi.cpp">
       <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\Logger.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Utility\Logger.cpp">
       <Filter>ソース ファイル\engine\utility</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\utility\StringUtility.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Utility\StringUtility.cpp">
       <Filter>ソース ファイル\engine\utility</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\DirectXBasic.cpp">
@@ -162,6 +162,18 @@
     <ClCompile Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\Player.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Model\Model.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -201,10 +213,10 @@
     <ClInclude Include="2025_CG2_DirectX\engine\debug\DebugCamera.h">
       <Filter>ヘッダー ファイル\engine\debug</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\MyMath.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\MyMath.h">
       <Filter>ヘッダー ファイル\engine\utility</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\input.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Input.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\WindowsApi.h">
@@ -213,10 +225,10 @@
     <ClInclude Include="2025_CG2_DirectX\engine\DirectXBasic.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Logger.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Logger.h">
       <Filter>ヘッダー ファイル\engine\utility</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\StringUtility.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\StringUtility.h">
       <Filter>ヘッダー ファイル\engine\utility</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\FixFPS.h">
@@ -252,25 +264,25 @@
     <ClInclude Include="2025_CG2_DirectX\engine\TextureManager.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix3x3.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix3x3.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Matrix4x4.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix4x4.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Transform.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="TransformationMatrix.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector2.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector2.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector3.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector3.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\utility\Math\Vector4.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector4.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
@@ -280,6 +292,18 @@
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\GameScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\Player.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Model\Model.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

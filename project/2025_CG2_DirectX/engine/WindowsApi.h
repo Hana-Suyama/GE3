@@ -14,7 +14,7 @@ public:
 
 	/* --------- 定数 --------- */
 
-	//クライアント領域のサイズ
+	// クライアント領域のサイズ
 	static const int32_t kClientWidth = 1280;// 横
 	static const int32_t kClientHeight = 720;// 縦
 

@@ -2,8 +2,9 @@
 #include "Object3DBasic.h"
 #include "../Model/ModelManager.h"
 #include "../../../TransformationMatrix.h"
-#include "../../../Transform.h"
+#include "../utility/Math/Transform.h"
 #include "../Camera/Camera.h"
+#include "../../../Material.h"
 
 class Object3D
 {
@@ -36,6 +37,12 @@ public:
 	void Draw();
 
 	/// <summary>
+	///	デバッグ描画
+	/// </summary>
+	/// <param name="rabel">ImGuiのラベル名</param>
+	void DebugDraw(std::string rabel);
+
+	/// <summary>
 	///	モデルデータのセット
 	/// </summary>
 	void SetModelData(std::string modelFilePath);
@@ -43,12 +50,27 @@ public:
 	/* --------- ゲッター --------- */
 
 	/// <summary>
+	///	表示フラグのゲッター
+	/// </summary>
+	const bool& GetIsDraw() const { return isDraw_; }
+
+	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
 	const struct Transform& GetTransform() const { return transform_; }
 
+	/// <summary>
+	///	マテリアルデータのゲッター
+	/// </summary>
+	std::vector<Material*> GetMaterialData() const { return materialDatas_; }
 
 	/* --------- セッター --------- */
+
+	/// <summary>
+	///	表示フラグのセッター
+	/// </summary>
+	/// <param name="isDraw">表示/非表示</param>
+	void SetIsDraw(const bool& isDraw) { isDraw_ = isDraw; }
 
 	/// <summary>
 	///	座標のセッター
@@ -83,6 +105,11 @@ private:
 	/// </summary>
 	void CreateWVPResource();
 
+	/// <summary>
+	///	現在のモデルデータに基づいてマテリアル、テクスチャ、UVトランスフォームを生成
+	/// </summary>
+	void CreateMTUV();
+
 private:
 
 	/* --------- private変数 --------- */
@@ -98,13 +125,22 @@ private:
 	TransformationMatrix* transformationMatrixData_ = nullptr;
 
 	// 描画するモデルのポインタ
-	ModelManager::ModelData* modelData_ = nullptr;
+	Model* modelData_ = nullptr;
+	// マテリアルのリソース。使用するモデルのメッシュ数と同じだけ要素を持つ
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> materialResources_;
+	// マテリアルのデータ。使用するモデルのメッシュ数と同じだけ要素を持つ
+	std::vector<Material*> materialDatas_;
+
+	// 使用するテクスチャ。使用するモデルのメッシュ数と同じだけ要素を持つ
+	std::vector<std::string> textureFilePaths_;
 
 	// トランスフォーム
 	struct Transform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	// UVトランスフォーム。使用するモデルのメッシュ数と同じだけ要素を持つ
+	std::vector<struct Transform> uvTransforms_;
 	
 	// 表示フラグ
-	bool isDraw_ = true;
+	bool isDraw_ = false;
 
 	// カメラ
 	Camera* camera_ = nullptr;
