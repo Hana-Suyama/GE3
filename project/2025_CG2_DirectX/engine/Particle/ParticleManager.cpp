@@ -249,7 +249,9 @@ void ParticleManager::Draw()
 	//IBVを設定
 	directXBasic_->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 	//描画！(DrawCall/ドローコール)
-	directXBasic_->GetCommandList()->DrawIndexedInstanced(6, numInstance, 0, 0, 0);
+	if (numInstance) {
+		directXBasic_->GetCommandList()->DrawIndexedInstanced(6, numInstance, 0, 0, 0);
+	}
 }
 
 void ParticleManager::CreatePSO()
