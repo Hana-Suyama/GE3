@@ -1,5 +1,5 @@
 #include "Object3D.h"
-#include "../../../TransformationMatrix.h"
+#include "../../engine/TransformationMatrix.h"
 #include "..//debug/ImGui/ImGuiManager.h"
 
 using namespace MyMath;
@@ -82,6 +82,7 @@ void Object3D::DebugDraw(std::string rabel)
 			ImGui::DragFloat2(("UVTranslate[" + std::to_string(i) + "]").c_str(), &uvTransforms_.at(i).translate.x, 0.01f, -10.0f, 10.0f);
 			ImGui::DragFloat2(("UVScale[" + std::to_string(i) + "]").c_str(), &uvTransforms_.at(i).scale.x, 0.01f, -10.0f, 10.0f);
 			ImGui::SliderAngle(("UVRotate[" + std::to_string(i) + "]").c_str(), &uvTransforms_.at(i).rotate.z);
+			ImGui::ColorPicker4(("Color[" + std::to_string(i) + "]").c_str(), reinterpret_cast<float*>(&materialDatas_.at(i)->color));
 			i++;
 		}
 		ImGui::TreePop();

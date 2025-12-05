@@ -165,6 +165,7 @@ void Sprite::CreateMaterialResource()
 	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	// SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = Light::None;
+	materialData_->enableReflection = Reflection::NoneReflection;
 	// UVTransformを単位行列で初期化
 	materialData_->uvTransform = MakeIdentity4x4();
 }

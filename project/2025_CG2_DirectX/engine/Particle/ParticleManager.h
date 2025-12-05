@@ -2,8 +2,8 @@
 #include "../Camera/Camera.h"
 #include "../TextureManager.h"
 #include "Particle.h"
-#include "../../../Material.h"
-#include "../../../TransformationMatrix.h"
+#include "../../engine/Material.h"
+#include "../../engine/TransformationMatrix.h"
 #include <random>
 
 struct Particle {

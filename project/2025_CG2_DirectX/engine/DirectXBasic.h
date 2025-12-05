@@ -2,7 +2,7 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include "utility/Logger.h"
+#include "debug/Logger/Logger.h"
 #include "WindowsApi.h"
 #include <dxcapi.h>
 #include "../../externals/DirectXTex/DirectXTex.h"

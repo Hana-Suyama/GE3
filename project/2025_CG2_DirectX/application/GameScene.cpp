@@ -7,12 +7,12 @@ void GameScene::Initialize(Object3DBasic* object3dBasic, ModelManager* modelMana
 	input_ = input;
 	camera_ = camera;
 
-	/*for (int32_t i = 0; i < 60; i++) {
+	for (int32_t i = 0; i < 60; i++) {
 		Object3D* newblocks_ = new Object3D();
 		newblocks_->Initialize(object3dBasic_, modelManager_, "resources/Block.obj");
 		newblocks_->SetTranslate({ -30 + (i * 1.0f), 0.0f, 0.0f });
 		blocks_.push_back(newblocks_);
-	}*/
+	}
 
 	playerModel_ = new Object3D();
 	playerModel_->Initialize(object3dBasic_, modelManager_, "resources/player.obj");

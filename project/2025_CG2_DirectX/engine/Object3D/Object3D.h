@@ -1,10 +1,10 @@
 #pragma once
 #include "Object3DBasic.h"
 #include "../Model/ModelManager.h"
-#include "../../../TransformationMatrix.h"
+#include "../../engine/TransformationMatrix.h"
 #include "../utility/Math/Transform.h"
 #include "../Camera/Camera.h"
-#include "../../../Material.h"
+#include "../../engine/Material.h"
 
 class Object3D
 {
@@ -140,7 +140,7 @@ private:
 	std::vector<struct Transform> uvTransforms_;
 	
 	// 表示フラグ
-	bool isDraw_ = false;
+	bool isDraw_ = true;
 
 	// カメラ
 	Camera* camera_ = nullptr;

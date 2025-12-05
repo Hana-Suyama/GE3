@@ -9,6 +9,9 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 void WindowsApi::Initialize(){
 
+	//COMの初期化
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+
 	// ウィンドウプロシージャ
 	wndClass_.lpfnWndProc = WindowProc;
 	// ウィンドウクラス名(なんでも良い)

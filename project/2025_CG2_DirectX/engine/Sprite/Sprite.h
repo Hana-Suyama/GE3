@@ -1,9 +1,9 @@
 #pragma once
 #include <wrl.h>
 #include <d3d12.h>
-#include "../../../VertexData.h"
-#include "../../../Material.h"
-#include "../../../TransformationMatrix.h"
+#include "../../engine/VertexData.h"
+#include "../../engine/Material.h"
+#include "../../engine/TransformationMatrix.h"
 #include "SpriteBasic.h"
 #include "../TextureManager.h"
 #include "../utility/Math/Transform.h"

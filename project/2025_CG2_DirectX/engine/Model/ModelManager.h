@@ -1,6 +1,6 @@
 #pragma once
 #include "../DirectXBasic.h"
-#include "../../../VertexData.h"
+#include "../../engine/VertexData.h"
 #include "../TextureManager.h"
 #include "Model.h"
 
