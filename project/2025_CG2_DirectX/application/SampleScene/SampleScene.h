@@ -52,6 +52,7 @@ private:
 	Object3D* object3dBunny = nullptr;
 	Object3D* object3dSuzanne = nullptr;
 	Object3D* object3dTerrain = nullptr;
+	Object3D* object3dPlanegLTF = nullptr;
 
 	Camera* camera = nullptr;
 

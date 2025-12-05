@@ -9,6 +9,14 @@ class Model
 {
 public:
 
+	struct Node {
+		Matrix4x4 localMatrix;
+		std::string name;
+		std::vector<Node> children;
+	};
+
+public:
+
 	struct Mesh {
 		std::vector<VertexData> vertices;
 		// デフォルトのテクスチャパス。モデル生成時にオブジェクト側にコピーする
@@ -28,6 +36,9 @@ public:
 	std::string mtlFileName;
 	// モデルファイル自体のパス
 	std::string filePath;
+
+	// ノード
+	Node rootNode;
 
 private:
 

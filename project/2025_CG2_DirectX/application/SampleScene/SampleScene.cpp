@@ -51,6 +51,9 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	object3dTerrain = new Object3D();
 	object3dTerrain->Initialize(object3dBasic_, modelManager, "resources/terrain.obj");
 
+	object3dPlanegLTF = new Object3D();
+	object3dPlanegLTF->Initialize(object3dBasic_, modelManager, "resources/plane.gltf");
+
 
 	//DirectionalLight用のリソースを作る
 	directionalLightResource = directXBasic->CreateBufferResource(sizeof(DirectionalLight));
@@ -111,6 +114,7 @@ void SampleScene::Update()
 	object3dBunny->Update();
 	object3dSuzanne->Update();
 	object3dTerrain->Update();
+	object3dPlanegLTF->Update();
 
 	if (playSound) {
 		//音声再生
@@ -139,6 +143,7 @@ void SampleScene::Update()
 	object3dMultiMaterial->DebugDraw("MultiMaterial");
 	object3dSuzanne->DebugDraw("Suzanne");
 	object3dTerrain->DebugDraw("Terrain");
+	object3dPlanegLTF->DebugDraw("planegltf");
 	if (ImGui::TreeNode("Camera")) {
 		ImGui::DragFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), 0.1f, -30.0f, 30.0f);
 		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
@@ -216,12 +221,14 @@ void SampleScene::ModelDraw()
 	object3dBunny->Draw();
 	object3dSuzanne->Draw();
 	object3dTerrain->Draw();
+	object3dPlanegLTF->Draw();
 
 	particleManager->Draw();
 }
 
 void SampleScene::Finalize()
 {
+	delete object3dPlanegLTF;
 	delete object3dTerrain;
 	delete object3dSuzanne;
 	delete object3dBunny;

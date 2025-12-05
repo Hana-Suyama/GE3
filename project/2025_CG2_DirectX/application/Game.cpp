@@ -10,7 +10,7 @@ void Game::Initialize()
 	textureManager->LoadTexture("resources/particle.png");
 
 	modelManager->LoadModel("resources", "plane.obj");
-	modelManager->LoadModel("resources", "teapot.obj");
+	modelManager->LoadModelAssimp("resources", "teapot.obj");
 	modelManager->LoadModel("resources", "fence.obj");
 	modelManager->LoadModel("resources", "player.obj");
 	modelManager->LoadModel("resources", "Block.obj");
@@ -19,6 +19,7 @@ void Game::Initialize()
 	modelManager->LoadModel("resources", "bunny.obj");
 	modelManager->LoadModel("resources", "suzanne.obj");
 	modelManager->LoadModel("resources", "terrain.obj");
+	modelManager->LoadModelAssimp("resources", "plane.gltf");
 
 	gameScene = new GameScene();
 	gameScene->Initialize(object3DBasic, modelManager, input, defaultCamera);

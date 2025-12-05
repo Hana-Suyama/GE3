@@ -4,6 +4,10 @@
 #include "../TextureManager.h"
 #include "Model.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 
 
 class ModelManager
@@ -35,6 +39,13 @@ public:
 	void LoadModel(const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
+	///	モデルをAssimpで読み込んで使用可能な状態にする
+	/// </summary>
+	/// <param name="directoryPath">ディレクトリパス</param>
+	/// <param name="filename">ファイル名</param>
+	void LoadModelAssimp(const std::string& directoryPath, const std::string& filename);
+
+	/// <summary>
 	///	モデルの要素番号を返す
 	/// </summary>
 	/// <param name="filePath">ファイルパス</param>
@@ -44,12 +55,16 @@ public:
 
 	TextureManager* GetTextureManager() const { return textureManager_; }
 
+	Model::Node ReadNode(aiNode* node);
+
 private:
 
 	/* --------- private変数 --------- */
 
 
 	Model LoadObjFile(const std::string& directoryPath, const std::string& filename);
+
+	Model LoadObjFileAssimp(const std::string& directoryPath, const std::string& filename);
 
 	std::string LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename, const std::string& materialName);
 

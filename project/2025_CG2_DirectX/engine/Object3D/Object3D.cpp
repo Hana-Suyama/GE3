@@ -31,8 +31,8 @@ void Object3D::Update()
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	transformationMatrixData_->WVP = worldViewProjectionMatrix;
-	transformationMatrixData_->World = worldMatrix;
+	transformationMatrixData_->WVP = modelData_->rootNode.localMatrix * worldViewProjectionMatrix;
+	transformationMatrixData_->World = modelData_->rootNode.localMatrix * worldMatrix;
 	transformationMatrixData_->WorldInverseTranspose = Transpose(Inverse(worldMatrix));
 
 	for (int32_t i = 0; i < modelData_->meshes.size(); i++) {
