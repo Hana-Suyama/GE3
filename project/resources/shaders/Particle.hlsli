@@ -6,3 +6,12 @@ struct VertexShaderOutput
     int32_t falseUV : FALSEUV0;
     float32_t4 color : COLOR0;
 };
+
+struct GSOutput
+{
+    float32_t4 position : SV_POSITION;
+    float32_t2 texcoord : TEXCOORD0;
+    float32_t3 normal : NORMAL0;
+    int32_t falseUV : FALSEUV0;
+    float32_t4 color : COLOR0;
+};

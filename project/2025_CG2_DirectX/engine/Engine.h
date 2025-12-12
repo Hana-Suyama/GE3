@@ -38,6 +38,7 @@
 #include "DirectXBasic.h"
 #include "debug/Logger/Logger.h"
 #include <dxcapi.h>
+#include "Scene/SceneManager.h"
 
 using namespace MyMath;
 
@@ -70,25 +71,27 @@ private:
 
 protected:
 
-	TextureManager* textureManager = nullptr;
-	ModelManager* modelManager = nullptr;
-	XAudio2Basic* xaudio2Basic = nullptr;
-	Logger* logger = nullptr;
-	WindowsApi* winApi = nullptr;
-	DirectXBasic* directXBasic = nullptr;
-	SRVManager* srvManager = nullptr;
-	ImGuiManager* imguiManager = nullptr;
-	Input* input = nullptr;
-	SpriteBasic* spriteBasic = nullptr;
-	Camera* defaultCamera = new Camera();
-	Object3DBasic* object3DBasic = nullptr;
+	std::unique_ptr<TextureManager> textureManager = nullptr;
+	std::unique_ptr<ModelManager> modelManager = nullptr;
+	std::unique_ptr<XAudio2Basic> xaudio2Basic = nullptr;
+	std::unique_ptr<Logger> logger = nullptr;
+	std::unique_ptr<WindowsApi> winApi = nullptr;
+	std::unique_ptr<DirectXBasic> directXBasic = nullptr;
+	std::unique_ptr<SRVManager> srvManager = nullptr;
+	std::unique_ptr<ImGuiManager> imguiManager = nullptr;
+	std::unique_ptr<Input> input = nullptr;
+	std::unique_ptr<SpriteBasic> spriteBasic = nullptr;
+	std::unique_ptr<Camera> defaultCamera = nullptr;
+	std::unique_ptr<Object3DBasic> object3DBasic = nullptr;
 
 	BYTE beforeKey[256] = {};
-	DebugCamera* debugcamera = new DebugCamera();
+	std::unique_ptr<DebugCamera> debugcamera = nullptr;
 
 	bool useDebugcamera = false;
 
 	std::mt19937 randomEngine{ std::random_device{}() };
+
+	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
 
 };
 

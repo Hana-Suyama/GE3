@@ -1,7 +1,9 @@
 #pragma once
-#include "../../engine/Scene/BaseScene.h"
+#include "Player.h"
+#include "CameraController.h"
+#include "../engine/Scene/BaseScene.h"
 
-class SampleScene : public BaseScene
+class ClearScene : public BaseScene
 {
 public:
 
@@ -15,8 +17,6 @@ public:
 
 	virtual void Finalize();
 
-	void SetLight();
-
 private:
 
 	DirectXBasic* directXBasic_ = nullptr;
@@ -29,19 +29,6 @@ private:
 	SpriteBasic* spriteBasic_ = nullptr;
 	std::mt19937* randomEngine_ = nullptr;
 
-	std::unique_ptr<ParticleManager> particleManager = nullptr;
-
-	std::unique_ptr<Sprite> sprite = nullptr;
-	std::unique_ptr<Sprite> sprite2 = nullptr;
-
-	std::unique_ptr<Object3D> object3d = nullptr;
-	std::unique_ptr<Object3D> object3dTeapot= nullptr;
-	std::unique_ptr<Object3D> object3dMultiMesh = nullptr;
-	std::unique_ptr<Object3D> object3dMultiMaterial = nullptr;
-	std::unique_ptr<Object3D> object3dBunny = nullptr;
-	std::unique_ptr<Object3D> object3dSuzanne = nullptr;
-	std::unique_ptr<Object3D> object3dTerrain = nullptr;
-	std::unique_ptr<Object3D> object3dPlanegLTF = nullptr;
 
 	std::unique_ptr<Camera> camera = nullptr;
 
@@ -60,11 +47,8 @@ private:
 	//カメラ用変数を作る
 	struct Transform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -30.0f } };
 
-	bool playSound = false;
-
-	Vector3 EmitterPosition{};
-
-
+	// ロゴ
+	std::unique_ptr<Object3D> object_;
 
 };
 

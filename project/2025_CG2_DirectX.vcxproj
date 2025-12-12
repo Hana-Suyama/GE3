@@ -156,6 +156,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="2025_CG2_DirectX\application\MapChipFieldv.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Camera\DebugCamera.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -163,6 +164,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\DirectXBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Camera\Camera.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Engine.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\CameraController.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\ClearScene.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Scene\BaseScene.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -199,6 +203,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\application\Player.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Model\Model.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\SampleScene\SampleScene.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
@@ -208,6 +214,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Geometry</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">5.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -235,8 +244,20 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="resources\shaders\ParticleGS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Development|x64'">5.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\CameraForGPU.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\debug\D3DResourceLeakChecker.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\DebugCamera.h" />
@@ -252,6 +273,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector4.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\Camera.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Engine.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\CameraController.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\ClearScene.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Scene\BaseScene.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -286,6 +310,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\VertexData.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.h" />
     <ClInclude Include="2025_CG2_DirectX\application\Game.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

@@ -7,7 +7,7 @@ void Engine::Initialize()
 	SetUnhandledExceptionFilter(ExportDump);
 
 	//loggerの初期化
-	logger = new Logger();
+	logger = std::make_unique<Logger>();
 	logger->Initialize();
 
 	//起動時にログ出力のテスト
@@ -15,52 +15,56 @@ void Engine::Initialize()
 
 	//WindowsApi
 	//WinApiの初期化
-	winApi = new WindowsApi();
+	winApi = std::make_unique<WindowsApi>();
 	winApi->Initialize();
 
 	//DirectXの初期化
-	directXBasic = new DirectXBasic();
-	directXBasic->Initialize(logger, winApi);
+	directXBasic = std::make_unique<DirectXBasic>();
+	directXBasic->Initialize(logger.get(), winApi.get());
 
-	srvManager = new SRVManager();
-	srvManager->Initialize(directXBasic);
+	srvManager = std::make_unique<SRVManager>();
+	srvManager->Initialize(directXBasic.get());
 
-	imguiManager = new ImGuiManager();
-	imguiManager->Initialize(winApi, directXBasic, srvManager);
+	imguiManager = std::make_unique<ImGuiManager>();
+	imguiManager->Initialize(winApi.get(), directXBasic.get(), srvManager.get());
 
 	//テクスチャマネージャの初期化
-	textureManager = new TextureManager();
-	textureManager->Initialize(directXBasic, srvManager);
+	textureManager = std::make_unique<TextureManager>();
+	textureManager->Initialize(directXBasic.get(), srvManager.get());
 
 	//モデルマネージャの初期化
-	modelManager = new ModelManager();
-	modelManager->Initialize(directXBasic, textureManager);
+	modelManager = std::make_unique<ModelManager>();
+	modelManager->Initialize(directXBasic.get(), textureManager.get());
 
-	xaudio2Basic = new XAudio2Basic();
+	xaudio2Basic = std::make_unique<XAudio2Basic>();
 	xaudio2Basic->Initialize();
 
 	//ポインタ
 	//入力の初期化
-	input = new Input();
-	input->Initialize(winApi);
+	input = std::make_unique<Input>();
+	input->Initialize(winApi.get());
 
 	logger->Log("Complete create D3D12Device!!!\n");//初期化完了のログを出す
 
 	//スプライト基盤
-	spriteBasic = new SpriteBasic();
-	spriteBasic->Initialize(directXBasic, logger);
+	spriteBasic = std::make_unique<SpriteBasic>();
+	spriteBasic->Initialize(directXBasic.get(), logger.get());
 
+	defaultCamera = std::make_unique<Camera>();
 	defaultCamera->SetRotate({ 0.0f, 0.0f, 0.0f });
 	defaultCamera->SetTranslate({ 0.0f, 0.0f, -10.0f });
 
 	//3Dオブジェクト基盤
-	object3DBasic = new Object3DBasic();
-	object3DBasic->Initialize(directXBasic, logger);
+	object3DBasic = std::make_unique<Object3DBasic>();
+	object3DBasic->Initialize(directXBasic.get(), logger.get());
 
-	object3DBasic->SetDefaultCamera(defaultCamera);
+	object3DBasic->SetDefaultCamera(defaultCamera.get());
 
-	
+	debugcamera = std::make_unique<DebugCamera>();
 	debugcamera->Initialize(WindowsApi::kClientWidth, WindowsApi::kClientHeight);
+
+	sceneManager_ = std::make_unique<SceneManager>();
+	sceneManager_->Initialize(directXBasic.get(), object3DBasic.get(), modelManager.get(), input.get(), logger.get(), srvManager.get(), textureManager.get(), spriteBasic.get(), xaudio2Basic.get(), &randomEngine);
 	
 }
 
@@ -69,8 +73,8 @@ void Engine::Update()
 
 	input->Update();
 
+	sceneManager_->Update();
 
-	
 }
 
 void Engine::PreDraw()
@@ -83,11 +87,15 @@ void Engine::PreDraw()
 void Engine::SpritePreDraw()
 {
 	spriteBasic->SpritePreDraw();
+
+	sceneManager_->SpriteDraw();
 }
 
 void Engine::ModelPreDraw()
 {
 	object3DBasic->Object3DPreDraw();
+
+	sceneManager_->ModelDraw();
 }
 
 void Engine::PostDraw()
@@ -103,25 +111,12 @@ void Engine::Finalize()
 	imguiManager->Finalize();
 
 	//解放処理
-	delete debugcamera;
 	CloseHandle(directXBasic->GetFenceEvent());
 
 	//WindowsApiの終了処理
 	winApi->Finalize();
-
-	delete object3DBasic;
-	delete spriteBasic;
-	//入力解放
-	delete input;
-	//音声データ解放
+	
 	xaudio2Basic->Finalize();
-	delete modelManager;
-	delete textureManager;
-	delete imguiManager;
-	delete srvManager;
-	delete directXBasic;
-	delete winApi;
-	delete xaudio2Basic;
 }
 
 void Engine::Run()

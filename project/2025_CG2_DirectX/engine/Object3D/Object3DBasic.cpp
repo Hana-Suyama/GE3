@@ -146,6 +146,10 @@ void Object3DBasic::CreatePSO()
 		L"ps_6_0", logger_);
 	assert(pixelShaderBlob != nullptr);
 
+	Microsoft::WRL::ComPtr<IDxcBlob> geometryShaderBlob = directXBasic_->CompileShader(L"resources/shaders/BasicGeometryShader.hlsl",
+		L"gs_6_0", logger_);
+	assert(geometryShaderBlob != nullptr);
+
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
@@ -153,6 +157,8 @@ void Object3DBasic::CreatePSO()
 	vertexShaderBlob->GetBufferSize() };//VertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
 	pixelShaderBlob->GetBufferSize() };//PixelShader
+	graphicsPipelineStateDesc.GS = { geometryShaderBlob->GetBufferPointer(),
+	geometryShaderBlob->GetBufferSize() };//GeometryShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	//書き込むRTVの情報

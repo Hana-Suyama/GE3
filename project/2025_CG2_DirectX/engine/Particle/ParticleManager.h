@@ -98,8 +98,6 @@ private:
 
 	std::string textureFilePath_;
 
-	//std::list<Particle*> particles_;
-
 	Camera* camera_ = nullptr;
 
 	uint32_t intervl_ = 5;
@@ -113,11 +111,6 @@ private:
 	ParticleForGPU* instancingData = nullptr;
 	uint32_t srvIndex_ = 0;
 
-	// インデックスバッファビュー
-	D3D12_INDEX_BUFFER_VIEW indexBufferView_{};
-	// インデックスリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource_;
-	
 	// マテリアル
 	Material* materialData_ = nullptr;
 	// マテリアルリソース

@@ -3,8 +3,41 @@
 #include "../engine/Model/ModelManager.h"
 #include "../engine/Object3D/Object3D.h"
 #include "../engine/Input/input.h"
+#include "MapChipField.h"
 class Player
 {
+public:
+
+	struct CollisionMapInfo {
+		bool isCeilingCollision = false;
+		bool isGroundCollision = false;
+		bool isWallCollision = false;
+		Vector3 velocity;
+	};
+
+	enum Corner {
+		kRightBottom,	//右下
+		kLeftBottom,	//左下
+		kRightTop,		//右上
+		kLeftTop,		//左上
+
+		kNumCorner		//要素数
+
+	};
+
+	enum class Behavior {
+		kRoot,	//通常攻撃
+		kAttack,	//攻撃中
+		kUnknown,
+	};
+
+	//攻撃フェーズ(型)
+	enum class AttackPhase {
+		kChage,	//溜め
+		kRush,	//突進
+		kInterval,	//余韻
+	};
+
 public:
 
 	void Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Input* input, Camera* camera);
@@ -12,6 +45,34 @@ public:
 	void Update();
 
 	void Draw();
+
+	void Move();
+
+	void MapCollisionCheck(CollisionMapInfo& info);
+
+	void MapCollisionCheckUp(CollisionMapInfo& info);
+	void MapCollisionCheckDown(CollisionMapInfo& info);
+	void MapCollisionCheckRight(CollisionMapInfo& info);
+	void MapCollisionCheckLeft(CollisionMapInfo& info);
+
+	Vector3 CornerPosition(const Vector3& center, Corner corner);
+
+	void CheckResultMove(const CollisionMapInfo& info);
+
+	void CeilingCollisionMove(const CollisionMapInfo& info);
+
+	void OnGroundSwitch(const CollisionMapInfo& info);
+
+	void isWallHit(const CollisionMapInfo& info);
+
+	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; };
+
+	const Vector3& GetWorldTransform() { return model_->GetTransform().translate; };
+
+	const Vector3& GetVelocity() const { return velocity_; };
+
+
+
 
 	float EaseInOutSine(float t);
 
@@ -48,7 +109,7 @@ private:
 	//速度減衰率
 	static inline const float kAttenuation = 0.1f;
 	//上限速度
-	static inline const float kLimitRunSpeed = 0.2f;
+	static inline const float kLimitRunSpeed = 0.5f;
 	//左右
 	LRDirection lrDirection_ = LRDirection::kRight;
 	//旋回開始時の角度
@@ -57,6 +118,28 @@ private:
 	float turnTimer_ = 0.0f;
 	//旋回時間<秒>
 	static inline const float kTimeTurn = 0.3f;
+	//接地状態フラグ
+	bool onGround_ = true;
+	//重力加速度(下方向)
+	static inline const float kGravityAcceleration = 0.03f;
+	//最大落下速度(下方向)
+	static inline const float kLimitFallSpeed = 1.0f;
+	//ジャンプ初速(上方向)
+	static inline const float kJumpAcceleration = 0.5f;
+	//マップチップによるフィールド
+	MapChipField* mapChipField_ = nullptr;
+	//キャラクターの当たり判定サイズ
+	static inline const float kWidth = 0.8f;
+	static inline const float kHeight = 0.8f;
+
+	static inline const float kBlank = 0.1f;
+	//着地時の速度減衰率
+	static inline const float kAttenuationLanding = 0.1f;
+	//壁接触時の速度減衰率
+	static inline const float kAttenuationWall = 0.1f;
+
+	//デスフラグ
+	bool isDead_ = false;
 
 	//追従対象とカメラの座標の差(オフセット)
 	Vector3 targetOffset_ = { 0, 0, -30.0f };

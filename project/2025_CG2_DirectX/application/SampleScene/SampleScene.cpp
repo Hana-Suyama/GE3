@@ -15,45 +15,58 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	xaudio2Basic_ = xaudio2Basic;
 	randomEngine_ = randomEngine;
 
-	camera = new Camera();
+	textureManager_->LoadTexture("resources/uvChecker.png");
+	textureManager_->LoadTexture("resources/monsterBall.png");
+	textureManager_->LoadTexture("resources/particle.png");
+
+	modelManager_->LoadModel("resources", "plane.obj");
+	modelManager_->LoadModelAssimp("resources", "teapot.obj");
+	modelManager_->LoadModel("resources", "fence.obj");
+	modelManager_->LoadModel("resources", "multiMesh.obj");
+	modelManager_->LoadModel("resources", "multiMaterial.obj");
+	modelManager_->LoadModel("resources", "bunny.obj");
+	modelManager_->LoadModel("resources", "suzanne.obj");
+	modelManager_->LoadModel("resources", "terrain.obj");
+	modelManager_->LoadModelAssimp("resources", "plane.gltf");
+
+	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
 	camera->SetTranslate({ 0.0f, 0.0f, -10.0f });
-	object3dBasic_->SetDefaultCamera(camera);
+	object3dBasic_->SetDefaultCamera(camera.get());
 
-	particleManager = new ParticleManager();
-	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/particle.png", camera);
+	particleManager = std::make_unique<ParticleManager>();
+	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/particle.png", camera.get());
 
 	//sprite
-	sprite = new Sprite();
+	sprite = std::make_unique<Sprite>();
 	sprite->Initialize(spriteBasic, textureManager, "resources/uvChecker.png");
 
-	sprite2 = new Sprite();
+	sprite2 = std::make_unique<Sprite>();
 	sprite2->Initialize(spriteBasic, textureManager, "resources/monsterBall.png");
 
-	object3d = new Object3D();
+	object3d = std::make_unique<Object3D>();
 	object3d->Initialize(object3dBasic_, modelManager, "resources/plane.obj");
 
-	object3dTeapot = new Object3D();
+	object3dTeapot = std::make_unique<Object3D>();
 	object3dTeapot->Initialize(object3dBasic_, modelManager, "resources/teapot.obj");
 
-	object3dMultiMesh = new Object3D();
+	object3dMultiMesh = std::make_unique<Object3D>();
 	object3dMultiMesh->Initialize(object3dBasic_, modelManager, "resources/multiMesh.obj");
 
-	object3dMultiMaterial = new Object3D();
+	object3dMultiMaterial = std::make_unique<Object3D>();
 	object3dMultiMaterial->Initialize(object3dBasic_, modelManager, "resources/multiMaterial.obj");
 
-	object3dBunny = new Object3D();
+	object3dBunny = std::make_unique<Object3D>();
 	object3dBunny->Initialize(object3dBasic_, modelManager, "resources/bunny.obj");
 
-	object3dSuzanne = new Object3D();
+	object3dSuzanne = std::make_unique<Object3D>();
 	object3dSuzanne->Initialize(object3dBasic_, modelManager, "resources/suzanne.obj");
 
-	object3dTerrain = new Object3D();
+	object3dTerrain = std::make_unique<Object3D>();
 	object3dTerrain->Initialize(object3dBasic_, modelManager, "resources/terrain.obj");
 
-	object3dPlanegLTF = new Object3D();
+	object3dPlanegLTF = std::make_unique<Object3D>();
 	object3dPlanegLTF->Initialize(object3dBasic_, modelManager, "resources/plane.gltf");
-
 
 	//DirectionalLight用のリソースを作る
 	directionalLightResource = directXBasic->CreateBufferResource(sizeof(DirectionalLight));
@@ -228,17 +241,7 @@ void SampleScene::ModelDraw()
 
 void SampleScene::Finalize()
 {
-	delete object3dPlanegLTF;
-	delete object3dTerrain;
-	delete object3dSuzanne;
-	delete object3dBunny;
-	delete object3dMultiMaterial;
-	delete object3dMultiMesh;
-	delete object3dTeapot;
-	delete object3d;
-	delete sprite2;
-	delete sprite;
-	delete particleManager;
+	
 }
 
 void SampleScene::SetLight()

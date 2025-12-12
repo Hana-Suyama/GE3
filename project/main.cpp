@@ -10,11 +10,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3DResourceLeakChecker leakCheck;
 
 	// エンジンを継承してゲームを作る
-	Engine* game = new Game();
+	std::unique_ptr<Engine> game = std::make_unique<Game>();
 
 	game->Run();
 
-	delete game;
+	game.reset();
 
 	return 0;
 }

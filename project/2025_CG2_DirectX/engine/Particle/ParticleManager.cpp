@@ -33,48 +33,21 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	CreatePSO();
 
 	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData));
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点4つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	//使用するリソースのサイズは頂点1つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(VertexData);
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//スプライト用の頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-	vertexData[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };//左下
+	vertexData[0].position = { 0.0f, 0.0f, 0.0f, 1.0f };
 	vertexData[0].texcoord = { 0.0f, 1.0f };
 	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
-	vertexData[1].position = { 0.0f, 0.0f, 0.0f, 1.0f };//左上
-	vertexData[1].texcoord = { 0.0f, 0.0f };
-	vertexData[1].normal = { 0.0f, 0.0f, -1.0f };
-	vertexData[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };//右下
-	vertexData[2].texcoord = { 1.0f, 1.0f };
-	vertexData[2].normal = { 0.0f, 0.0f, -1.0f };
-	vertexData[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };//右上
-	vertexData[3].texcoord = { 1.0f, 0.0f };
-	vertexData[3].normal = { 0.0f, 0.0f, -1.0f };
-
-	//Sprite用のindexリソース
-	indexResource_ = directXBasic_->CreateBufferResource(sizeof(uint32_t) * 6);
-	//リソースの先頭のアドレスから使う
-	indexBufferView_.BufferLocation = indexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズはインデックス6つ分のサイズ
-	indexBufferView_.SizeInBytes = sizeof(uint32_t) * 6;
-	//インデックスはuint32_tとする
-	indexBufferView_.Format = DXGI_FORMAT_R32_UINT;
-	//Sprite用インデックスリソースにデータを書き込む
-	uint32_t* indexData = nullptr;
-	indexResource_->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-	indexData[0] = 0;
-	indexData[1] = 1;
-	indexData[2] = 2;
-	indexData[3] = 1;
-	indexData[4] = 3;
-	indexData[5] = 2;
 
 	//Sprite用のマテリアルリソースを作る
 	materialResource_ = directXBasic_->CreateBufferResource(sizeof(Material));
@@ -87,7 +60,6 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	materialData_->enableLighting = Light::None;
 	//UVTransformを単位行列で初期化
 	materialData_->uvTransform = MakeIdentity4x4();
-
 
 	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
@@ -223,7 +195,7 @@ void ParticleManager::Draw()
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());	//PSOを設定
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	//テクスチャを指定
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
@@ -246,11 +218,9 @@ void ParticleManager::Draw()
 
 	//マテリアルCBufferの場所を設定
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
-	//IBVを設定
-	directXBasic_->GetCommandList()->IASetIndexBuffer(&indexBufferView_);
 	//描画！(DrawCall/ドローコール)
 	if (numInstance) {
-		directXBasic_->GetCommandList()->DrawIndexedInstanced(6, numInstance, 0, 0, 0);
+		directXBasic_->GetCommandList()->DrawInstanced(1, numInstance, 0, 0);
 	}
 }
 
@@ -373,6 +343,10 @@ void ParticleManager::CreatePSO()
 		L"ps_6_0", logger_);
 	assert(pixelShaderBlob != nullptr);
 
+	Microsoft::WRL::ComPtr<IDxcBlob> geometryShaderBlob = directXBasic_->CompileShader(L"resources/shaders/ParticleGS.hlsl",
+		L"gs_6_0", logger_);
+	assert(geometryShaderBlob != nullptr);
+
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc{};
 	graphicsPipelineStateDesc.pRootSignature = rootSignature_.Get();//RootSignature
 	graphicsPipelineStateDesc.InputLayout = inputLayoutDesc;//InputLayout
@@ -380,14 +354,16 @@ void ParticleManager::CreatePSO()
 	vertexShaderBlob->GetBufferSize() };//VertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
 	pixelShaderBlob->GetBufferSize() };//PixelShader
+	graphicsPipelineStateDesc.GS = { geometryShaderBlob->GetBufferPointer(),
+	geometryShaderBlob->GetBufferSize() };//GeometryShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	//書き込むRTVの情報
 	graphicsPipelineStateDesc.NumRenderTargets = 1;
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-	//利用するトポロジ(形状)のタイプ。三角形
+	//利用するトポロジ(形状)のタイプ。点の情報だけ送るようにしたので点
 	graphicsPipelineStateDesc.PrimitiveTopologyType =
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 	//どのように画面に色を打ち込むかの設定(気にしなくて良い)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -403,12 +379,12 @@ void ParticleManager::CreatePSO()
 void ParticleManager::CreateVertexResource()
 {
 	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData));
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点4つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	//使用するリソースのサイズは頂点1つ分のサイズ
+	vertexBufferView_.SizeInBytes = sizeof(VertexData);
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 }
