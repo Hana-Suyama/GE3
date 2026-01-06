@@ -59,13 +59,13 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	//SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = Light::None;
 	//UVTransformを単位行列で初期化
-	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
 
 	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-		instancingData[index].WVP = MakeIdentity4x4();
-		instancingData[index].World = MakeIdentity4x4();
+		instancingData[index].WVP = Matrix4x4::MakeIdentity4x4();
+		instancingData[index].World = Matrix4x4::MakeIdentity4x4();
 		instancingData[index].color = Vector4( 1.0f, 1.0f, 1.0f, 1.0f );
 	}
 
@@ -111,9 +111,9 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 	
 #endif
 
-	Matrix4x4 billboardMatrix = MakeIdentity4x4();
+	Matrix4x4 billboardMatrix = Matrix4x4::MakeIdentity4x4();
 		Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
-		billboardMatrix = Multiply(backToFrontMatrix, camera_->GetWorldMatrix());
+		billboardMatrix = backToFrontMatrix.Multiply(camera_->GetWorldMatrix());
 		billboardMatrix.m[3][0] = 0.0f;
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
@@ -132,7 +132,7 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 		if (isBillboard) {
 			worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
 		}
-		Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, camera_->GetViewProjectionMatrix());
+		Matrix4x4 worldViewProjectionMatrix = worldMatrix.Multiply(camera_->GetViewProjectionMatrix());
 
 		if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
 			(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;

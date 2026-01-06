@@ -17,112 +17,15 @@ using namespace std;
 // }
 //
 
-Vector3 operator+(const Vector3& v1, const Vector3& v2) { return MyMath::Add(v1, v2); }
-Vector3 operator-(const Vector3& v1, const Vector3& v2) { return MyMath::Subtract(v1, v2); }
-Vector3 operator*(float s, const Vector3& v) { return MyMath::Multiply(v, s); }
-Vector3 operator*(const Vector3& v, float s) { return s * v; }
-Vector3 operator/(const Vector3& v, float s) { return MyMath::Multiply(v, 1.0f / s); }
-
 namespace MyMath {
 
-	Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2) { return Add(m1, m2); }
-	Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2) { return Subtract(m1, m2); }
-	Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2) { return Multiply(m1, m2); }
-
-	Vector3 operator-(const Vector3& v) { return { -v.x, -v.y, -v.z }; }
-	Vector3 operator+(const Vector3& v) { return v; }
-
+	
 	/// <summary>
 	/// 角度をラジアンに変換
 	/// </summary>
 	float DEGtoRAD(float degree) {
 		float result;
 		result = degree * ((float)M_PI / 180);
-		return result;
-	}
-
-	/// <summary>
-	/// 行列の加法
-	/// </summary>
-	Matrix4x4 Add(Matrix4x4 matrix1, Matrix4x4 matrix2) {
-		Matrix4x4 Return{};
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				Return.m[i][j] = matrix1.m[i][j] + matrix2.m[i][j];
-			}
-		}
-		return Return;
-	}
-
-	/// <summary>
-	/// 行列の減法
-	/// </summary>
-	Matrix4x4 Subtract(Matrix4x4 matrix1, Matrix4x4 matrix2) {
-		Matrix4x4 Return{};
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				Return.m[i][j] = matrix1.m[i][j] - matrix2.m[i][j];
-			}
-		}
-		return Return;
-	}
-
-	/// <summary>
-	/// 行列の積
-	/// </summary>
-	Matrix4x4 Multiply(Matrix4x4 matrix1, Matrix4x4 matrix2) {
-		Matrix4x4 Return{};
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				for (int k = 0; k < 4; k++) {
-					Return.m[i][j] += matrix1.m[i][k] * matrix2.m[k][j];
-				}
-			}
-		}
-		return Return;
-	}
-
-	/// <summary>
-	/// Vector3の加法
-	/// </summary>
-	Vector3 Add(Vector3 a, Vector3 b) {
-		Vector3 result{};
-		result.x = a.x + b.x;
-		result.y = a.y + b.y;
-		result.z = a.z + b.z;
-		return result;
-	}
-
-	/// <summary>
-	/// Vector3の減法
-	/// </summary>
-	Vector3 Subtract(Vector3 a, Vector3 b) {
-		Vector3 result{};
-		result.x = a.x - b.x;
-		result.y = a.y - b.y;
-		result.z = a.z - b.z;
-		return result;
-	}
-
-	/// <summary>
-	/// Vector3の積
-	/// </summary>
-	Vector3 Multiply(const Vector3 a, const Vector3 b) {
-		Vector3 result{};
-		result.x = a.x * b.x;
-		result.y = a.y * b.y;
-		result.z = a.z * b.z;
-		return result;
-	}
-
-	/// <summary>
-	/// Vector3のスカラー倍
-	/// </summary>
-	Vector3 Multiply(const Vector3& a, const float& b) {
-		Vector3 result{};
-		result.x = a.x * b;
-		result.y = a.y * b;
-		result.z = a.z * b;
 		return result;
 	}
 
@@ -137,187 +40,6 @@ namespace MyMath {
 			(vector.x * matrix.m[0][1]) + (vector.y * matrix.m[1][1]) + (vector.z * matrix.m[2][1]) + (matrix.m[3][1]);
 		Return.z =
 			(vector.x * matrix.m[0][2]) + (vector.y * matrix.m[1][2]) + (vector.z * matrix.m[2][2]) + (matrix.m[3][2]);
-		return Return;
-	}
-
-	/// <summary>
-	/// 正規化
-	/// </summary>
-	Vector3 Normalize(const Vector3& a) {
-
-		Vector3 result{};
-
-		float length = sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
-
-		if (length != 0.0f) {
-			result.x = a.x / length;
-			result.y = a.y / length;
-			result.z = a.z / length;
-		}
-
-		return result;
-	}
-
-	/// <summary>
-	/// 内積
-	/// </summary>
-	float Dot(const Vector3 v1, const Vector3 v2) {
-		float Result{};
-		Result = (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
-		return Result;
-	}
-
-	/// <summary>
-	/// クロス積
-	/// </summary>
-	Vector3 Cross(const Vector3& v1, const Vector3& v2) {
-		Vector3 result{};
-		result.x = (v1.y * v2.z) - (v1.z * v2.y);
-		result.y = (v1.z * v2.x) - (v1.x * v2.z);
-		result.z = (v1.x * v2.y) - (v1.y * v2.x);
-		return result;
-	}
-
-	/// <summary>
-	/// 逆行列
-	/// </summary>
-	Matrix4x4 Inverse(const Matrix4x4& m) {
-		Matrix4x4 Return{};
-		float A = 0;
-
-		A = (m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3]) +
-			(m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1]) +
-			(m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]) -
-			(m.m[0][0] * m.m[1][3] * m.m[2][2] * m.m[3][1]) -
-			(m.m[0][0] * m.m[1][2] * m.m[2][1] * m.m[3][3]) -
-			(m.m[0][0] * m.m[1][1] * m.m[2][3] * m.m[3][2]) -
-			(m.m[0][1] * m.m[1][0] * m.m[2][2] * m.m[3][3]) -
-			(m.m[0][2] * m.m[1][0] * m.m[2][3] * m.m[3][1]) -
-			(m.m[0][3] * m.m[1][0] * m.m[2][1] * m.m[3][2]) +
-			(m.m[0][3] * m.m[1][0] * m.m[2][2] * m.m[3][1]) +
-			(m.m[0][2] * m.m[1][0] * m.m[2][1] * m.m[3][3]) +
-			(m.m[0][1] * m.m[1][0] * m.m[2][3] * m.m[3][2]) +
-			(m.m[0][1] * m.m[1][2] * m.m[2][0] * m.m[3][3]) +
-			(m.m[0][2] * m.m[1][3] * m.m[2][0] * m.m[3][1]) +
-			(m.m[0][3] * m.m[1][1] * m.m[2][0] * m.m[3][2]) -
-			(m.m[0][3] * m.m[1][2] * m.m[2][0] * m.m[3][1]) -
-			(m.m[0][2] * m.m[1][1] * m.m[2][0] * m.m[3][3]) -
-			(m.m[0][1] * m.m[1][3] * m.m[2][0] * m.m[3][2]) -
-			(m.m[0][1] * m.m[1][2] * m.m[2][3] * m.m[3][0]) -
-			(m.m[0][2] * m.m[1][3] * m.m[2][1] * m.m[3][0]) -
-			(m.m[0][3] * m.m[1][1] * m.m[2][2] * m.m[3][0]) +
-			(m.m[0][3] * m.m[1][2] * m.m[2][1] * m.m[3][0]) +
-			(m.m[0][2] * m.m[1][1] * m.m[2][3] * m.m[3][0]) +
-			(m.m[0][1] * m.m[1][3] * m.m[2][2] * m.m[3][0]);
-
-		Return.m[0][0] =
-			(1 / A) * ((m.m[1][1] * m.m[2][2] * m.m[3][3]) + (m.m[1][2] * m.m[2][3] * m.m[3][1]) +
-				(m.m[1][3] * m.m[2][1] * m.m[3][2]) - (m.m[1][3] * m.m[2][2] * m.m[3][1]) -
-				(m.m[1][2] * m.m[2][1] * m.m[3][3]) - (m.m[1][1] * m.m[2][3] * m.m[3][2]));
-
-		Return.m[0][1] =
-			(1 / A) * (-(m.m[0][1] * m.m[2][2] * m.m[3][3]) - (m.m[0][2] * m.m[2][3] * m.m[3][1]) -
-				(m.m[0][3] * m.m[2][1] * m.m[3][2]) + (m.m[0][3] * m.m[2][2] * m.m[3][1]) +
-				(m.m[0][2] * m.m[2][1] * m.m[3][3]) + (m.m[0][1] * m.m[2][3] * m.m[3][2]));
-
-		Return.m[0][2] =
-			(1 / A) * ((m.m[0][1] * m.m[1][2] * m.m[3][3]) + (m.m[0][2] * m.m[1][3] * m.m[3][1]) +
-				(m.m[0][3] * m.m[1][1] * m.m[3][2]) - (m.m[0][3] * m.m[1][2] * m.m[3][1]) -
-				(m.m[0][2] * m.m[1][1] * m.m[3][3]) - (m.m[0][1] * m.m[1][3] * m.m[3][2]));
-
-		Return.m[0][3] =
-			(1 / A) * (-(m.m[0][1] * m.m[1][2] * m.m[2][3]) - (m.m[0][2] * m.m[1][3] * m.m[2][1]) -
-				(m.m[0][3] * m.m[1][1] * m.m[2][2]) + (m.m[0][3] * m.m[1][2] * m.m[2][1]) +
-				(m.m[0][2] * m.m[1][1] * m.m[2][3]) + (m.m[0][1] * m.m[1][3] * m.m[2][2]));
-
-		Return.m[1][0] =
-			(1 / A) * (-(m.m[1][0] * m.m[2][2] * m.m[3][3]) - (m.m[1][2] * m.m[2][3] * m.m[3][0]) -
-				(m.m[1][3] * m.m[2][0] * m.m[3][2]) + (m.m[1][3] * m.m[2][2] * m.m[3][0]) +
-				(m.m[1][2] * m.m[2][0] * m.m[3][3]) + (m.m[1][0] * m.m[2][3] * m.m[3][2]));
-
-		Return.m[1][1] =
-			(1 / A) * ((m.m[0][0] * m.m[2][2] * m.m[3][3]) + (m.m[0][2] * m.m[2][3] * m.m[3][0]) +
-				(m.m[0][3] * m.m[2][0] * m.m[3][2]) - (m.m[0][3] * m.m[2][2] * m.m[3][0]) -
-				(m.m[0][2] * m.m[2][0] * m.m[3][3]) - (m.m[0][0] * m.m[2][3] * m.m[3][2]));
-
-		Return.m[1][2] =
-			(1 / A) * (-(m.m[0][0] * m.m[1][2] * m.m[3][3]) - (m.m[0][2] * m.m[1][3] * m.m[3][0]) -
-				(m.m[0][3] * m.m[1][0] * m.m[3][2]) + (m.m[0][3] * m.m[1][2] * m.m[3][0]) +
-				(m.m[0][2] * m.m[1][0] * m.m[3][3]) + (m.m[0][0] * m.m[1][3] * m.m[3][2]));
-
-		Return.m[1][3] =
-			(1 / A) * ((m.m[0][0] * m.m[1][2] * m.m[2][3]) + (m.m[0][2] * m.m[1][3] * m.m[2][0]) +
-				(m.m[0][3] * m.m[1][0] * m.m[2][2]) - (m.m[0][3] * m.m[1][2] * m.m[2][0]) -
-				(m.m[0][2] * m.m[1][0] * m.m[2][3]) - (m.m[0][0] * m.m[1][3] * m.m[2][2]));
-
-		Return.m[2][0] =
-			(1 / A) * ((m.m[1][0] * m.m[2][1] * m.m[3][3]) + (m.m[1][1] * m.m[2][3] * m.m[3][0]) +
-				(m.m[1][3] * m.m[2][0] * m.m[3][1]) - (m.m[1][3] * m.m[2][1] * m.m[3][0]) -
-				(m.m[1][1] * m.m[2][0] * m.m[3][3]) - (m.m[1][0] * m.m[2][3] * m.m[3][1]));
-
-		Return.m[2][1] =
-			(1 / A) * (-(m.m[0][0] * m.m[2][1] * m.m[3][3]) - (m.m[0][1] * m.m[2][3] * m.m[3][0]) -
-				(m.m[0][3] * m.m[2][0] * m.m[3][1]) + (m.m[0][3] * m.m[2][1] * m.m[3][0]) +
-				(m.m[0][1] * m.m[2][0] * m.m[3][3]) + (m.m[0][0] * m.m[2][3] * m.m[3][1]));
-
-		Return.m[2][2] =
-			(1 / A) * ((m.m[0][0] * m.m[1][1] * m.m[3][3]) + (m.m[0][1] * m.m[1][3] * m.m[3][0]) +
-				(m.m[0][3] * m.m[1][0] * m.m[3][1]) - (m.m[0][3] * m.m[1][1] * m.m[3][0]) -
-				(m.m[0][1] * m.m[1][0] * m.m[3][3]) - (m.m[0][0] * m.m[1][3] * m.m[3][1]));
-
-		Return.m[2][3] =
-			(1 / A) * (-(m.m[0][0] * m.m[1][1] * m.m[2][3]) - (m.m[0][1] * m.m[1][3] * m.m[2][0]) -
-				(m.m[0][3] * m.m[1][0] * m.m[2][1]) + (m.m[0][3] * m.m[1][1] * m.m[2][0]) +
-				(m.m[0][1] * m.m[1][0] * m.m[2][3]) + (m.m[0][0] * m.m[1][3] * m.m[2][1]));
-
-		Return.m[3][0] =
-			(1 / A) * (-(m.m[1][0] * m.m[2][1] * m.m[3][2]) - (m.m[1][1] * m.m[2][2] * m.m[3][0]) -
-				(m.m[1][2] * m.m[2][0] * m.m[3][1]) + (m.m[1][2] * m.m[2][1] * m.m[3][0]) +
-				(m.m[1][1] * m.m[2][0] * m.m[3][2]) + (m.m[1][0] * m.m[2][2] * m.m[3][1]));
-
-		Return.m[3][1] =
-			(1 / A) * ((m.m[0][0] * m.m[2][1] * m.m[3][2]) + (m.m[0][1] * m.m[2][2] * m.m[3][0]) +
-				(m.m[0][2] * m.m[2][0] * m.m[3][1]) - (m.m[0][2] * m.m[2][1] * m.m[3][0]) -
-				(m.m[0][1] * m.m[2][0] * m.m[3][2]) - (m.m[0][0] * m.m[2][2] * m.m[3][1]));
-
-		Return.m[3][2] =
-			(1 / A) * (-(m.m[0][0] * m.m[1][1] * m.m[3][2]) - (m.m[0][1] * m.m[1][2] * m.m[3][0]) -
-				(m.m[0][2] * m.m[1][0] * m.m[3][1]) + (m.m[0][2] * m.m[1][1] * m.m[3][0]) +
-				(m.m[0][1] * m.m[1][0] * m.m[3][2]) + (m.m[0][0] * m.m[1][2] * m.m[3][1]));
-
-		Return.m[3][3] =
-			(1 / A) * ((m.m[0][0] * m.m[1][1] * m.m[2][2]) + (m.m[0][1] * m.m[1][2] * m.m[2][0]) +
-				(m.m[0][2] * m.m[1][0] * m.m[2][1]) - (m.m[0][2] * m.m[1][1] * m.m[2][0]) -
-				(m.m[0][1] * m.m[1][0] * m.m[2][2]) - (m.m[0][0] * m.m[1][2] * m.m[2][1]));
-
-		return Return;
-	}
-
-	/// <summary>
-	/// 転置行列
-	/// </summary>
-	Matrix4x4 Transpose(const Matrix4x4& m) {
-		Matrix4x4 Return{};
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				Return.m[i][j] = m.m[j][i];
-			}
-		}
-		return Return;
-	}
-
-	/// <summary>
-	/// 単位行列
-	/// </summary>
-	Matrix4x4 MakeIdentity4x4() {
-		Matrix4x4 Return{};
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
-				if (i == j) {
-					Return.m[i][j] = 1;
-				}
-			}
-		}
 		return Return;
 	}
 
@@ -422,9 +144,9 @@ namespace MyMath {
 		Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
 		Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
 		Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
-		Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
-		result = Multiply(result, rotateXYZMatrix);
-		result = Multiply(result, MakeTranslateMatrix(translate));
+		Matrix4x4 rotateXYZMatrix = rotateXMatrix.Multiply(rotateYMatrix.Multiply(rotateZMatrix));
+		result = result.Multiply(rotateXYZMatrix);
+		result = result.Multiply(MakeTranslateMatrix(translate));
 		return result;
 	}
 
@@ -488,7 +210,7 @@ namespace MyMath {
 	/// </summary>
 	Vector3 Project(const Vector3& v1, const Vector3& v2) {
 		Vector3 Result{};
-		Result = Multiply(Normalize(v2), Dot(v1, Normalize(v2)));
+		Result = v2.Normalize().Multiply(v1.Dot(v2.Normalize()));
 		return Result;
 	}
 
@@ -497,7 +219,7 @@ namespace MyMath {
 	/// </summary>
 	Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 		Vector3 Result{};
-		Result = Add(segment.origin, Project(Subtract(point, segment.origin), segment.diff));
+		Result = segment.origin.Add(Project(point.Subtract(segment.origin), segment.diff));
 		return Result;
 	}
 
@@ -527,7 +249,7 @@ namespace MyMath {
 	/// </summary>
 	Vector3 Reflect(const Vector3& input, const Vector3& normal) {
 		Vector3 result;
-		result = input - ((2.0f * Dot(input, normal)) * normal);
+		result = input - ((2.0f * input.Dot(normal)) * normal);
 		return result;
 	}
 
@@ -753,7 +475,7 @@ namespace MyMath {
 	/// </summary>
 	bool IsCollision(const Sphere& sphere, const Plane& plane) {
 		float k{};
-		k = fabsf(Dot(plane.normal, sphere.center) - plane.distsnce);
+		k = fabsf(plane.normal.Dot(sphere.center) - plane.distsnce);
 		if (k <= sphere.radius) {
 			return true;
 		} else {
@@ -765,13 +487,13 @@ namespace MyMath {
 	/// 線分と平面の衝突判定
 	/// </summary>
 	bool IsCollision(const Segment& segment, const Plane& plane) {
-		float dot = Dot(plane.normal, segment.diff);
+		float dot = plane.normal.Dot(segment.diff);
 
 		if (dot == 0.0f) {
 			return false;
 		}
 
-		float t = (plane.distsnce - Dot(segment.origin, plane.normal)) / dot;
+		float t = (plane.distsnce - segment.origin.Dot(plane.normal)) / dot;
 
 		if (t <= 1 && t >= 0) {
 			return true;
@@ -784,7 +506,7 @@ namespace MyMath {
 	/// 直線と平面の衝突判定
 	/// </summary>
 	bool IsCollision(const Line& line, const Plane& plane) {
-		float dot = Dot(plane.normal, line.diff);
+		float dot = plane.normal.Dot(line.diff);
 
 		if (dot == 0.0f) {
 			return false;
@@ -797,13 +519,13 @@ namespace MyMath {
 	/// 半直線と平面の衝突判定
 	/// </summary>
 	bool IsCollision(const Ray& ray, const Plane& plane) {
-		float dot = Dot(plane.normal, ray.diff);
+		float dot = plane.normal.Dot(ray.diff);
 
 		if (dot == 0.0f) {
 			return false;
 		}
 
-		float t = (plane.distsnce - Dot(ray.origin, plane.normal)) / dot;
+		float t = (plane.distsnce - ray.origin.Dot(plane.normal)) / dot;
 
 		if (t >= 0) {
 			return true;
@@ -817,31 +539,31 @@ namespace MyMath {
 	/// </summary>
 	bool IsCollision(const Triangle& triangle, const Segment& segment) {
 
-		Vector3 v1 = (Subtract(triangle.LocalVertices[1], triangle.LocalVertices[0]));
-		Vector3 v2 = (Subtract(triangle.LocalVertices[2], triangle.LocalVertices[1]));
-		Vector3 v3 = (Subtract(triangle.LocalVertices[0], triangle.LocalVertices[2]));
-		Vector3 n = Normalize(Cross(v1, v2));
-		float d = Dot(triangle.LocalVertices[1], n);
+		Vector3 v1 = (triangle.LocalVertices[1].Subtract(triangle.LocalVertices[0]));
+		Vector3 v2 = (triangle.LocalVertices[2].Subtract(triangle.LocalVertices[1]));
+		Vector3 v3 = (triangle.LocalVertices[0].Subtract(triangle.LocalVertices[2]));
+		Vector3 n = v1.Cross(v2).Normalize();
+		float d = triangle.LocalVertices[1].Dot(n);
 
-		float dot = Dot(n, segment.diff);
+		float dot = n.Dot(segment.diff);
 
 		if (dot == 0.0f) {
 			return false;
 		}
 
-		float t = (d - Dot(segment.origin, n)) / dot;
+		float t = (d - segment.origin.Dot(n)) / dot;
 
 
 		if (t <= 1 && t >= 0) {
 
-			Vector3 p = Add(segment.origin, Multiply(segment.diff, t));
-			Vector3 cross01 = Cross(v1, Subtract(p, triangle.LocalVertices[1]));
-			Vector3 cross12 = Cross(v2, Subtract(p, triangle.LocalVertices[2]));
-			Vector3 cross20 = Cross(v3, Subtract(p, triangle.LocalVertices[0]));
+			Vector3 p = segment.origin.Add(segment.diff.Multiply(t));
+			Vector3 cross01 = v1.Cross(p.Subtract(triangle.LocalVertices[1]));
+			Vector3 cross12 = v2.Cross(p.Subtract(triangle.LocalVertices[2]));
+			Vector3 cross20 = v3.Cross(p.Subtract(triangle.LocalVertices[0]));
 
-			if (Dot(cross01, n) >= 0.0f &&
-				Dot(cross12, n) >= 0.0f &&
-				Dot(cross20, n) >= 0.0f) {
+			if (cross01.Dot(n) >= 0.0f &&
+				cross12.Dot(n) >= 0.0f &&
+				cross20.Dot(n) >= 0.0f) {
 				return true;
 			}
 
@@ -984,13 +706,13 @@ namespace MyMath {
 	/// カプセルと平面の衝突判定
 	/// </summary>
 	bool IsCollision(const Capsule& capsule, const Plane& plane) {
-		float dot = Dot(plane.normal, capsule.segment.diff);
+		float dot = plane.normal.Dot(capsule.segment.diff);
 
 		if (dot == 0.0f) {
 			return false;
 		}
 
-		float t = (plane.distsnce - Dot(capsule.segment.origin, plane.normal)) / dot;
+		float t = (plane.distsnce - capsule.segment.origin.Dot(plane.normal)) / dot;
 
 		if (t <= 1 && t >= 0) {
 			return true;

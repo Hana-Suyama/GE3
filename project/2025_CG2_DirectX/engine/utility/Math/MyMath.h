@@ -3,11 +3,7 @@
 #include "Vector3.h"
 #include "Matrix4x4.h"
 
-Vector3 operator+(const Vector3& v1, const Vector3& v2);
-Vector3 operator-(const Vector3& v1, const Vector3& v2);
-Vector3 operator*(float s, const Vector3& v);
-Vector3 operator*(const Vector3& v, float s);
-Vector3 operator/(const Vector3& v, float s);
+
 
 namespace MyMath {
 
@@ -74,87 +70,15 @@ namespace MyMath {
 		float radius;
 	};
 
-	Matrix4x4 operator+(const Matrix4x4& m1, const Matrix4x4& m2);
-	Matrix4x4 operator-(const Matrix4x4& m1, const Matrix4x4& m2);
-	Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2);
-
-	Vector3 operator-(const Vector3& v);
-	Vector3 operator+(const Vector3& v);
-
 	/// <summary>
 	/// 角度をラジアンに変換
 	/// </summary>
 	float DEGtoRAD(float degree);
 
 	/// <summary>
-	/// 行列の加法
-	/// </summary>
-	Matrix4x4 Add(Matrix4x4 matrix1, Matrix4x4 matrix2);
-
-	/// <summary>
-	/// 行列の減法
-	/// </summary>
-	Matrix4x4 Subtract(Matrix4x4 matrix1, Matrix4x4 matrix2);
-
-	/// <summary>
-	/// 行列の積
-	/// </summary>
-	Matrix4x4 Multiply(Matrix4x4 matrix1, Matrix4x4 matrix2);
-
-	/// <summary>
-	/// Vector3の加法
-	/// </summary>
-	Vector3 Add(Vector3 a, Vector3 b);
-
-	/// <summary>
-	/// Vector3の減法
-	/// </summary>
-	Vector3 Subtract(Vector3 a, Vector3 b);
-
-	/// <summary>
-	/// Vector3の積
-	/// </summary>
-	Vector3 Multiply(Vector3 a, Vector3 b);
-
-	/// <summary>
-	/// Vector3のスカラー倍
-	/// </summary>
-	Vector3 Multiply(const Vector3& a, const float& b);
-
-	/// <summary>
 	/// ベクトルと行列の積
 	/// </summary>
 	Vector3 Multiply(const Vector3 vector, const Matrix4x4 matrix);
-
-	/// <summary>
-	/// 正規化
-	/// </summary>
-	Vector3 Normalize(const Vector3& a);
-
-	/// <summary>
-	/// 内積
-	/// </summary>
-	float Dot(const Vector3 v1, const Vector3 v2);
-
-	/// <summary>
-	/// クロス積
-	/// </summary>
-	Vector3 Cross(const Vector3& v1, const Vector3& v2);
-
-	/// <summary>
-	/// 逆行列
-	/// </summary>
-	Matrix4x4 Inverse(const Matrix4x4& m);
-
-	/// <summary>
-	/// 転置行列
-	/// </summary>
-	Matrix4x4 Transpose(const Matrix4x4& m);
-
-	/// <summary>
-	/// 単位行列
-	/// </summary>
-	Matrix4x4 MakeIdentity4x4();
 
 	/// <summary>
 	/// 平行移動行列

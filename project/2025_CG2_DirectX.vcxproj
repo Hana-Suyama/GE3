@@ -266,6 +266,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Light\DirectionalLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\SpotLight.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix2x2.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix3x3.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix4x4.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector2.h" />

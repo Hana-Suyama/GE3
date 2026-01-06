@@ -3,16 +3,16 @@ using namespace MyMath;
 
 void DebugCamera::Initialize(const int32_t clientWidth, const int32_t clientHeight) {
 
-	viewMatrix_ = MakeIdentity4x4();
+	viewMatrix_ = Matrix4x4::MakeIdentity4x4();
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(clientWidth) / float(clientHeight), 0.1f, 100.0f);
-	matRot_ = MakeIdentity4x4();
+	matRot_ = Matrix4x4::MakeIdentity4x4();
 }
 
 void DebugCamera::Update(const BYTE key[256]) {
 
-	Matrix4x4 cameraMatrix = MakeIdentity4x4();
-	cameraMatrix = Multiply(cameraMatrix, matRot_);
-	cameraMatrix = Multiply(cameraMatrix, MakeTranslateMatrix(translation_));
+	Matrix4x4 cameraMatrix = Matrix4x4::MakeIdentity4x4();
+	cameraMatrix = cameraMatrix.Multiply(matRot_);
+	cameraMatrix = cameraMatrix.Multiply(MakeTranslateMatrix(translation_));
 
 	if (key[DIK_UP]) {
 		//カメラ移動ベクトル
@@ -87,17 +87,17 @@ void DebugCamera::Update(const BYTE key[256]) {
 	}
 
 	//追加回転分の回転行列を生成
-	Matrix4x4 matRotDelta = MakeIdentity4x4();
-	matRotDelta = Multiply(matRotDelta, MakeRotateXMatrix(Xrotate));
-	matRotDelta = Multiply(matRotDelta, MakeRotateYMatrix(Yrotate));
-	matRotDelta = Multiply(matRotDelta, MakeRotateZMatrix(Zrotate));
+	Matrix4x4 matRotDelta = Matrix4x4::MakeIdentity4x4();
+	matRotDelta = matRotDelta.Multiply(MakeRotateXMatrix(Xrotate));
+	matRotDelta = matRotDelta.Multiply(MakeRotateYMatrix(Yrotate));
+	matRotDelta = matRotDelta.Multiply(MakeRotateZMatrix(Zrotate));
 
 	//累積の回転行列を合成
-	matRot_ = Multiply(matRotDelta, matRot_);
+	matRot_ = matRotDelta.Multiply(matRot_);
 
 	Vector3 offset = TransformNormal(kOffset_, matRot_);
 
 	translation_ = targetTranslation_ + offset;
 	
-	viewMatrix_ = Inverse(cameraMatrix);
+	viewMatrix_ = cameraMatrix.Inverse();
 }

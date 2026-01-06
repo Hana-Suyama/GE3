@@ -59,7 +59,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 		//Lighting有効
 		materialData->enableLighting = Light::HalfLambert;
 		//UVTransformを単位行列で初期化
-		materialData->uvTransform = MyMath::MakeIdentity4x4();
+		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
 
 		materialData->shininess = 1.0f;
 	}
@@ -148,7 +148,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 		//Lighting有効
 		materialData->enableLighting = Light::HalfLambert;
 		//UVTransformを単位行列で初期化
-		materialData->uvTransform = MyMath::MakeIdentity4x4();
+		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
 
 		materialData->shininess = 1.0f;
 	}
@@ -315,7 +315,7 @@ Model ModelManager::LoadObjFile(const std::string& directoryPath, const std::str
 
 	}
 
-	modelData.rootNode.localMatrix = MyMath::MakeIdentity4x4();
+	modelData.rootNode.localMatrix = Matrix4x4::MakeIdentity4x4();
 
 	return modelData;
 

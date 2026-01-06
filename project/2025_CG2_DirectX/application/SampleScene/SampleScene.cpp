@@ -100,7 +100,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	spotLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
 	spotLightData->decay = 2.0f;
-	spotLightData->direction = Normalize({ -1.0f, -1.0f, 0.0f });
+	spotLightData->direction = Vector3{ -1.0f, -1.0f, 0.0f }.Normalize();
 	spotLightData->distance = 7.0f;
 	spotLightData->intensity = 4.0f;
 	spotLightData->position = { 2.0f, 1.25f, 0.0f };
@@ -203,8 +203,8 @@ void SampleScene::Update()
 	ImGui::End();
 #endif
 
-	directionalLightData->direction = Normalize(directionalLightData->direction);
-	spotLightData->direction = Normalize(spotLightData->direction);
+	directionalLightData->direction = directionalLightData->direction.Normalize();
+	spotLightData->direction = spotLightData->direction.Normalize();
 	if (spotLightData->cosAngle == spotLightData->cosFalloffStart) {
 		spotLightData->cosFalloffStart += 0.01f;
 	}

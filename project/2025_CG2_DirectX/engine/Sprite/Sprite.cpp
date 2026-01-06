@@ -40,16 +40,16 @@ void Sprite::Update()
 	CreateVertexData();
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 viewMatrix = MakeIdentity4x4();
+	Matrix4x4 viewMatrix = Matrix4x4::MakeIdentity4x4();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsApi::kClientWidth), float(WindowsApi::kClientHeight), 0.0f, 100.0f);
-	Matrix4x4 worldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+	Matrix4x4 worldViewProjectionMatrix = worldMatrix.Multiply(viewMatrix.Multiply(projectionMatrix));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
 	transformationMatrixData_->World = worldMatrix;
 
 	//パラメータからUVTransform用の行列を生成する
 	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform_.scale);
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransform_.rotate.z));
-	uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransform_.translate));
+	uvTransformMatrix = uvTransformMatrix.Multiply(MakeRotateZMatrix(uvTransform_.rotate.z));
+	uvTransformMatrix = uvTransformMatrix.Multiply(MakeTranslateMatrix(uvTransform_.translate));
 	materialData_->uvTransform = uvTransformMatrix;
 }
 
@@ -167,7 +167,7 @@ void Sprite::CreateMaterialResource()
 	materialData_->enableLighting = Light::None;
 	materialData_->enableReflection = Reflection::NoneReflection;
 	// UVTransformを単位行列で初期化
-	materialData_->uvTransform = MakeIdentity4x4();
+	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
 }
 
 void Sprite::CreateTransformationMatrixResource()
@@ -178,8 +178,8 @@ void Sprite::CreateTransformationMatrixResource()
 	// 書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	// 単位行列を書き込んでおく
-	transformationMatrixData_->WVP = MakeIdentity4x4();
-	transformationMatrixData_->World = MakeIdentity4x4();
+	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity4x4();
+	transformationMatrixData_->World = Matrix4x4::MakeIdentity4x4();
 }
 
 void Sprite::CreateIndexResource()

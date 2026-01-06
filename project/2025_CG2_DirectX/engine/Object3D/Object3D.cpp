@@ -26,20 +26,20 @@ void Object3D::Update()
 
 	if (camera_) {
 		const Matrix4x4& viewProjectionMatrix = camera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix = Multiply(worldMatrix, viewProjectionMatrix);
+		worldViewProjectionMatrix = worldMatrix.Multiply(viewProjectionMatrix);
 	} else {
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
 	transformationMatrixData_->WVP = modelData_->rootNode.localMatrix * worldViewProjectionMatrix;
 	transformationMatrixData_->World = modelData_->rootNode.localMatrix * worldMatrix;
-	transformationMatrixData_->WorldInverseTranspose = Transpose(Inverse(worldMatrix));
+	transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
 
 	for (int32_t i = 0; i < modelData_->meshes.size(); i++) {
 		//パラメータからUVTransform用の行列を生成する
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransforms_.at(i).scale);
-		uvTransformMatrix = Multiply(uvTransformMatrix, MakeRotateZMatrix(uvTransforms_.at(i).rotate.z));
-		uvTransformMatrix = Multiply(uvTransformMatrix, MakeTranslateMatrix(uvTransforms_.at(i).translate));
+		uvTransformMatrix = uvTransformMatrix.Multiply(MakeRotateZMatrix(uvTransforms_.at(i).rotate.z));
+		uvTransformMatrix = uvTransformMatrix.Multiply(MakeTranslateMatrix(uvTransforms_.at(i).translate));
 		materialDatas_.at(i)->uvTransform = uvTransformMatrix;
 	}
 }
@@ -111,9 +111,9 @@ void Object3D::CreateWVPResource()
 	//データを書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	//単位行列を書き込んでおく
-	transformationMatrixData_->WVP = MakeIdentity4x4();
-	transformationMatrixData_->World = MakeIdentity4x4();
-	transformationMatrixData_->WorldInverseTranspose = MakeIdentity4x4();
+	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity4x4();
+	transformationMatrixData_->World = Matrix4x4::MakeIdentity4x4();
+	transformationMatrixData_->WorldInverseTranspose = Matrix4x4::MakeIdentity4x4();
 }
 
 void Object3D::CreateMTUV()

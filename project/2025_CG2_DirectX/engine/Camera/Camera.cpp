@@ -10,15 +10,15 @@ Camera::Camera()
 	, nearClip_(0.1f)
 	, farClip_(100.0f)
 	, worldMatrix_(MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate))
-	, viewMatrix_(Inverse(worldMatrix_))
+	, viewMatrix_(worldMatrix_.Inverse())
 	, projectionMatrix_(MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_))
-	, viewProjectionMatrix_(Multiply(viewMatrix_, projectionMatrix_))
+	, viewProjectionMatrix_(viewMatrix_.Multiply(projectionMatrix_))
 {}
 
 void Camera::Update()
 {
 	worldMatrix_ = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	viewMatrix_ = Inverse(worldMatrix_);
+	viewMatrix_ = worldMatrix_.Inverse();
 	projectionMatrix_ = MakePerspectiveFovMatrix(fovY_, aspectRatio_, nearClip_, farClip_);
-	viewProjectionMatrix_ = Multiply(viewMatrix_, projectionMatrix_);
+	viewProjectionMatrix_ = viewMatrix_.Multiply(projectionMatrix_);
 }
