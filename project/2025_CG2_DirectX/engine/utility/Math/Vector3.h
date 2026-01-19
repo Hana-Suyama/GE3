@@ -52,6 +52,11 @@ struct Vector3 {
 	/* --------- 数学 --------- */
 
 	/// <summary>
+	/// ノルム
+	/// </summary>
+	float Norm() const;
+
+	/// <summary>
 	/// 正規化
 	/// </summary>
 	Vector3 Normalize() const;
@@ -131,13 +136,21 @@ inline Vector3 Vector3::Multiply(const float s) const {
 }
 
 /// <summary>
+/// ノルム
+/// </summary>
+inline float Vector3::Norm() const {
+	float result = sqrtf(x * x + y * y + z * z);
+	return result;
+}
+
+/// <summary>
 /// 正規化
 /// </summary>
 inline Vector3 Vector3::Normalize() const {
 
 	Vector3 result{};
 
-	float length = sqrtf(x * x + y * y + z * z);
+	float length = Norm();
 
 	if (length != 0.0f) {
 		result.x = x / length;
@@ -152,9 +165,9 @@ inline Vector3 Vector3::Normalize() const {
 /// 内積
 /// </summary>
 inline float Vector3::Dot(const Vector3 v1) const {
-	float Result{};
-	Result = (x * v1.x) + (y * v1.y) + (z * v1.z);
-	return Result;
+	float result{};
+	result = (x * v1.x) + (y * v1.y) + (z * v1.z);
+	return result;
 }
 
 /// <summary>

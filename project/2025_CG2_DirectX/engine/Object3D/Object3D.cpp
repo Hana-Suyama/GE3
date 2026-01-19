@@ -67,16 +67,16 @@ void Object3D::Draw()
 	}
 }
 
-void Object3D::DebugDraw(std::string rabel)
+void Object3D::DebugDraw(std::string label)
 {
 #ifdef USE_IMGUI
-	if (ImGui::TreeNode(rabel.c_str())) {
+	if (ImGui::TreeNode(label.c_str())) {
 		ImGui::Checkbox("isDraw", &isDraw_);
 		ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transform_.scale), -5, 5);
 		ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transform_.rotate), -5, 5);
 		ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transform_.translate), -5, 5);
 		for (int32_t i = 0; Material * materialData : materialDatas_) {
-			ImGui::Combo(("Ligting[" + std::to_string(i) + "]").c_str(), &materialDatas_.at(i)->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+			ImGui::Combo(("Lighting[" + std::to_string(i) + "]").c_str(), &materialDatas_.at(i)->enableLighting, "None\0Lambert\0Half Lambert\0\0");
 			ImGui::Combo(("Reflection[" + std::to_string(i) + "]").c_str(), &materialDatas_.at(i)->enableReflection, "NoneReflection\0PhongReflection\0BlinnPhongReflection\0\0");
 			ImGui::SliderFloat(("Shininess[" + std::to_string(i) + "]").c_str(), &materialDatas_.at(i)->shininess, 0.0f, 10.0f);
 			ImGui::DragFloat2(("UVTranslate[" + std::to_string(i) + "]").c_str(), &uvTransforms_.at(i).translate.x, 0.01f, -10.0f, 10.0f);

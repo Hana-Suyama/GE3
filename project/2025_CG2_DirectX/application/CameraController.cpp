@@ -1,6 +1,7 @@
 #define NOMINMAX
 #include "CameraController.h"
 #include <algorithm>
+#include "../engine/Utility/Math/Lerp.h"
 
 void CameraController::Initialize(Camera* camera) {
 	camera_ = camera;

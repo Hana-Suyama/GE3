@@ -2,78 +2,20 @@
 #include <cstdint>
 #include "Vector3.h"
 #include "Matrix4x4.h"
-
-
+#include "Geometry.h"
+#include "Quaternion.h"
 
 namespace MyMath {
-
-	/// <summary>
-	/// 球
-	/// </summary>
-	struct Sphere {
-		Vector3 center{};	//!< 中心点
-		float radius{};	//!< 半径
-	};
-
-	/// <summary>
-	/// 直線
-	/// </summary>
-	struct Line {
-		Vector3 origin;	//!<始点
-		Vector3 diff;	//!<終点への差分ベクトル
-	};
-
-	/// <summary>
-	/// 半直線
-	/// </summary>
-	struct Ray {
-		Vector3 origin;	//!<始点
-		Vector3 diff;	//!<終点への差分ベクトル
-	};
-
-	/// <summary>
-	/// 線分
-	/// </summary>
-	struct Segment {
-		Vector3 origin;	//!<始点
-		Vector3 diff;	//!<終点への差分ベクトル
-	};
-
-	/// <summary>
-	/// 平面
-	/// </summary>
-	struct Plane {
-		Vector3 normal;//法線
-		float distsnce;//距離
-	};
-
-	/// <summary>
-	/// 三角形
-	/// </summary>
-	struct Triangle {
-		Vector3 LocalVertices[3];
-	};
-
-	/// <summary>
-	/// AABB
-	/// </summary>
-	struct AABB {
-		Vector3 min; //!< 最小点
-		Vector3 max; //!< 最大点
-	};
-
-	/// <summary>
-	/// カプセル
-	/// </summary>
-	struct Capsule {
-		Segment segment;
-		float radius;
-	};
 
 	/// <summary>
 	/// 角度をラジアンに変換
 	/// </summary>
 	float DEGtoRAD(float degree);
+
+	/// <summary>
+	/// ラジアンを角度に変換
+	/// </summary>
+	float RADtoDEG(float radian);
 
 	/// <summary>
 	/// ベクトルと行列の積
@@ -109,6 +51,16 @@ namespace MyMath {
 	/// Z軸回転行列
 	/// </summary>
 	Matrix4x4 MakeRotateZMatrix(float radian);
+
+	/// <summary>
+	/// 任意軸回転行列
+	/// </summary>
+	Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle);
+
+	/// <summary>
+	/// クロス積行列
+	/// </summary>
+	Matrix4x4 MakeCrossMatrix(const Vector3& vector);
 
 	/// <summary>
 	/// 3次元アフィン変換行列
@@ -159,11 +111,6 @@ namespace MyMath {
 	/// 反射ベクトルを求める
 	/// </summary>
 	Vector3 Reflect(const Vector3& input, const Vector3& normal);
-
-	/// <summary>
-	/// 線形補間
-	/// </summary>
-	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
 
 	/// <summary>
 	/// ベジェ曲線
@@ -256,4 +203,43 @@ namespace MyMath {
 	/// </summary>
 	bool IsCollision(const Capsule& capsule, const Plane& plane);
 
+	/// <summary>
+	/// 方向から方向への回転
+	/// </summary>
+	/// <param name="from"></param>
+	/// <param name="to"></param>
+	/// <returns></returns>
+	Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to);
+
+	/// <summary>
+	/// 任意軸回転を表すクォータニオン
+	/// </summary>
+	/// <param name="axis"></param>
+	/// <param name="angle"></param>
+	/// <returns></returns>
+	Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle);
+
+	/// <summary>
+	/// クォータニオンで回転させたベクトル
+	/// </summary>
+	/// <param name="vector"></param>
+	/// <param name="quaternion"></param>
+	/// <returns></returns>
+	Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion);
+
+	/// <summary>
+	/// クォータニオンから回転行列を求める
+	/// </summary>
+	/// <param name="quaternion"></param>
+	/// <returns></returns>
+	Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion);
+
+	/// <summary>
+	/// 球面線形補間
+	/// </summary>
+	/// <param name="q0"></param>
+	/// <param name="q1"></param>
+	/// <param name="t"></param>
+	/// <returns></returns>
+	Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t);
 };

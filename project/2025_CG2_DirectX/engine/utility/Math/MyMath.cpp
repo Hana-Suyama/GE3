@@ -4,6 +4,8 @@
 #include <algorithm>
 #include "MyMath.h"
 #include <cassert>
+#include "Lerp.h"
+
 using namespace std;
 
 // void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char a[]) {
@@ -26,6 +28,15 @@ namespace MyMath {
 	float DEGtoRAD(float degree) {
 		float result;
 		result = degree * ((float)M_PI / 180);
+		return result;
+	}
+
+	/// <summary>
+	/// ラジアンを角度に変換
+	/// </summary>
+	float RADtoDEG(float radian) {
+		float result;
+		result = radian * (180 / (float)M_PI);
 		return result;
 	}
 
@@ -133,6 +144,50 @@ namespace MyMath {
 		Return.m[2][2] = 1;
 		Return.m[3][3] = 1;
 		return Return;
+	}
+
+	/// <summary>
+	/// 任意軸回転行列
+	/// </summary>
+	Matrix4x4 MakeRotateAxisAngle(const Vector3& axis, float angle)
+	{
+		Matrix4x4 Result{};
+		Matrix4x4 S = MakeScaleMatrix({ std::cos(angle), std::cos(angle), std::cos(angle) });
+
+		Matrix4x4 a{};
+		a.m[0][0] = axis.x;
+		a.m[0][1] = axis.y;
+		a.m[0][2] = axis.z;
+
+		Matrix4x4 b{};
+		b.m[0][0] = axis.x;
+		b.m[1][0] = axis.y;
+		b.m[2][0] = axis.z;
+
+		Matrix4x4 P = MakeScaleMatrix({ 1.0f - std::cos(angle), 1.0f - std::cos(angle), 1.0f - std::cos(angle) }) * b * a;
+		Matrix4x4 C = MakeScaleMatrix({ -std::sin(angle), -std::sin(angle) , -std::sin(angle) }) * MakeCrossMatrix({ axis.x, axis.y, axis.z });
+		Result = S + P + C;
+		return Result;
+	}
+
+	/// <summary>
+	/// クロス積行列
+	/// </summary>
+	Matrix4x4 MakeCrossMatrix(const Vector3& vector)
+	{
+		Matrix4x4 Result{};
+
+		Result.m[0][0] = 0.0f;
+		Result.m[0][1] = -vector.z;
+		Result.m[0][2] = vector.y;
+		Result.m[1][0] = vector.z;
+		Result.m[1][1] = 0.0f;
+		Result.m[1][2] = -vector.x;
+		Result.m[2][0] = -vector.y;
+		Result.m[2][1] = vector.x;
+		Result.m[2][2] = 0.0f;
+
+		return Result;
 	}
 
 	/// <summary>
@@ -250,17 +305,6 @@ namespace MyMath {
 	Vector3 Reflect(const Vector3& input, const Vector3& normal) {
 		Vector3 result;
 		result = input - ((2.0f * input.Dot(normal)) * normal);
-		return result;
-	}
-
-	/// <summary>
-	/// 線形補間
-	/// </summary>
-	Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
-		Vector3 result;
-		result.x = (t * v1.x) + ((1.0f - t) * v2.x);
-		result.y = (t * v1.y) + ((1.0f - t) * v2.y);
-		result.z = (t * v1.z) + ((1.0f - t) * v2.z);
 		return result;
 	}
 
@@ -726,6 +770,158 @@ namespace MyMath {
 			}
 			return false;
 		}
+	}
+
+	/// <summary>
+	/// 方向から方向への回転
+	/// </summary>
+	/// <param name="from"></param>
+	/// <param name="to"></param>
+	/// <returns></returns>
+	Matrix4x4 DirectionToDirection(const Vector3& from, const Vector3& to)
+	{
+		Vector3 n = from.Cross(to).Normalize();
+		if (from.x == -to.x && from.y == -to.y && from.z == -to.z) {
+			if (from.x != 0.0f || from.y != 0.0f) {
+				n = Vector3{ -from.y, -from.x, 0.0f };
+			}
+		}
+
+		float cos = from.Dot(to);
+		Vector3 cross = from.Cross(to);
+		float sin = sqrtf(cross.x * cross.x + cross.y * cross.y + cross.z * cross.z);
+
+		Matrix4x4 Result{};
+		Matrix4x4 S = MakeScaleMatrix({ cos, cos, cos });
+
+		Matrix4x4 a{};
+		a.m[0][0] = n.x;
+		a.m[0][1] = n.y;
+		a.m[0][2] = n.z;
+
+		Matrix4x4 b{};
+		b.m[0][0] = n.x;
+		b.m[1][0] = n.y;
+		b.m[2][0] = n.z;
+
+		Matrix4x4 P = MakeScaleMatrix({ 1.0f - cos, 1.0f - cos, 1.0f - cos }) * b * a;
+		Matrix4x4 C = MakeScaleMatrix({ -sin, -sin , -sin }) * MakeCrossMatrix({ n.x, n.y, n.z });
+		Result = S + P + C;
+		return Result;
+	}
+
+	/// <summary>
+	/// 任意軸回転を表すクォータニオン
+	/// </summary>
+	/// <param name="axis"></param>
+	/// <param name="angle"></param>
+	/// <returns></returns>
+	Quaternion MakeRotateAxisAngleQuaternion(const Vector3& axis, float angle)
+	{
+		Quaternion result{};
+		Vector3 v = axis * std::sin(angle / 2.0f);
+
+		result.x = v.x;
+		result.y = v.y;
+		result.z = v.z;
+		result.w = std::cos(angle / 2.0f);
+
+		return result;
+
+	}
+
+	/// <summary>
+	/// クォータニオンで回転させたベクトル
+	/// </summary>
+	/// <param name="vector"></param>
+	/// <param name="quaternion"></param>
+	/// <returns></returns>
+	Vector3 RotateVector(const Vector3& vector, const Quaternion& quaternion)
+	{
+		Vector3 result{};
+
+		Quaternion r{};
+		r.x = vector.x;
+		r.y = vector.y;
+		r.z = vector.z;
+		r.w = 0.0f;
+
+		r = quaternion.Multiply(r).Multiply(quaternion.Conjugate());
+
+		result.x = r.x;
+		result.y = r.y;
+		result.z = r.z;
+
+		return result;
+	}
+
+	/// <summary>
+	/// クォータニオンから回転行列を求める
+	/// </summary>
+	/// <param name="quaternion"></param>
+	/// <returns></returns>
+	Matrix4x4 MakeRotateMatrix(const Quaternion& quaternion)
+	{
+		Matrix4x4 result{};
+
+		result.m[0][0] = (quaternion.w * quaternion.w) + (quaternion.x * quaternion.x) - (quaternion.y * quaternion.y) - (quaternion.z * quaternion.z);
+		result.m[0][1] = 2.0f * ((quaternion.x * quaternion.y) + (quaternion.w * quaternion.z));
+		result.m[0][2] = 2.0f * ((quaternion.x * quaternion.z) - (quaternion.w * quaternion.y));
+		result.m[0][3] = 0.0f;
+
+		result.m[1][0] = 2.0f * ((quaternion.x * quaternion.y) - (quaternion.w * quaternion.z));
+		result.m[1][1] = (quaternion.w * quaternion.w) - (quaternion.x * quaternion.x) + (quaternion.y * quaternion.y) - (quaternion.z * quaternion.z);
+		result.m[1][2] = 2.0f * ((quaternion.y * quaternion.z) + (quaternion.w * quaternion.x));
+		result.m[1][3] = 0.0f;
+
+		result.m[2][0] = 2.0f * ((quaternion.x * quaternion.z) + (quaternion.w * quaternion.y));
+		result.m[2][1] = 2.0f * ((quaternion.y * quaternion.z) - (quaternion.w * quaternion.x));
+		result.m[2][2] = (quaternion.w * quaternion.w) - (quaternion.x * quaternion.x) - (quaternion.y * quaternion.y) + (quaternion.z * quaternion.z);
+		result.m[2][3] = 0.0f;
+
+		result.m[3][0] = 0.0f;
+		result.m[3][1] = 0.0f;
+		result.m[3][2] = 0.0f;
+		result.m[3][3] = 1.0f;
+
+		return result;
+	}
+
+	/// <summary>
+	/// 球面線形補間
+	/// </summary>
+	/// <param name="q0"></param>
+	/// <param name="q1"></param>
+	/// <param name="t"></param>
+	/// <returns></returns>
+	Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
+
+		Quaternion q00 = q0;
+		Quaternion q01 = q1;
+
+		float dot = q00.Dot(q01);
+
+		if (dot < 0) {
+			q00.x = -q00.x;
+			q00.y = -q00.y;
+			q00.z = -q00.z;
+			q00.w = -q00.w;
+			dot = -dot;
+		}
+
+		float theta = std::acos(dot);
+
+		float scale0 = std::sin((1.0f - t) * theta) / std::sin(theta);
+		float scale1 = std::sin(t * theta) / std::sin(theta);
+
+		Quaternion result{};
+
+		result.x = scale0 * q00.x + scale1 * q01.x;
+		result.y = scale0 * q00.y + scale1 * q01.y;
+		result.z = scale0 * q00.z + scale1 * q01.z;
+		result.w = scale0 * q00.w + scale1 * q01.w;
+
+		return result;
 	}
 
 }

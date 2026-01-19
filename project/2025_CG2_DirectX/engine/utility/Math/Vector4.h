@@ -53,6 +53,11 @@ struct Vector4 {
 	/* --------- 数学 --------- */
 
 	/// <summary>
+	/// ノルム
+	/// </summary>
+	float Norm() const;
+
+	/// <summary>
 	/// 正規化
 	/// </summary>
 	Vector4 Normalize() const;
@@ -73,13 +78,13 @@ inline Vector4 Vector4::operator*(const float s) const { return Multiply(s); }
 inline Vector4 operator*(float s, const Vector4& v) { return v * s; }
 inline Vector4 Vector4::operator/(const float s) const { return Multiply(1.0f / s); }
 
-inline Vector4 Vector4::operator-() const { return { -x, -y, -z }; }
-inline Vector4 Vector4::operator+() const { return { x, y, z }; }
+inline Vector4 Vector4::operator-() const { return { -x, -y, -z, -w }; }
+inline Vector4 Vector4::operator+() const { return { x, y, z, w }; }
 
-inline Vector4& Vector4::operator*=(float s) { x *= s; y *= s; z *= s; return *this; }
-inline Vector4& Vector4::operator-=(const Vector4& v) { x -= v.x; y -= v.y; z -= v.z; return *this; }
-inline Vector4& Vector4::operator+=(const Vector4& v) { x += v.x; y += v.y; z += v.z; return *this; }
-inline Vector4& Vector4::operator/=(float s) { x /= s; y /= s; z /= s; return *this; }
+inline Vector4& Vector4::operator*=(float s) { x *= s; y *= s; z *= s; w *= s; return *this; }
+inline Vector4& Vector4::operator-=(const Vector4& v) { x -= v.x; y -= v.y; z -= v.z; w -= v.w; return *this; }
+inline Vector4& Vector4::operator+=(const Vector4& v) { x += v.x; y += v.y; z += v.z; w += v.w; return *this; }
+inline Vector4& Vector4::operator/=(float s) { x /= s; y /= s; z /= s; w /= s; return *this; }
 
 
 /// <summary>
@@ -131,13 +136,21 @@ inline Vector4 Vector4::Multiply(const float s) const {
 }
 
 /// <summary>
+/// ノルム
+/// </summary>
+inline float Vector4::Norm() const {
+	float result = sqrtf(x * x + y * y + z * z + w * w);
+	return result;
+}
+
+/// <summary>
 /// 正規化
 /// </summary>
 inline Vector4 Vector4::Normalize() const {
 
 	Vector4 result{};
 
-	float length = sqrtf(x * x + y * y + z * z + w * w);
+	float length = Norm();
 
 	if (length != 0.0f) {
 		result.x = x / length;
@@ -153,7 +166,7 @@ inline Vector4 Vector4::Normalize() const {
 /// 内積
 /// </summary>
 inline float Vector4::Dot(const Vector4 v1) const {
-	float Result{};
-	Result = (x * v1.x) + (y * v1.y) + (z * v1.z) + (w * v1.w);
-	return Result;
+	float result{};
+	result = (x * v1.x) + (y * v1.y) + (z * v1.z) + (w * v1.w);
+	return result;
 }

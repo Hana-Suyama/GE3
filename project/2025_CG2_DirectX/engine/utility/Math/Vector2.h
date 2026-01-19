@@ -51,6 +51,11 @@ struct Vector2 {
 	/* --------- 数学 --------- */
 
 	/// <summary>
+	/// ノルム
+	/// </summary>
+	float Norm() const;
+
+	/// <summary>
 	/// 正規化
 	/// </summary>
 	Vector2 Normalize() const;
@@ -126,13 +131,21 @@ inline Vector2 Vector2::Multiply(const float s) const {
 }
 
 /// <summary>
+/// ノルム
+/// </summary>
+inline float Vector2::Norm() const {
+	float result = sqrtf(x * x + y * y);
+	return result;
+}
+
+/// <summary>
 /// 正規化
 /// </summary>
 inline Vector2 Vector2::Normalize() const {
 
 	Vector2 result{};
 
-	float length = sqrtf(x * x + y * y);
+	float length = Norm();
 
 	if (length != 0.0f) {
 		result.x = x / length;
@@ -146,9 +159,9 @@ inline Vector2 Vector2::Normalize() const {
 /// 内積
 /// </summary>
 inline float Vector2::Dot(const Vector2 v1) const {
-	float Result{};
-	Result = (x * v1.x) + (y * v1.y);
-	return Result;
+	float result{};
+	result = (x * v1.x) + (y * v1.y);
+	return result;
 }
 
 /// <summary>
