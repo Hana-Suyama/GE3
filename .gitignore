@@ -330,5 +330,3 @@ FodyWeavers.xsd
 imgui.ini
 
 /project/externals/DirectXTex/Shaders/Compiled
-
-*.pdb
