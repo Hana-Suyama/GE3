@@ -9,12 +9,11 @@
 
 using namespace MyMath;
 
-void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Input* input, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
 	modelManager_ = modelManager;
-	input_ = input;
 	logger_ = logger;
 	srvManager_ = srvManager;
 	textureManager_ = textureManager;
@@ -83,7 +82,7 @@ void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBa
 	playerModel_->SetTranslate(mapChipField_->GetMapChipPositionByIndex(3, 18));
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize(object3dBasic_, modelManager_, playerModel_.get(), input_, camera.get());
+	player_->Initialize(object3dBasic_, modelManager_, playerModel_.get(), camera.get());
 	player_->SetMapChipField(mapChipField_.get());
 
 	//カメラコントローラの生成

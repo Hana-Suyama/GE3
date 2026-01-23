@@ -9,12 +9,11 @@
 
 using namespace MyMath;
 
-void TitleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Input* input, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void TitleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
 	modelManager_ = modelManager;
-	input_ = input;
 	logger_ = logger;
 	srvManager_ = srvManager;
 	textureManager_ = textureManager;
@@ -75,7 +74,7 @@ void TitleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dB
 void TitleScene::Update()
 {
 
-	if (input_->TriggerKeyDown(DIK_SPACE)) {
+	if (Input::GetInstance()->IsTriggerPushKey(DIK_SPACE)) {
 		std::unique_ptr<BaseScene> scene = std::make_unique<GameScene>();
 		sceneManager_->SetNextScene(move(scene));
 	}

@@ -1,5 +1,6 @@
 #include "ModelManager.h"
 #include "../../engine/Material.h"
+#include <numbers>
 
 void ModelManager::Initialize(DirectXBasic* directXBasic, TextureManager* textureManager)
 {
@@ -182,6 +183,169 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 			mesh.defaultTextureFilePath = "resources/white2x2.png";
 		}
 	}
+
+	modelDatas_.push_back(newModel);
+}
+
+void ModelManager::CreateSphere()
+{
+
+	// すでに球が構築されていたら構築しない
+	auto it = std::find_if(
+		modelDatas_.begin(),
+		modelDatas_.end(),
+		[&](Model& modelData) {return modelData.filePath == "debug_sphere"; }
+	);
+	if (it != modelDatas_.end()) {
+		return;
+	}
+
+	// モデル上限を超えて読み込もうとしたら止める
+	assert(modelDatas_.size() < kModelMax_);
+
+	// 新しく追加する空のモデルデータを作成
+	Model newModel;
+	newModel.meshes.push_back(Model::Mesh{});
+
+	//ファイルパスを記録
+	newModel.filePath = "debug_sphere";
+
+	const uint32_t kSubdivision = 16;//分割数
+	const float kLonEvery = std::numbers::pi_v<float> * 2.0f / float(kSubdivision);//経度分割1つ分の角度
+	const float kLatEvery = std::numbers::pi_v<float> / float(kSubdivision);//緯度分割1つ分の角度
+
+	//球を構成する頂点の数
+	int32_t vertexTotalNumber = kSubdivision * kSubdivision * 6;
+
+	float space = 1.0f / kSubdivision;
+
+	//緯度の方向に分割 0 ~ 2π
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = (-std::numbers::pi_v<float>) / 2.0f + kLatEvery * latIndex;//現在の緯度
+		//経度の方向に分割 0 ~ 2π
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+			float lon = lonIndex * kLonEvery;//現在の経度
+
+			VertexData a, b, c, d;
+
+			a.falseUV = false;
+			b.falseUV = false;
+			c.falseUV = false;
+			d.falseUV = false;
+
+			//頂点にデータを入力する。基準点a
+			//a(左下)
+			a.position.x = cosf(lat) * cosf(lon);
+			a.position.y = sinf(lat);
+			a.position.z = cosf(lat) * sinf(lon);
+			a.position.w = 1.0f;
+			a.texcoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) };
+			a.normal.x = a.position.x;
+			a.normal.y = a.position.y;
+			a.normal.z = a.position.z;
+
+			//b(左上)
+			b.position.x = cosf(lat + kLatEvery) * cosf(lon);
+			b.position.y = sinf(lat + kLatEvery);
+			b.position.z = cosf(lat + kLatEvery) * sinf(lon);
+			b.position.w = 1.0f;
+			b.texcoord = { float(lonIndex) / float(kSubdivision), 1.0f - float(latIndex) / float(kSubdivision) - space };
+			b.normal.x = b.position.x;
+			b.normal.y = b.position.y;
+			b.normal.z = b.position.z;
+
+			//c(右下)
+			c.position.x = cosf(lat) * cosf(lon + kLonEvery);
+			c.position.y = sinf(lat);
+			c.position.z = cosf(lat) * sinf(lon + kLonEvery);
+			c.position.w = 1.0f;
+			c.texcoord = { float(lonIndex) / float(kSubdivision) + space, 1.0f - float(latIndex) / float(kSubdivision) };
+			c.normal.x = c.position.x;
+			c.normal.y = c.position.y;
+			c.normal.z = c.position.z;
+
+			//d(右上)
+			d.position.x = cosf(lat + kLatEvery) * cosf(lon + kLonEvery);
+			d.position.y = sinf(lat + kLatEvery);
+			d.position.z = cosf(lat + kLatEvery) * sinf(lon + kLonEvery);
+			d.position.w = 1.0f;
+			d.texcoord = { float(lonIndex) / float(kSubdivision) + space, 1.0f - float(latIndex) / float(kSubdivision) - space };
+			d.normal.x = d.position.x;
+			d.normal.y = d.position.y;
+			d.normal.z = d.position.z;
+
+			newModel.meshes.at(0).vertices.push_back(a);
+			newModel.meshes.at(0).vertices.push_back(b);
+			newModel.meshes.at(0).vertices.push_back(c);
+
+			newModel.meshes.at(0).vertices.push_back(c);
+			newModel.meshes.at(0).vertices.push_back(b);
+			newModel.meshes.at(0).vertices.push_back(d);
+		}
+	}
+
+	//球の頂点リソース
+	newModel.meshes.at(0).vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * vertexTotalNumber);
+	//リソースの先頭のアドレスから使う
+	newModel.meshes.at(0).vertexBufferView.BufferLocation = newModel.meshes.at(0).vertexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズは分割数×分割数×6のサイズ
+	newModel.meshes.at(0).vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexTotalNumber;
+	//1頂点当たりのサイズ
+	newModel.meshes.at(0).vertexBufferView.StrideInBytes = sizeof(VertexData);
+	////球の頂点リソースにデータを書き込む
+	VertexData* vertexDataSphere = nullptr;
+	//書き込むためのアドレスを取得
+	newModel.meshes.at(0).vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+	std::memcpy(vertexDataSphere, newModel.meshes.at(0).vertices.data(), sizeof(VertexData)* newModel.meshes.at(0).vertices.size());
+
+	//球用のマテリアルリソースを作る
+	newModel.meshes.at(0).defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
+	//Sprite用のマテリアルにデータを書き込む
+	Material* materialDataSphere = nullptr;
+	//書き込むためのアドレスを取得
+	newModel.meshes.at(0).defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
+	//白
+	materialDataSphere->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	//SpriteはLightingしないのでfalseを設定する
+	materialDataSphere->enableLighting = Light::HalfLambert;
+	//UVTransformを単位行列で初期化
+	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity4x4();
+
+	materialDataSphere->shininess = 1.0f;
+
+	//球用のindexリソース
+	newModel.meshes.at(0).indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * vertexTotalNumber);
+	//リソースの先頭のアドレスから使う
+	newModel.meshes.at(0).indexBufferView.BufferLocation = newModel.meshes.at(0).indexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズはインデックス*vertexTotalNumberのサイズ
+	newModel.meshes.at(0).indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * vertexTotalNumber);
+	//インデックスはuint32_tとする
+	newModel.meshes.at(0).indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	//球用インデックスリソースにデータを書き込む
+	uint32_t* indexDataSphere = nullptr;
+	newModel.meshes.at(0).indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = float(-std::numbers::pi_v<float>) / 2.0f + kLatEvery * latIndex;//現在の緯度
+		//経度の方向に分割 0 ~ 2π
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			uint32_t start = (latIndex * kSubdivision + lonIndex) * 6;
+			float lon = lonIndex * kLonEvery;//現在の経度
+			indexDataSphere[start] = start;
+			indexDataSphere[start + 1] = start + 1;
+			indexDataSphere[start + 2] = start + 2;
+			indexDataSphere[start + 3] = start + 1;
+			indexDataSphere[start + 4] = start + 5;
+			indexDataSphere[start + 5] = start + 2;
+		}
+	}
+
+	// メッシュごとに使うテクスチャ番号を記録
+	// テクスチャが存在しない場合、white1x1を読み込み割り当てる
+	textureManager_->LoadTexture("resources/monsterBall.png");
+	newModel.meshes.at(0).defaultTextureFilePath = "resources/monsterBall.png";
+
+	newModel.rootNode.localMatrix = Matrix4x4::MakeIdentity4x4();
 
 	modelDatas_.push_back(newModel);
 }

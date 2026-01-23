@@ -51,7 +51,7 @@ public:
 	///	SRV確保可能チェック
 	/// </summary>
 	/// <param name="index">テクスチャ枚数</param>
-	bool AllocateRimitChack(uint32_t index);
+	bool AllocateLimitCheck(uint32_t index);
 
 	/// <summary>
 	///	SRVインデックスを確保

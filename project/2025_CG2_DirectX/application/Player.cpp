@@ -5,12 +5,11 @@
 #include <array>
 using namespace MyMath;
 
-void Player::Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Input* input, Camera* camera)
+void Player::Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Camera* camera)
 {
 	object3dBasic_ = object3dBasic;
 	modelManager_ = modelManager;
 	model_ = model;
-	input_ = input;
 	camera_ = camera;
 
 	lrDirection_ = LRDirection::kRight;
@@ -67,11 +66,11 @@ void Player::Move()
 	// 接地状態
 	if (onGround_) {
 		// 左右移動操作
-		if (input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_LEFT)) {
+		if (Input::GetInstance()->IsPushKey(DIK_RIGHT) || Input::GetInstance()->IsPushKey(DIK_LEFT)) {
 
 			// 左右加速
 			Vector3 acceleration = {};
-			if (input_->PushKey(DIK_RIGHT)) {
+			if (Input::GetInstance()->IsPushKey(DIK_RIGHT)) {
 
 				// 左入力中の右入力
 				if (velocity_.x < 0.0f) {
@@ -86,7 +85,7 @@ void Player::Move()
 					turnTimer_ = kTimeTurn;
 				}
 
-			} else if (input_->PushKey(DIK_LEFT)) {
+			} else if (Input::GetInstance()->IsPushKey(DIK_LEFT)) {
 
 				// 右移動中の左入力
 				if (velocity_.x > 0.0f) {
@@ -114,7 +113,7 @@ void Player::Move()
 			velocity_.x *= (1.0f - kAttenuation);
 		}
 
-		if (input_->PushKey(DIK_UP)) {
+		if (Input::GetInstance()->IsPushKey(DIK_UP)) {
 			// ジャンプ初速
 			velocity_.x += Vector3(0, kJumpAcceleration, 0).x;
 			velocity_.y += Vector3(0, kJumpAcceleration, 0).y;

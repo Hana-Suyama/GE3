@@ -27,7 +27,7 @@ void Game::Update()
 	Engine::Update();
 
 #ifdef _DEBUG
-	if (input->TriggerKey(DIK_V)) {
+	if (Input::GetInstance()->IsTriggerKey(DIK_V)) {
 		useDebugcamera = !useDebugcamera;
 	}
 

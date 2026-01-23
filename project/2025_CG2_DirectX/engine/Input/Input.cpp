@@ -4,6 +4,22 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+// シングルトン化
+std::unique_ptr<Input> Input::instance = nullptr;
+
+Input* Input::GetInstance()
+{
+	if (!instance) {
+		instance = std::make_unique<Input>();
+	}
+	return instance.get();
+}
+
+void Input::ReleaseInstance()
+{
+	instance.reset();
+}
+
 void Input::Initialize(WindowsApi* winApi){
 
 	//仮引数のwinApiのインスタンスを記録
@@ -51,9 +67,9 @@ void Input::Initialize(WindowsApi* winApi){
 
 void Input::Update(){
 
-	//前回のキー入力を保存
+	// 前回のキー入力を保存
 	memcpy(keyPre, key, sizeof(key));
-
+	
 	//キーボード情報の取得開始
 	keyboard->Acquire();
 
@@ -61,6 +77,9 @@ void Input::Update(){
 	keyboard->GetDeviceState(sizeof(key), key);
 
 	if (gamepad) {
+		// 前回のゲームパッド入力を保存
+		memcpy(&padKeyPre, &padKey, sizeof(DIJOYSTATE));
+
 		//ゲームパッド情報の取得開始
 		gamepad->Acquire();
 
@@ -70,7 +89,7 @@ void Input::Update(){
 
 }
 
-bool Input::PushKey(BYTE keyNumber)
+bool Input::IsPushKey(BYTE keyNumber)
 {
 	//指定キーを押していればtrueを返す
 	if (key[keyNumber]) {
@@ -80,7 +99,7 @@ bool Input::PushKey(BYTE keyNumber)
 	return false;
 }
 
-bool Input::TriggerKey(BYTE keyNumber)
+bool Input::IsTriggerKey(BYTE keyNumber)
 {
 	if (key[keyNumber] != keyPre[keyNumber]) {
 		return true;
@@ -88,22 +107,76 @@ bool Input::TriggerKey(BYTE keyNumber)
 	return false;
 }
 
-bool Input::TriggerKeyDown(BYTE keyNumber)
+bool Input::IsTriggerPushKey(BYTE keyNumber)
 {
-	if (TriggerKey(keyNumber) && key[keyNumber]) {
+	if (IsTriggerKey(keyNumber) && key[keyNumber]) {
 		return true;
 	}
 	return false;
 }
 
-bool Input::TriggerKeyUp(BYTE keyNumber)
+bool Input::IsTriggerReleaseKey(BYTE keyNumber)
 {
-	if (TriggerKey(keyNumber) && !key[keyNumber]) {
+	if (IsTriggerKey(keyNumber) && !key[keyNumber]) {
 		return true;
 	}
 	return false;
 }
 
+bool Input::IsPadButton(int button)
+{
+	return (padKey.rgbButtons[button] & 0x80) != 0;
+}
+
+bool Input::IsPadButtonDown(int button)
+{
+	return (padKey.rgbButtons[button] & 0x80) &&
+		!(padKeyPre.rgbButtons[button] & 0x80);
+}
+
+bool Input::IsPadButtonUp(int button)
+{
+	return !(padKey.rgbButtons[button] & 0x80) &&
+		(padKeyPre.rgbButtons[button] & 0x80);
+}
+
+Vector2 Input::GetLeftStick(float deadZone = 0.2f)
+{
+	float x = padKey.lX / 32767.0f;
+	float y = padKey.lY / 32767.0f;
+
+	x = ApplyDeadZone(x, deadZone);
+	y = ApplyDeadZone(y, deadZone);
+
+	return { x, y };
+}
+
+Vector2 Input::GetRightStick(float deadZone = 0.2f)
+{
+	float x = padKey.lZ / 32767.0f;
+	float y = padKey.lRz / 32767.0f;
+
+	x = ApplyDeadZone(x, deadZone);
+	y = ApplyDeadZone(y, deadZone);
+
+	return { x, y };
+}
+
+float Input::GetLeftTrigger()
+{
+	return padKey.lRx / 65535.0f;
+}
+
+float Input::GetRightTrigger()
+{
+	return padKey.lRy / 65535.0f;
+}
+
+float Input::ApplyDeadZone(float v, float dead)
+{
+	if (fabs(v) < dead) return 0.0f;
+	return v;
+}
 
 // デバイス発見時に実行される
 BOOL CALLBACK Input::DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef)

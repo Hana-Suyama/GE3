@@ -5,7 +5,7 @@ class SampleScene : public BaseScene
 {
 public:
 
-	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Input* input, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
+	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
 
 	virtual void Update();
 
@@ -22,7 +22,6 @@ private:
 	DirectXBasic* directXBasic_ = nullptr;
 	Object3DBasic* object3dBasic_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
-	Input* input_ = nullptr;
 	Logger* logger_ = nullptr;
 	SRVManager* srvManager_ = nullptr;
 	TextureManager* textureManager_ = nullptr;
@@ -42,6 +41,7 @@ private:
 	std::unique_ptr<Object3D> object3dSuzanne = nullptr;
 	std::unique_ptr<Object3D> object3dTerrain = nullptr;
 	std::unique_ptr<Object3D> object3dPlanegLTF = nullptr;
+	std::unique_ptr<Object3D> object3dSphere = nullptr;
 
 	std::unique_ptr<Camera> camera = nullptr;
 

@@ -41,8 +41,7 @@ void Engine::Initialize()
 
 	//ポインタ
 	//入力の初期化
-	input = std::make_unique<Input>();
-	input->Initialize(winApi.get());
+	Input::GetInstance()->Initialize(winApi.get());
 
 	logger->Log("Complete create D3D12Device!!!\n");//初期化完了のログを出す
 
@@ -64,14 +63,14 @@ void Engine::Initialize()
 	debugcamera->Initialize(WindowsApi::kClientWidth, WindowsApi::kClientHeight);
 
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(directXBasic.get(), object3DBasic.get(), modelManager.get(), input.get(), logger.get(), srvManager.get(), textureManager.get(), spriteBasic.get(), xaudio2Basic.get(), &randomEngine);
+	sceneManager_->Initialize(directXBasic.get(), object3DBasic.get(), modelManager.get(), logger.get(), srvManager.get(), textureManager.get(), spriteBasic.get(), xaudio2Basic.get(), &randomEngine);
 	
 }
 
 void Engine::Update()
 {
 
-	input->Update();
+	Input::GetInstance()->Update();
 
 	sceneManager_->Update();
 
@@ -105,6 +104,9 @@ void Engine::PostDraw()
 
 void Engine::Finalize()
 {
+	// 入力の解放
+	Input::GetInstance()->ReleaseInstance();
+
 	//COMの終了処理
 	CoUninitialize();
 

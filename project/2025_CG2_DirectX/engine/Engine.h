@@ -79,7 +79,6 @@ protected:
 	std::unique_ptr<DirectXBasic> directXBasic = nullptr;
 	std::unique_ptr<SRVManager> srvManager = nullptr;
 	std::unique_ptr<ImGuiManager> imguiManager = nullptr;
-	std::unique_ptr<Input> input = nullptr;
 	std::unique_ptr<SpriteBasic> spriteBasic = nullptr;
 	std::unique_ptr<Camera> defaultCamera = nullptr;
 	std::unique_ptr<Object3DBasic> object3DBasic = nullptr;

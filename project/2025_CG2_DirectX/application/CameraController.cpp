@@ -12,11 +12,11 @@ void CameraController::Update() {
 	const Vector3 targetWorldTransform = target_->GetWorldTransform();
 	const Vector3& targetVelocity = target_->GetVelocity();
 	// 追従対象とオフセットと追従対象の速度からカメラの目標座標を計算
-	targetPositon_ = targetWorldTransform + targetOffset_ + targetVelocity * kVelocityBias;
+	targetPosition_ = targetWorldTransform + targetOffset_ + targetVelocity * kVelocityBias;
 
 	Vector3 result{};
 	//座標補間によりゆったり追従
-	result = MyMath::Lerp(camera_->GetTranslate(), targetPositon_, kInterpolationRate);
+	result = MyMath::Lerp(camera_->GetTranslate(), targetPosition_, kInterpolationRate);
 	
 	//追従対象が画面外に出ないように補正
 	result.x = std::max(result.x, targetWorldTransform.x + kMargin.left);

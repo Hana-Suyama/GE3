@@ -1,10 +1,10 @@
 #pragma once
-#define _USE_MATH_DEFINES
 #include "cmath"
 #include <algorithm>
 #include "MyMath.h"
 #include <cassert>
 #include "Lerp.h"
+#include <numbers>
 
 using namespace std;
 
@@ -27,7 +27,7 @@ namespace MyMath {
 	/// </summary>
 	float DEGtoRAD(float degree) {
 		float result;
-		result = degree * ((float)M_PI / 180);
+		result = degree * (numbers::pi_v<float> / 180.0f);
 		return result;
 	}
 
@@ -36,7 +36,7 @@ namespace MyMath {
 	/// </summary>
 	float RADtoDEG(float radian) {
 		float result;
-		result = radian * (180 / (float)M_PI);
+		result = radian * (180.0f / numbers::pi_v<float>);
 		return result;
 	}
 

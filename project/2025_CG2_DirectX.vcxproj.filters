@@ -79,6 +79,36 @@
     <Filter Include="ヘッダー ファイル\engine\utility\Math">
       <UniqueIdentifier>{32ab3e37-c014-4505-8c6b-fb423fcbbf3d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\application\SampleScene">
+      <UniqueIdentifier>{c99d5b02-318c-43a0-bd36-867314e0a1ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\application\SampleScene">
+      <UniqueIdentifier>{37cbf9dc-1aeb-44b6-9ea9-6a04749d1a33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\debug\ImGui">
+      <UniqueIdentifier>{7a6ed118-6570-404b-aca3-9a45b698f0e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\debug\ImGui">
+      <UniqueIdentifier>{9d018fdb-6cc2-4e43-be1c-ff2c4f136249}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\Scene">
+      <UniqueIdentifier>{b4bec3b4-2341-4ebe-a2f1-b77c5dec47f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Scene">
+      <UniqueIdentifier>{ba1d9c58-b77f-47d8-ba14-8c0373e44426}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\engine\Audio">
+      <UniqueIdentifier>{05135a0e-bfff-4220-b23a-a2bd380e19e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Audio">
+      <UniqueIdentifier>{455a16e4-481d-4a69-a2db-bf50aefea6fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\Light">
+      <UniqueIdentifier>{d5c7f869-0004-4ab8-aad1-35872757d143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\engine\debug\Dump">
+      <UniqueIdentifier>{e0405e77-162d-4eae-a1c2-13168b41ab31}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -147,9 +177,6 @@
     <ClCompile Include="2025_CG2_DirectX\engine\Model\ModelManager.cpp">
       <Filter>ソース ファイル\engine\Model</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Particle\Particle.cpp">
-      <Filter>ソース ファイル\engine\Particle</Filter>
-    </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleManager.cpp">
       <Filter>ソース ファイル\engine\Particle</Filter>
     </ClCompile>
@@ -159,47 +186,47 @@
     <ClCompile Include="2025_CG2_DirectX\engine\TextureManager.cpp">
       <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Model\Model.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\SampleScene\SampleScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Engine.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\Game.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\MapChipFieldv.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\application\CameraController.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\application\ClearScene.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Scene\BaseScene.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\MapChipField.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\Player.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\SampleScene\SampleScene.cpp">
+      <Filter>ソース ファイル\application\SampleScene</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\Game.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Model\Model.cpp">
+      <Filter>ソース ファイル\engine\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Engine.cpp">
+      <Filter>ソース ファイル\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.cpp">
+      <Filter>ソース ファイル\engine\debug\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\SceneManager.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Scene\BaseScene.cpp">
+      <Filter>ソース ファイル\engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.cpp">
+      <Filter>ソース ファイル\engine\Audio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -209,10 +236,18 @@
     <FxCompile Include="resources\shaders\Object3d.VS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Particle.VS.hlsl" />
-    <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl" />
-    <FxCompile Include="resources\shaders\ParticleGS.hlsl" />
+    <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle.PS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\Particle.VS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="resources\shaders\ParticleGS.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -281,9 +316,6 @@
     <ClInclude Include="2025_CG2_DirectX\engine\Model\ModelManager.h">
       <Filter>ヘッダー ファイル\engine\Model</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Particle\Particle.h">
-      <Filter>ヘッダー ファイル\engine\Particle</Filter>
-    </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleManager.h">
       <Filter>ヘッダー ファイル\engine\Particle</Filter>
     </ClInclude>
@@ -320,77 +352,77 @@
     <ClInclude Include="2025_CG2_DirectX\engine\VertexData.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\Player.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Model\Model.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Light\DirectionalLight.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Light\SpotLight.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Camera\CameraForGPU.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\D3DResourceLeakChecker.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\SampleScene\SampleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Engine.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\Dump\ExportDump.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\Game.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\application\CameraController.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\application\ClearScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Scene\BaseScene.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="2025_CG2_DirectX\application\Game.h">
+      <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="2025_CG2_DirectX\application\GameScene.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\Player.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\SampleScene\SampleScene.h">
+      <Filter>ヘッダー ファイル\application\SampleScene</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Model\Model.h">
+      <Filter>ヘッダー ファイル\engine\Model</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Matrix2x2.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Geometry.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Lerp.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Quaternion.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Engine.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.h">
+      <Filter>ヘッダー ファイル\engine\debug\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h">
+      <Filter>ヘッダー ファイル\engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Scene\BaseScene.h">
+      <Filter>ヘッダー ファイル\engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.h">
+      <Filter>ヘッダー ファイル\engine\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Camera\CameraForGPU.h">
+      <Filter>ヘッダー ファイル\engine\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\debug\D3DResourceLeakChecker.h">
+      <Filter>ヘッダー ファイル\engine\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\DirectionalLight.h">
+      <Filter>ヘッダー ファイル\engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h">
+      <Filter>ヘッダー ファイル\engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\SpotLight.h">
+      <Filter>ヘッダー ファイル\engine\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\debug\Dump\ExportDump.h">
+      <Filter>ヘッダー ファイル\engine\debug\Dump</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Geometry.h">
+      <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Lerp.h">
+      <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -402,6 +434,8 @@
     <None Include="resources\shaders\Object3d.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="resources\shaders\Particle.hlsli" />
+    <None Include="resources\shaders\Particle.hlsli">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

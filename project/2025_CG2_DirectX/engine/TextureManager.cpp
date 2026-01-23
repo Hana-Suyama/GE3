@@ -16,7 +16,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 		return;
 	}
 
-	assert(srvManager_->AllocateRimitChack(static_cast<uint32_t>(textureDatas_.size())));
+	assert(srvManager_->AllocateLimitCheck(static_cast<uint32_t>(textureDatas_.size())));
 
 	TextureData& newTex = textureDatas_[filePath];
 
@@ -47,7 +47,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath)
 {
-	assert(srvManager_->AllocateRimitChack(static_cast<uint32_t>(textureDatas_.size())));
+	assert(srvManager_->AllocateLimitCheck(static_cast<uint32_t>(textureDatas_.size())));
 
 	TextureData& textureData = textureDatas_.at(filePath);
 
@@ -56,7 +56,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& f
 
 const DirectX::TexMetadata& TextureManager::GetMetaData(const std::string& filePath)
 {
-	assert(srvManager_->AllocateRimitChack(static_cast<uint32_t>(textureDatas_.size())));
+	assert(srvManager_->AllocateLimitCheck(static_cast<uint32_t>(textureDatas_.size())));
 
 	TextureData& textureData = textureDatas_.at(filePath);
 	return textureData.metadata_;

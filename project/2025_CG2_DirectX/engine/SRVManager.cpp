@@ -51,7 +51,7 @@ void SRVManager::SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameterIndex, GetGPUDescriptorHandle(srvIndex));
 }
 
-bool SRVManager::AllocateRimitChack(uint32_t index)
+bool SRVManager::AllocateLimitCheck(uint32_t index)
 {
 	if (index < kMaxSRV_) {
 		return true;

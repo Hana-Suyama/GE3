@@ -1,7 +1,6 @@
 #pragma once
 #include "../Camera/Camera.h"
 #include "../TextureManager.h"
-#include "Particle.h"
 #include "../../engine/Material.h"
 #include "../../engine/TransformationMatrix.h"
 #include <random>
@@ -100,7 +99,7 @@ private:
 
 	Camera* camera_ = nullptr;
 
-	uint32_t intervl_ = 5;
+	uint32_t interval_ = 5;
 
 	static const uint32_t kNumMaxInstance = 1000;
 	uint32_t numInstance = 0;

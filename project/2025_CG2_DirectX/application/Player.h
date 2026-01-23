@@ -40,7 +40,7 @@ public:
 
 public:
 
-	void Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Input* input, Camera* camera);
+	void Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Camera* camera);
 
 	void Update();
 
@@ -96,8 +96,6 @@ private:
 	ModelManager* modelManager_ = nullptr;
 
 	Object3D* model_ = nullptr;
-
-	Input* input_ = nullptr;
 
 	Camera* camera_ = nullptr;
 

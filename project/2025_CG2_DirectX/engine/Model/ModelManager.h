@@ -46,6 +46,11 @@ public:
 	void LoadModelAssimp(const std::string& directoryPath, const std::string& filename);
 
 	/// <summary>
+	/// 球のモデルを構築
+	/// </summary>
+	void CreateSphere();
+
+	/// <summary>
 	///	モデルの要素番号を返す
 	/// </summary>
 	/// <param name="filePath">ファイルパス</param>

@@ -39,8 +39,8 @@ public:
 	/// <summary>
 	///	デバッグ描画
 	/// </summary>
-	/// <param name="rabel">ImGuiのラベル名</param>
-	void DebugDraw(std::string rabel);
+	/// <param name="label">ImGuiのラベル名</param>
+	void DebugDraw(std::string label);
 
 	/// <summary>
 	///	モデルデータのセット

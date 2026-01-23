@@ -7,12 +7,11 @@ SceneManager::~SceneManager()
 	scene_ = nullptr;
 }
 
-void SceneManager::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Input* input, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void SceneManager::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
 	modelManager_ = modelManager;
-	input_ = input;
 	logger_ = logger;
 	srvManager_ = srvManager;
 	textureManager_ = textureManager;
@@ -36,7 +35,7 @@ void SceneManager::Update()
 
 		scene_->SetSceneManager(this);
 
-		scene_->Initialize(directXBasic_, object3dBasic_, modelManager_, input_, logger_, srvManager_, textureManager_, spriteBasic_, xaudio2Basic_, randomEngine_);
+		scene_->Initialize(directXBasic_, object3dBasic_, modelManager_, logger_, srvManager_, textureManager_, spriteBasic_, xaudio2Basic_, randomEngine_);
 	}
 
 	scene_->Update();

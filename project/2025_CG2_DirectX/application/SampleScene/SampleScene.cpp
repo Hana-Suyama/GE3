@@ -3,12 +3,11 @@
 #include "../../engine/Utility/Math/Lerp.h"
 using namespace MyMath;
 
-void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Input* input, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
 	modelManager_ = modelManager;
-	input_ = input;
 	logger_ = logger;
 	srvManager_ = srvManager;
 	textureManager_ = textureManager;
@@ -29,6 +28,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	modelManager_->LoadModel("resources", "suzanne.obj");
 	modelManager_->LoadModel("resources", "terrain.obj");
 	modelManager_->LoadModelAssimp("resources", "plane.gltf");
+	modelManager_->CreateSphere();
 
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
@@ -68,6 +68,9 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 
 	object3dPlanegLTF = std::make_unique<Object3D>();
 	object3dPlanegLTF->Initialize(object3dBasic_, modelManager, "resources/plane.gltf");
+
+	object3dSphere = std::make_unique<Object3D>();
+	object3dSphere->Initialize(object3dBasic_, modelManager, "debug_sphere");
 
 	//DirectionalLight用のリソースを作る
 	directionalLightResource = directXBasic->CreateBufferResource(sizeof(DirectionalLight));
@@ -129,6 +132,7 @@ void SampleScene::Update()
 	object3dSuzanne->Update();
 	object3dTerrain->Update();
 	object3dPlanegLTF->Update();
+	object3dSphere->Update();
 
 	if (playSound) {
 		//音声再生
@@ -148,7 +152,7 @@ void SampleScene::Update()
 	//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
 	//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSphere.rotate), -5, 5);
 	//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSphere.translate), -5, 5);
-	//	ImGui::Combo("Ligting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
+	//	ImGui::Combo("Lighting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
 	//	ImGui::TreePop();
 	//}*/
 	object3dTeapot->DebugDraw("teapot");
@@ -158,6 +162,7 @@ void SampleScene::Update()
 	object3dSuzanne->DebugDraw("Suzanne");
 	object3dTerrain->DebugDraw("Terrain");
 	object3dPlanegLTF->DebugDraw("planegltf");
+	object3dSphere->DebugDraw("Sphere");
 	if (ImGui::TreeNode("Camera")) {
 		ImGui::DragFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), 0.1f, -30.0f, 30.0f);
 		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
@@ -194,13 +199,13 @@ void SampleScene::Update()
 		}
 		ImGui::TreePop();
 	}
-	///*if (ImGui::TreeNode("Key")) {
-	//	ImGui::Text("PushKey : %d", input->PushKey(DIK_SPACE));
-	//	ImGui::Text("TriggerKey : %d", input->TriggerKey(DIK_SPACE));
-	//	ImGui::Text("Gamepad RightJoy : %ld", input->GetPadKey().lRx);
-	//	ImGui::Text("Gamepad RightJoy : %ld", ((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / static_cast <LONG>(10000.0)));
-	//	ImGui::TreePop();
-	//}*/
+	if (ImGui::TreeNode("Key")) {
+		ImGui::Text("PushKey : %d", Input::GetInstance()->IsPushKey(DIK_SPACE));
+		ImGui::Text("TriggerKey : %d", Input::GetInstance()->IsTriggerKey(DIK_SPACE));
+		/*ImGui::Text("Gamepad RightJoy : %ld", input->GetPadKey().lRx);
+		ImGui::Text("Gamepad RightJoy : %ld", ((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / static_cast <LONG>(10000.0)));*/
+		ImGui::TreePop();
+	}
 	ImGui::End();
 #endif
 
@@ -236,6 +241,7 @@ void SampleScene::ModelDraw()
 	object3dSuzanne->Draw();
 	object3dTerrain->Draw();
 	object3dPlanegLTF->Draw();
+	object3dSphere->Draw();
 
 	particleManager->Draw();
 }
