@@ -1,5 +1,5 @@
 #pragma once
-#include "../utility/Math/MyMath.h"
+#include "MyMath.h"
 
 #define DIRECTINPUT_VERSION     0x0800
 #include <dinput.h>

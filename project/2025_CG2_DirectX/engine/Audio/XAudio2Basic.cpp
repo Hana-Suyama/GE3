@@ -3,7 +3,7 @@
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
-#include "../utility/StringUtility.h"
+#include "StringUtility.h"
 
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "Mfreadwrite.lib")
@@ -12,11 +12,11 @@
 void XAudio2Basic::Initialize()
 {
 	//XAudioエンジンのインスタンスを生成
-	HRESULT hr = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
+	HRESULT hr = XAudio2Create(&xAudio2_, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(hr));
 
 	//マスターボイスを生成
-	hr = xAudio2->CreateMasteringVoice(&masterVoice);
+	hr = xAudio2_->CreateMasteringVoice(&masterVoice_);
 	assert(SUCCEEDED(hr));
 
 	// Windows Media Foundationの初期化(ローカルファイル版)
@@ -37,7 +37,7 @@ void XAudio2Basic::Finalize()
 	assert(SUCCEEDED(hr));
 
 	//XAudio2解放
-	xAudio2.Reset();
+	xAudio2_.Reset();
 }
 
 SoundData XAudio2Basic::SoundLoadFile(const char* filename) {
@@ -148,6 +148,6 @@ void XAudio2Basic::PlayAudio(const std::string& filePath)
 {
 	SoundData& soundData = soundDatas_.at(filePath);
 
-	SoundPlayWave(xAudio2.Get(), soundData);
+	SoundPlayWave(xAudio2_.Get(), soundData);
 }
 

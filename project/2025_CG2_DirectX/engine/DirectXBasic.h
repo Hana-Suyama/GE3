@@ -2,11 +2,11 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include "debug/Logger/Logger.h"
+#include "Logger.h"
 #include "WindowsApi.h"
 #include <dxcapi.h>
-#include "../../externals/DirectXTex/DirectXTex.h"
-#include "../../externals/DirectXTex/d3dx12.h"
+#include "DirectXTex.h"
+#include "d3dx12.h"
 #include "FixFPS.h"
 
 class DirectXBasic
@@ -242,7 +242,7 @@ private:
 	HANDLE fenceEvent_;
 
 	// バリア
-	D3D12_RESOURCE_BARRIER barrier{};
+	D3D12_RESOURCE_BARRIER barrier_{};
 
 	// デプスステンシルリソース
 	Comptr<ID3D12Resource> depthStencilResource_ = nullptr;

@@ -3,7 +3,7 @@
 #include "2025_CG2_DirectX/engine/Engine.h"
 #include "2025_CG2_DirectX/application/Game.h"
 
-//Windowsアプリでのエントリーポイント
+// Windowsアプリでのエントリーポイント
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	// DirectXのリソースリークチェック

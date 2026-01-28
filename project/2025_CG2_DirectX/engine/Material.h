@@ -1,6 +1,6 @@
 #pragma once
-#include "utility/Math/Vector4.h"
-#include "utility/Math/Matrix4x4.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
 
 struct Material {
 	Vector4 color;

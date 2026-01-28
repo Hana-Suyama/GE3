@@ -1,8 +1,8 @@
 #pragma once
 #include <d3d12.h>
 #include <wrl.h>
-#include "../../../2025_CG2_DirectX/engine/DirectXBasic.h"
-#include "../../../2025_CG2_DirectX/engine/debug/Logger/Logger.h"
+#include "DirectXBasic.h"
+#include "Logger.h"
 
 class SpriteBasic
 {

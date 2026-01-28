@@ -52,11 +52,11 @@ public:
 	void PlayAudio(const std::string& filePath);
 
 	//音声関連
-	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
+	Microsoft::WRL::ComPtr<IXAudio2> xAudio2_;
 
 private:
 	
-	IXAudio2MasteringVoice* masterVoice;
+	IXAudio2MasteringVoice* masterVoice_;
 
 	std::unordered_map<std::string, SoundData> soundDatas_;
 

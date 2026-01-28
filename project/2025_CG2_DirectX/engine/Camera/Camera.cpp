@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include "../utility/Math/MyMath.h"
+#include "MyMath.h"
 
 using namespace MyMath;
 

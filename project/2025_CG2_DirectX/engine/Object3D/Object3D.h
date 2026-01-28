@@ -1,10 +1,10 @@
 #pragma once
 #include "Object3DBasic.h"
-#include "../Model/ModelManager.h"
-#include "../../engine/TransformationMatrix.h"
-#include "../utility/Math/Transform.h"
-#include "../Camera/Camera.h"
-#include "../../engine/Material.h"
+#include "ModelManager.h"
+#include "TransformationMatrix.h"
+#include "Transform.h"
+#include "Camera.h"
+#include "Material.h"
 
 class Object3D
 {

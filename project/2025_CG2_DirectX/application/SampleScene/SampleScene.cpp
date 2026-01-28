@@ -1,6 +1,7 @@
 #include "SampleScene.h"
 #include <numbers>
 #include "../../engine/Utility/Math/Lerp.h"
+#include <TimeManager.h>
 using namespace MyMath;
 
 void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
@@ -18,8 +19,9 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	textureManager_->LoadTexture("resources/uvChecker.png");
 	textureManager_->LoadTexture("resources/monsterBall.png");
 	textureManager_->LoadTexture("resources/particle.png");
+	//textureManager_->AllIntermediateResourceRelease();
 
-	modelManager_->LoadModel("resources", "plane.obj");
+	modelManager_->LoadModelAssimp("resources", "plane.obj");
 	modelManager_->LoadModelAssimp("resources", "teapot.obj");
 	modelManager_->LoadModel("resources", "fence.obj");
 	modelManager_->LoadModel("resources", "multiMesh.obj");
@@ -140,9 +142,17 @@ void SampleScene::Update()
 		playSound = false;
 	}
 
+	if (Input::GetInstance()->IsPadButtonDown(XINPUT_GAMEPAD_A))
+	{
+		Input::GetInstance()->PlayVibration(1.0f, 0.3f, 0.2f);
+	}
+
 #ifdef USE_IMGUI
 	////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
 	ImGui::Begin("ImGui");
+
+	ImGui::Text("Application average %.1f FPS", ImGui::GetIO().Framerate);
+
 	sprite->DebugDraw("Sprite 1");
 	sprite2->DebugDraw("Sprite 2");
 
@@ -202,8 +212,20 @@ void SampleScene::Update()
 	if (ImGui::TreeNode("Key")) {
 		ImGui::Text("PushKey : %d", Input::GetInstance()->IsPushKey(DIK_SPACE));
 		ImGui::Text("TriggerKey : %d", Input::GetInstance()->IsTriggerKey(DIK_SPACE));
-		/*ImGui::Text("Gamepad RightJoy : %ld", input->GetPadKey().lRx);
-		ImGui::Text("Gamepad RightJoy : %ld", ((input->GetPadKey().lRx - static_cast<LONG>(32767.0)) / static_cast <LONG>(10000.0)));*/
+		ImGui::Text("PadButton : A %d", Input::GetInstance()->IsPadButton(XINPUT_GAMEPAD_A));
+		ImGui::Text("Gamepad RightJoy : %f %f", Input::GetInstance()->GetRightStick().x, Input::GetInstance()->GetRightStick().y);
+		ImGui::Text("Gamepad LeftJoy : %f %f", Input::GetInstance()->GetLeftStick().x, Input::GetInstance()->GetLeftStick().y);
+		ImGui::Text("Gamepad RightTrigger : %f", Input::GetInstance()->GetRightTrigger());
+		ImGui::Text("Gamepad LeftTrigger : %f", Input::GetInstance()->GetLeftTrigger());
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Time")) {
+		ImGui::Text("DeltaTime : %f", TimeManager::GetInstance()->GetDeltaTime());
+		ImGui::Text("UnscaledDeltaTime : %f", TimeManager::GetInstance()->GetUnscaledDeltaTime());
+		ImGui::Text("TimeScale : %f", TimeManager::GetInstance()->GetTimeScale());
+		if (ImGui::Button("Scale 0.1")) {
+			TimeManager::GetInstance()->SetTimeScale(0.1f);
+		}
 		ImGui::TreePop();
 	}
 	ImGui::End();

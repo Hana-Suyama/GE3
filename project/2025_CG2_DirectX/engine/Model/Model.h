@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../../engine/VertexData.h"
+#include "VertexData.h"
 #include <wrl.h>
 #include <d3d12.h>
 
@@ -30,15 +30,15 @@ public:
 	};
 	
 	// メッシュのベクター
-	std::vector<Mesh> meshes;
+	std::vector<Mesh> meshes_;
 
 	// .mtlファイルのパス
-	std::string mtlFileName;
+	std::string mtlFileName_;
 	// モデルファイル自体のパス
-	std::string filePath;
+	std::string filePath_;
 
 	// ノード
-	Node rootNode;
+	Node rootNode_;
 
 private:
 

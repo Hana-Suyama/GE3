@@ -1,6 +1,6 @@
 #pragma once
-#include "utility/Math/MyMath.h"
-#include "utility/Math/Matrix4x4.h"
+#include "MyMath.h"
+#include "Matrix4x4.h"
 
 struct TransformationMatrix {
 	Matrix4x4 WVP;

@@ -1,6 +1,6 @@
 #include "Object3D.h"
-#include "../../engine/TransformationMatrix.h"
-#include "..//debug/ImGui/ImGuiManager.h"
+#include "TransformationMatrix.h"
+#include "ImGuiManager.h"
 #include <numbers>
 
 using namespace MyMath;
@@ -32,11 +32,11 @@ void Object3D::Update()
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	transformationMatrixData_->WVP = modelData_->rootNode.localMatrix * worldViewProjectionMatrix;
-	transformationMatrixData_->World = modelData_->rootNode.localMatrix * worldMatrix;
+	transformationMatrixData_->WVP = modelData_->rootNode_.localMatrix * worldViewProjectionMatrix;
+	transformationMatrixData_->World = modelData_->rootNode_.localMatrix * worldMatrix;
 	transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
 
-	for (int32_t i = 0; i < modelData_->meshes.size(); i++) {
+	for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
 		//パラメータからUVTransform用の行列を生成する
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransforms_.at(i).scale);
 		uvTransformMatrix = uvTransformMatrix.Multiply(MakeRotateZMatrix(uvTransforms_.at(i).rotate.z));
@@ -50,19 +50,19 @@ void Object3D::Draw()
 	// 表示フラグがたっていたらもろもろの描画処理を行う
 	if (isDraw_) {
 
-		for (int32_t i = 0; i < modelData_->meshes.size(); i++) {
+		for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
 			// テクスチャを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetSrvHandleGPU(textureFilePaths_.at(i)));
 			// VBVを設定
-			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &modelData_->meshes.at(i).vertexBufferView);
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &modelData_->meshes_.at(i).vertexBufferView);
 			// wvp用のCBufferの場所を設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 			// マテリアルCBufferの場所を設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResources_.at(i)->GetGPUVirtualAddress());
 			// IBVを設定
-			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&modelData_->meshes.at(i).indexBufferView);
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&modelData_->meshes_.at(i).indexBufferView);
 			// 描画！ (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(UINT(modelData_->meshes.at(i).vertices.size()), 1, 0, 0, 0);
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(UINT(modelData_->meshes_.at(i).vertices.size()), 1, 0, 0, 0);
 		}
 
 	}
@@ -120,13 +120,13 @@ void Object3D::CreateWVPResource()
 void Object3D::CreateMTUV()
 {
 	// メッシュの数だけにマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
-	for (int32_t i = 0; i < modelData_->meshes.size(); i++) {
+	for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
 
 		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = object3DBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(Material));
 
 		// メッシュ側のdefaultMaterialのデータを読む
 		Material* defaultMaterialData = nullptr;
-		modelData_->meshes.at(i).defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&defaultMaterialData));
+		modelData_->meshes_.at(i).defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&defaultMaterialData));
 
 		// マテリアルにデータを書き込む
 		Material* materialData = nullptr;
@@ -149,7 +149,7 @@ void Object3D::CreateMTUV()
 		uvTransforms_.push_back(uvTransform);
 
 		// テクスチャをコピー
-		textureFilePaths_.push_back(modelData_->meshes.at(i).defaultTextureFilePath);
+		textureFilePaths_.push_back(modelData_->meshes_.at(i).defaultTextureFilePath);
 	}
 }
 

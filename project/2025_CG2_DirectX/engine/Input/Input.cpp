@@ -1,98 +1,90 @@
 #include "Input.h"
 #include <cassert>
+#include <algorithm>
 
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
+#define PAD_A XINPUT_GAMEPAD_A
+#define PAD_B XINPUT_GAMEPAD_B
+#define PAD_X XINPUT_GAMEPAD_X
+#define PAD_Y XINPUT_GAMEPAD_Y
+#define PAD_LB XINPUT_GAMEPAD_LEFT_SHOULDER
+#define PAD_RB XINPUT_GAMEPAD_RIGHT_SHOULDER
+#define PAD_START XINPUT_GAMEPAD_START
+#define PAD_BACK XINPUT_GAMEPAD_BACK
+
 // シングルトン化
-std::unique_ptr<Input> Input::instance = nullptr;
+std::unique_ptr<Input> Input::instance_ = nullptr;
 
 Input* Input::GetInstance()
 {
-	if (!instance) {
-		instance = std::make_unique<Input>();
+	if (!instance_) {
+		instance_ = std::make_unique<Input>();
 	}
-	return instance.get();
+	return instance_.get();
 }
 
 void Input::ReleaseInstance()
 {
-	instance.reset();
+	instance_.reset();
 }
 
 void Input::Initialize(WindowsApi* winApi){
 
 	//仮引数のwinApiのインスタンスを記録
-	this->winApi = winApi;
+	this->winApi_ = winApi;
 
 	HRESULT hr;
 
 	//DirectInputの初期化
 	hr = DirectInput8Create(
 		winApi->GetHInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8,
-		(void**)&directInput, nullptr);
+		(void**)&directInput_, nullptr);
 	assert(SUCCEEDED(hr));
 
 	//キーボードデバイスの生成
-	hr = directInput->CreateDevice(GUID_SysKeyboard, &keyboard, NULL);
+	hr = directInput_->CreateDevice(GUID_SysKeyboard, &keyboard_, NULL);
 	assert(SUCCEEDED(hr));
 
 	//入力データ形式のセット
-	hr = keyboard->SetDataFormat(&c_dfDIKeyboard);//標準形式
+	hr = keyboard_->SetDataFormat(&c_dfDIKeyboard);//標準形式
 	assert(SUCCEEDED(hr));
 
 	//排他制御レベルのセット
-	hr = keyboard->SetCooperativeLevel(
+	hr = keyboard_->SetCooperativeLevel(
 		winApi->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 	assert(SUCCEEDED(hr));
 
-	//ゲームパッドデバイスの生成
-	enumDeviceData deviceData;
-	deviceData.directInput = directInput.Get();
-	deviceData.ppPadDevice = &gamepad;
-	//ゲームパッドの列挙
-	hr = directInput->EnumDevices(DI8DEVTYPE_GAMEPAD, DeviceFindCallBack, &deviceData, DIEDFL_ATTACHEDONLY);
-	assert(SUCCEEDED(hr));
-
-	if (gamepad) {
-		//入力データ形式のセット
-		hr = gamepad->SetDataFormat(&c_dfDIJoystick);
-		assert(SUCCEEDED(hr));
-
-		//排他制御レベルのセット
-		hr = gamepad->SetCooperativeLevel(
-			winApi->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	}
 }
 
-void Input::Update(){
+void Input::Update(float deltaTime){
 
 	// 前回のキー入力を保存
-	memcpy(keyPre, key, sizeof(key));
+	memcpy(keyPre_, key_, sizeof(key_));
 	
 	//キーボード情報の取得開始
-	keyboard->Acquire();
+	keyboard_->Acquire();
 
 	//全キーの入力状態を取得する
-	keyboard->GetDeviceState(sizeof(key), key);
+	keyboard_->GetDeviceState(sizeof(key_), key_);
 
-	if (gamepad) {
-		// 前回のゲームパッド入力を保存
-		memcpy(&padKeyPre, &padKey, sizeof(DIJOYSTATE));
+	padStatePre_ = padState_;
 
-		//ゲームパッド情報の取得開始
-		gamepad->Acquire();
-
-		//入力状態を取得する
-		gamepad->GetDeviceState(sizeof(DIJOYSTATE), &padKey);
+	DWORD result = XInputGetState(0, &padState_);
+	if (result != ERROR_SUCCESS)
+	{
+		ZeroMemory(&padState_, sizeof(XINPUT_STATE));
 	}
+
+	UpdateVibration(deltaTime);
 
 }
 
 bool Input::IsPushKey(BYTE keyNumber)
 {
 	//指定キーを押していればtrueを返す
-	if (key[keyNumber]) {
+	if (key_[keyNumber]) {
 		return true;
 	}
 	//そうでなければfalseを返す
@@ -101,7 +93,7 @@ bool Input::IsPushKey(BYTE keyNumber)
 
 bool Input::IsTriggerKey(BYTE keyNumber)
 {
-	if (key[keyNumber] != keyPre[keyNumber]) {
+	if (key_[keyNumber] != keyPre_[keyNumber]) {
 		return true;
 	}
 	return false;
@@ -109,7 +101,7 @@ bool Input::IsTriggerKey(BYTE keyNumber)
 
 bool Input::IsTriggerPushKey(BYTE keyNumber)
 {
-	if (IsTriggerKey(keyNumber) && key[keyNumber]) {
+	if (IsTriggerKey(keyNumber) && key_[keyNumber]) {
 		return true;
 	}
 	return false;
@@ -117,75 +109,118 @@ bool Input::IsTriggerPushKey(BYTE keyNumber)
 
 bool Input::IsTriggerReleaseKey(BYTE keyNumber)
 {
-	if (IsTriggerKey(keyNumber) && !key[keyNumber]) {
+	if (IsTriggerKey(keyNumber) && !key_[keyNumber]) {
 		return true;
 	}
 	return false;
 }
 
-bool Input::IsPadButton(int button)
+bool Input::IsPadButton(WORD button)
 {
-	return (padKey.rgbButtons[button] & 0x80) != 0;
+	return (padState_.Gamepad.wButtons & button) != 0;
 }
 
-bool Input::IsPadButtonDown(int button)
+bool Input::IsPadButtonDown(WORD button)
 {
-	return (padKey.rgbButtons[button] & 0x80) &&
-		!(padKeyPre.rgbButtons[button] & 0x80);
+	return (padState_.Gamepad.wButtons & button) &&
+		!(padStatePre_.Gamepad.wButtons & button);
 }
 
-bool Input::IsPadButtonUp(int button)
+bool Input::IsPadButtonUp(WORD button)
 {
-	return !(padKey.rgbButtons[button] & 0x80) &&
-		(padKeyPre.rgbButtons[button] & 0x80);
+	return !(padState_.Gamepad.wButtons & button) &&
+		(padStatePre_.Gamepad.wButtons & button);
 }
 
-Vector2 Input::GetLeftStick(float deadZone = 0.2f)
+Vector2 Input::GetLeftStick()
 {
-	float x = padKey.lX / 32767.0f;
-	float y = padKey.lY / 32767.0f;
+	float x = NormalizeStick(padState_.Gamepad.sThumbLX);
+	float y = NormalizeStick(padState_.Gamepad.sThumbLY);
 
-	x = ApplyDeadZone(x, deadZone);
-	y = ApplyDeadZone(y, deadZone);
+	if (fabs(x) < deadZone_) x = 0;
+	if (fabs(y) < deadZone_) y = 0;
 
 	return { x, y };
 }
 
-Vector2 Input::GetRightStick(float deadZone = 0.2f)
+Vector2 Input::GetRightStick()
 {
-	float x = padKey.lZ / 32767.0f;
-	float y = padKey.lRz / 32767.0f;
+	float x = NormalizeStick(padState_.Gamepad.sThumbRX);
+	float y = NormalizeStick(padState_.Gamepad.sThumbRY);
 
-	x = ApplyDeadZone(x, deadZone);
-	y = ApplyDeadZone(y, deadZone);
+	if (fabs(x) < deadZone_) x = 0;
+	if (fabs(y) < deadZone_) y = 0;
 
 	return { x, y };
 }
 
 float Input::GetLeftTrigger()
 {
-	return padKey.lRx / 65535.0f;
+	float v = padState_.Gamepad.bLeftTrigger / 255.0f;
+	return v < deadZone_ ? 0.0f : v;
 }
 
 float Input::GetRightTrigger()
 {
-	return padKey.lRy / 65535.0f;
+	float v = padState_.Gamepad.bRightTrigger / 255.0f;
+	return v < deadZone_ ? 0.0f : v;
 }
 
-float Input::ApplyDeadZone(float v, float dead)
+float Input::NormalizeStick(short v)
 {
-	if (fabs(v) < dead) return 0.0f;
-	return v;
+	if (v < 0) return v / 32768.0f;
+	return v / 32767.0f;
 }
 
-// デバイス発見時に実行される
-BOOL CALLBACK Input::DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef)
+void Input::SetVibration(float left, float right)
 {
-	enumDeviceData* deviceData = (enumDeviceData*)pvRef;
+	XINPUT_VIBRATION vib{};
+	vib.wLeftMotorSpeed = static_cast<WORD>(left * 65535);
+	vib.wRightMotorSpeed = static_cast<WORD>(right * 65535);
+	XInputSetState(0, &vib);
+}
 
-	//ゲームパッドデバイスの生成
-	HRESULT hr = deviceData->directInput->CreateDevice(ipddi->guidInstance, deviceData->ppPadDevice, NULL);
-	assert(SUCCEEDED(hr));
+void Input::PlayVibration(float left, float right, float time)
+{
+	vibLeft_ = std::clamp(left, 0.0f, 1.0f);
+	vibRight_ = std::clamp(right, 0.0f, 1.0f);
+	vibrationTime_ = time;
+	vibrationTimer_ = 0.0f;
+	isVibrating_ = true;
 
-	return DIENUM_CONTINUE;
+	SetVibration(vibLeft_, vibRight_);
+}
+
+void Input::StopVibration()
+{
+	isVibrating_ = false;
+	vibrationTimer_ = 0.0f;
+	vibrationTime_ = 0.0f;
+
+	SetVibration(0.0f, 0.0f);
+}
+
+void Input::UpdateVibration(float deltaTime)
+{
+	if (!isVibrating_) return;
+
+	vibrationTimer_ += deltaTime;
+
+	if (vibrationTimer_ >= vibrationTime_)
+	{
+		StopVibration();
+		return;
+	}
+
+	SetVibration(vibLeft_, vibRight_);
+}
+
+bool Input::IsVibrating() const
+{
+	return isVibrating_;
+}
+
+bool Input::IsPadConnected()
+{
+	return XInputGetState(0, &padState_) == ERROR_SUCCESS;
 }

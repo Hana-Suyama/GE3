@@ -22,13 +22,13 @@ void Game::Finalize()
 
 void Game::Update()
 {
-	imguiManager->UpdateBegin();
+	imguiManager_->UpdateBegin();
 
 	Engine::Update();
 
 #ifdef _DEBUG
 	if (Input::GetInstance()->IsTriggerKey(DIK_V)) {
-		useDebugcamera = !useDebugcamera;
+		useDebugcamera_ = !useDebugcamera_;
 	}
 
 	//if (useDebugcamera) {
@@ -38,7 +38,7 @@ void Game::Update()
 
 	//ゲームの処理
 
-	imguiManager->UpdateEnd();
+	imguiManager_->UpdateEnd();
 
 	Draw();
 
@@ -51,7 +51,7 @@ void Game::Draw()
 
 	Engine::ModelPreDraw();
 
-	imguiManager->Draw();
+	imguiManager_->Draw();
 
 	Engine::PostDraw();
 }

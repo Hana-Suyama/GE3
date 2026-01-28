@@ -4,7 +4,9 @@
 #include <string>
 #include <format>
 
-#include "utility/StringUtility.h"
+#include "StringUtility.h"
+#include "Time/FixFPS.h"
+#include <TimeManager.h>
 
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -345,19 +347,19 @@ void DirectXBasic::PreDraw()
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
 	//TransitionBarrierの設定
-	barrier = {};
+	barrier_ = {};
 	//今回のバリアはTransition
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	//Noneにしておく
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//バリアを張る対象のリソース。現在のバックバッファに対して行う
-	barrier.Transition.pResource = swapChainResources_[backBufferIndex].Get();
+	barrier_.Transition.pResource = swapChainResources_[backBufferIndex].Get();
 	//遷移前(現在)のResourceState
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	//遷移後のResourceState
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier_);
 
 	//描画先のRTVとDSVを設定する
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV_, 0);
@@ -380,10 +382,10 @@ void DirectXBasic::PostDraw()
 {
 	//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
 	//今回はRenderTargetからPresentにする
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier);
+	commandList_->ResourceBarrier(1, &barrier_);
 
 	//コマンドリストの内容を確定させる。全てのコマンドを積んでからCloseすること
 	HRESULT hr = commandList_->Close();

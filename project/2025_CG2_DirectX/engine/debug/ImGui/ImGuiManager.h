@@ -1,7 +1,7 @@
 #pragma once
-#include "../../WindowsApi.h"
-#include "../../DirectXBasic.h"
-#include "../../SRVManager.h"
+#include "WindowsApi.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
 
 #ifdef USE_IMGUI
 #include "../../externals/imgui/imgui.h"

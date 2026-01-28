@@ -45,6 +45,13 @@ void TextureManager::LoadTexture(const std::string& filePath)
 
 }
 
+void TextureManager::AllIntermediateResourceRelease()
+{
+	for (auto& [key, textureData] : textureDatas_) {
+		textureData.intermediateResource_.Reset();
+	}
+}
+
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(const std::string& filePath)
 {
 	assert(srvManager_->AllocateLimitCheck(static_cast<uint32_t>(textureDatas_.size())));

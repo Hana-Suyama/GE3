@@ -1,6 +1,6 @@
 #pragma once
-#include "../DirectXBasic.h"
-#include "../Camera/Camera.h"
+#include "DirectXBasic.h"
+#include "Camera.h"
 
 
 class Object3DBasic

@@ -1,8 +1,8 @@
 #pragma once
-#include "../Camera/Camera.h"
-#include "../TextureManager.h"
-#include "../../engine/Material.h"
-#include "../../engine/TransformationMatrix.h"
+#include "Camera.h"
+#include "TextureManager.h"
+#include "Material.h"
+#include "TransformationMatrix.h"
 #include <random>
 
 struct Particle {
@@ -101,13 +101,13 @@ private:
 
 	uint32_t interval_ = 5;
 
-	static const uint32_t kNumMaxInstance = 1000;
-	uint32_t numInstance = 0;
+	static const uint32_t kNumMaxInstance_ = 1000;
+	uint32_t numInstance_ = 0;
 	// インスタンシング用リソース
 	Comptr<ID3D12Resource> instancingResource_ = nullptr;
 
-	std::list<Particle> particles;
-	ParticleForGPU* instancingData = nullptr;
+	std::list<Particle> particles_;
+	ParticleForGPU* instancingData_ = nullptr;
 	uint32_t srvIndex_ = 0;
 
 	// マテリアル
@@ -115,11 +115,9 @@ private:
 	// マテリアルリソース
 	Comptr<ID3D12Resource> materialResource_ = nullptr;
 
-	const float kDeltaTime = 1.0f / 60.0f;
+	Emitter emitter_{};
+	AccelerationField accelerationField_;
 
-	Emitter emitter{};
-	AccelerationField accelerationField;
-
-	bool isBillboard = true;
+	bool isBillboard_ = true;
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <d3d12.h>
-#include "../../externals/DirectXTex/DirectXTex.h"
-#include "../../externals/DirectXTex/d3dx12.h"
+#include "DirectXTex.h"
+#include "d3dx12.h"
 #include "DirectXBasic.h"
 #include <vector>
 #include <unordered_map>
@@ -30,6 +30,11 @@ public:
 	/// </summary>
 	/// <param name="filePath">ファイルパス</param>
 	void LoadTexture(const std::string& filePath);
+
+	/// <summary>
+	/// 全ての中間リソースを解放
+	/// </summary>
+	void AllIntermediateResourceRelease();
 
 	/// <summary>
 	///	ファイルパスからGPUハンドルを取得

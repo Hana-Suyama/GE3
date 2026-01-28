@@ -3,6 +3,7 @@
 #include"../engine/utility/Math/MyMath.h"
 #include <numbers>
 #include <array>
+#include <TimeManager.h>
 using namespace MyMath;
 
 void Player::Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Camera* camera)
@@ -40,7 +41,7 @@ void Player::Update()
 
 	// 旋回制御
 	if (turnTimer_ > 0.0f) {
-		turnTimer_ -= 1.0f / 60.0f;
+		turnTimer_ -= TimeManager::GetInstance()->GetDeltaTime();
 
 		// 左右の自キャラ角度テーブル
 		float destinationRotationYTable[] = { std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float> *3.0f / 2.0f };

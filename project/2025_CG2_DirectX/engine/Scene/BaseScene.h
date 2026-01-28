@@ -1,16 +1,16 @@
 #pragma once
-#include "../../engine/Object3D/Object3DBasic.h"
-#include "../../engine/Model/ModelManager.h"
-#include "../../engine/Input/Input.h"
-#include "../../engine/Object3D/Object3D.h"
-#include "../../engine/Particle/ParticleManager.h"
-#include "../../engine/Sprite/Sprite.h"
-#include "../../engine/Light/DirectionalLight.h"
-#include "../../engine/Light/PointLight.h"
-#include "../../engine/Light/SpotLight.h"
-#include "../../engine/Camera/CameraForGPU.h"
-#include "../../engine/debug/ImGui/ImGuiManager.h"
-#include "../../engine/Audio/XAudio2Basic.h"
+#include "Object3DBasic.h"
+#include "ModelManager.h"
+#include "Input.h"
+#include "Object3D.h"
+#include "ParticleManager.h"
+#include "Sprite.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+#include "CameraForGPU.h"
+#include "ImGuiManager.h"
+#include "XAudio2Basic.h"
 
 class SceneManager;
 

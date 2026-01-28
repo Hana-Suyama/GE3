@@ -1,5 +1,5 @@
 #include "ModelManager.h"
-#include "../../engine/Material.h"
+#include "Material.h"
 #include <numbers>
 
 void ModelManager::Initialize(DirectXBasic* directXBasic, TextureManager* textureManager)
@@ -15,7 +15,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	auto it = std::find_if(
 		modelDatas_.begin(),
 		modelDatas_.end(),
-		[&](Model& modelData) {return modelData.filePath == directoryPath + "/" + filename; }
+		[&](Model& modelData) {return modelData.filePath_ == directoryPath + "/" + filename; }
 	);
 	if (it != modelDatas_.end()) {
 		return;
@@ -30,10 +30,10 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	newModel = LoadObjFile(directoryPath, filename);
 
 	//ファイルパスを記録
-	newModel.filePath = directoryPath + "/" + filename;
+	newModel.filePath_ = directoryPath + "/" + filename;
 
 	// メッシュごとに頂点リソースを作る
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		mesh.vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * mesh.vertices.size());
 		//メッシュの分だけ頂点バッファビューを作成する
 		mesh.vertexBufferView.BufferLocation = mesh.vertexResource->GetGPUVirtualAddress();	//リソースの先頭のアドレスから使う
@@ -49,7 +49,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 
 	// メッシュごとにデフォルトマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
 	// 現在はファイルから読み込んでおらず全部同じ値なので意味はない
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		mesh.defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
 		//マテリアルにデータを書き込む
 		Material* materialData = nullptr;
@@ -66,7 +66,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	}
 	
 	// メッシュごとにindexリソースを作る
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		mesh.indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * mesh.vertices.size());
 		//indexバッファビューを作る
 		//リソースの先頭のアドレスから使う
@@ -84,7 +84,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 	}	
 
 	// メッシュごとに使うテクスチャ番号を記録
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		//テクスチャファイルが読み込まれていなかったら読み込む
 		if (mesh.defaultTextureFilePath != "") {
 			textureManager_->LoadTexture(mesh.defaultTextureFilePath);
@@ -104,7 +104,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 	auto it = std::find_if(
 		modelDatas_.begin(),
 		modelDatas_.end(),
-		[&](Model& modelData) {return modelData.filePath == directoryPath + "/" + filename; }
+		[&](Model& modelData) {return modelData.filePath_ == directoryPath + "/" + filename; }
 	);
 	if (it != modelDatas_.end()) {
 		return;
@@ -119,10 +119,10 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 	newModel = LoadObjFileAssimp(directoryPath, filename);
 
 	//ファイルパスを記録
-	newModel.filePath = directoryPath + "/" + filename;
+	newModel.filePath_ = directoryPath + "/" + filename;
 
 	// メッシュごとに頂点リソースを作る
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		mesh.vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * mesh.vertices.size());
 		//メッシュの分だけ頂点バッファビューを作成する
 		mesh.vertexBufferView.BufferLocation = mesh.vertexResource->GetGPUVirtualAddress();	//リソースの先頭のアドレスから使う
@@ -138,7 +138,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 
 	// メッシュごとにデフォルトマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
 	// 現在はファイルから読み込んでおらず全部同じ値なので意味はない
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		mesh.defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
 		//マテリアルにデータを書き込む
 		Material* materialData = nullptr;
@@ -155,7 +155,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 	}
 
 	// メッシュごとにindexリソースを作る
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		mesh.indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * mesh.vertices.size());
 		//indexバッファビューを作る
 		//リソースの先頭のアドレスから使う
@@ -173,7 +173,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 	}
 
 	// メッシュごとに使うテクスチャ番号を記録
-	for (auto& mesh : newModel.meshes) {
+	for (auto& mesh : newModel.meshes_) {
 		//テクスチャファイルが読み込まれていなかったら読み込む
 		if (mesh.defaultTextureFilePath != "") {
 			textureManager_->LoadTexture(mesh.defaultTextureFilePath);
@@ -194,7 +194,7 @@ void ModelManager::CreateSphere()
 	auto it = std::find_if(
 		modelDatas_.begin(),
 		modelDatas_.end(),
-		[&](Model& modelData) {return modelData.filePath == "debug_sphere"; }
+		[&](Model& modelData) {return modelData.filePath_ == "debug_sphere"; }
 	);
 	if (it != modelDatas_.end()) {
 		return;
@@ -205,10 +205,10 @@ void ModelManager::CreateSphere()
 
 	// 新しく追加する空のモデルデータを作成
 	Model newModel;
-	newModel.meshes.push_back(Model::Mesh{});
+	newModel.meshes_.push_back(Model::Mesh{});
 
 	//ファイルパスを記録
-	newModel.filePath = "debug_sphere";
+	newModel.filePath_ = "debug_sphere";
 
 	const uint32_t kSubdivision = 16;//分割数
 	const float kLonEvery = std::numbers::pi_v<float> * 2.0f / float(kSubdivision);//経度分割1つ分の角度
@@ -275,36 +275,36 @@ void ModelManager::CreateSphere()
 			d.normal.y = d.position.y;
 			d.normal.z = d.position.z;
 
-			newModel.meshes.at(0).vertices.push_back(a);
-			newModel.meshes.at(0).vertices.push_back(b);
-			newModel.meshes.at(0).vertices.push_back(c);
+			newModel.meshes_.at(0).vertices.push_back(a);
+			newModel.meshes_.at(0).vertices.push_back(b);
+			newModel.meshes_.at(0).vertices.push_back(c);
 
-			newModel.meshes.at(0).vertices.push_back(c);
-			newModel.meshes.at(0).vertices.push_back(b);
-			newModel.meshes.at(0).vertices.push_back(d);
+			newModel.meshes_.at(0).vertices.push_back(c);
+			newModel.meshes_.at(0).vertices.push_back(b);
+			newModel.meshes_.at(0).vertices.push_back(d);
 		}
 	}
 
 	//球の頂点リソース
-	newModel.meshes.at(0).vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * vertexTotalNumber);
+	newModel.meshes_.at(0).vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * vertexTotalNumber);
 	//リソースの先頭のアドレスから使う
-	newModel.meshes.at(0).vertexBufferView.BufferLocation = newModel.meshes.at(0).vertexResource->GetGPUVirtualAddress();
+	newModel.meshes_.at(0).vertexBufferView.BufferLocation = newModel.meshes_.at(0).vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは分割数×分割数×6のサイズ
-	newModel.meshes.at(0).vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexTotalNumber;
+	newModel.meshes_.at(0).vertexBufferView.SizeInBytes = sizeof(VertexData) * vertexTotalNumber;
 	//1頂点当たりのサイズ
-	newModel.meshes.at(0).vertexBufferView.StrideInBytes = sizeof(VertexData);
+	newModel.meshes_.at(0).vertexBufferView.StrideInBytes = sizeof(VertexData);
 	////球の頂点リソースにデータを書き込む
 	VertexData* vertexDataSphere = nullptr;
 	//書き込むためのアドレスを取得
-	newModel.meshes.at(0).vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
-	std::memcpy(vertexDataSphere, newModel.meshes.at(0).vertices.data(), sizeof(VertexData)* newModel.meshes.at(0).vertices.size());
+	newModel.meshes_.at(0).vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+	std::memcpy(vertexDataSphere, newModel.meshes_.at(0).vertices.data(), sizeof(VertexData)* newModel.meshes_.at(0).vertices.size());
 
 	//球用のマテリアルリソースを作る
-	newModel.meshes.at(0).defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
+	newModel.meshes_.at(0).defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
 	//Sprite用のマテリアルにデータを書き込む
 	Material* materialDataSphere = nullptr;
 	//書き込むためのアドレスを取得
-	newModel.meshes.at(0).defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
+	newModel.meshes_.at(0).defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
 	//白
 	materialDataSphere->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	//SpriteはLightingしないのでfalseを設定する
@@ -315,16 +315,16 @@ void ModelManager::CreateSphere()
 	materialDataSphere->shininess = 1.0f;
 
 	//球用のindexリソース
-	newModel.meshes.at(0).indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * vertexTotalNumber);
+	newModel.meshes_.at(0).indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * vertexTotalNumber);
 	//リソースの先頭のアドレスから使う
-	newModel.meshes.at(0).indexBufferView.BufferLocation = newModel.meshes.at(0).indexResource->GetGPUVirtualAddress();
+	newModel.meshes_.at(0).indexBufferView.BufferLocation = newModel.meshes_.at(0).indexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズはインデックス*vertexTotalNumberのサイズ
-	newModel.meshes.at(0).indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * vertexTotalNumber);
+	newModel.meshes_.at(0).indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * vertexTotalNumber);
 	//インデックスはuint32_tとする
-	newModel.meshes.at(0).indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	newModel.meshes_.at(0).indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	//球用インデックスリソースにデータを書き込む
 	uint32_t* indexDataSphere = nullptr;
-	newModel.meshes.at(0).indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
+	newModel.meshes_.at(0).indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSphere));
 	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
 		float lat = float(-std::numbers::pi_v<float>) / 2.0f + kLatEvery * latIndex;//現在の緯度
 		//経度の方向に分割 0 ~ 2π
@@ -343,9 +343,9 @@ void ModelManager::CreateSphere()
 	// メッシュごとに使うテクスチャ番号を記録
 	// テクスチャが存在しない場合、white1x1を読み込み割り当てる
 	textureManager_->LoadTexture("resources/monsterBall.png");
-	newModel.meshes.at(0).defaultTextureFilePath = "resources/monsterBall.png";
+	newModel.meshes_.at(0).defaultTextureFilePath = "resources/monsterBall.png";
 
-	newModel.rootNode.localMatrix = Matrix4x4::MakeIdentity4x4();
+	newModel.rootNode_.localMatrix = Matrix4x4::MakeIdentity4x4();
 
 	modelDatas_.push_back(newModel);
 }
@@ -355,7 +355,7 @@ uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 	auto it = std::find_if(
 		modelDatas_.begin(),
 		modelDatas_.end(),
-		[&](Model& modelData) {return modelData.filePath == filePath; }
+		[&](Model& modelData) {return modelData.filePath_ == filePath; }
 	);
 	if (it != modelDatas_.end()) {
 		uint32_t modelIndex = static_cast<uint32_t>(std::distance(modelDatas_.begin(), it));
@@ -396,7 +396,7 @@ Model ModelManager::LoadObjFile(const std::string& directoryPath, const std::str
 	std::string line;	//ファイルから読んだ1行を格納するもの
 	int32_t meshCount = 0;
 	//0番目のメッシュデータを追加
-	modelData.meshes.push_back(Model::Mesh{});
+	modelData.meshes_.push_back(Model::Mesh{});
 
 	std::ifstream file(directoryPath + "/" + filename);	//ファイルを開く
 	assert(file.is_open());	//とりあえず開けなかったら止める
@@ -453,9 +453,9 @@ Model ModelManager::LoadObjFile(const std::string& directoryPath, const std::str
 
 			}
 			//頂点を逆順で登録することで、回り順を逆にする
-			modelData.meshes[meshCount].vertices.push_back(triangle[2]);
-			modelData.meshes[meshCount].vertices.push_back(triangle[1]);
-			modelData.meshes[meshCount].vertices.push_back(triangle[0]);
+			modelData.meshes_[meshCount].vertices.push_back(triangle[2]);
+			modelData.meshes_[meshCount].vertices.push_back(triangle[1]);
+			modelData.meshes_[meshCount].vertices.push_back(triangle[0]);
 		} else if (identifier == "mtllib") {
 			//materialTemplateLibraryファイルの名前を取得する
 			std::string materialFilename;
@@ -463,23 +463,23 @@ Model ModelManager::LoadObjFile(const std::string& directoryPath, const std::str
 			//基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
 			//modelData.material = LoadMaterialTemplateFile(directoryPath, materialFilename);
 			//マテリアルファイル名を保存しておく
-			modelData.mtlFileName = materialFilename;
+			modelData.mtlFileName_ = materialFilename;
 		} else if (identifier == "o") {
-			if (modelData.meshes[meshCount].vertices.size() != 0) {
+			if (modelData.meshes_[meshCount].vertices.size() != 0) {
 				meshCount++;
 				//空のメッシュデータを追加
-				modelData.meshes.push_back(Model::Mesh{});
+				modelData.meshes_.push_back(Model::Mesh{});
 			}
 		} else if (identifier == "usemtl") {
 			std::string materialName;
 			s >> materialName;
 			//基本的にobjファイルと同一階層にmtlは存在させるので、ディレクトリ名とファイル名を渡す
-			modelData.meshes[meshCount].defaultTextureFilePath = LoadMaterialTemplateFile(directoryPath, modelData.mtlFileName, materialName);
+			modelData.meshes_[meshCount].defaultTextureFilePath = LoadMaterialTemplateFile(directoryPath, modelData.mtlFileName_, materialName);
 		}
 
 	}
 
-	modelData.rootNode.localMatrix = Matrix4x4::MakeIdentity4x4();
+	modelData.rootNode_.localMatrix = Matrix4x4::MakeIdentity4x4();
 
 	return modelData;
 
@@ -490,7 +490,7 @@ Model ModelManager::LoadObjFileAssimp(const std::string& directoryPath, const st
 
 	Model modelData;	//構築するModelData
 	//0番目のメッシュデータを追加
-	modelData.meshes.push_back(Model::Mesh{});
+	modelData.meshes_.push_back(Model::Mesh{});
 	int32_t meshCount = 0;
 
 	Assimp::Importer importer;
@@ -520,7 +520,7 @@ Model ModelManager::LoadObjFileAssimp(const std::string& directoryPath, const st
 				// aiProcess_MakeLeftHandedはz*=-1で、右手->左手に変換するので手動で対処
 				vertex.position.x *= -1.0f;
 				vertex.normal.x *= -1.0f;
-				modelData.meshes[meshCount].vertices.push_back(vertex);
+				modelData.meshes_[meshCount].vertices.push_back(vertex);
 			}
 		}
 	}
@@ -530,11 +530,11 @@ Model ModelManager::LoadObjFileAssimp(const std::string& directoryPath, const st
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.meshes[meshCount].defaultTextureFilePath = directoryPath + "/" + textureFilePath.C_Str();
+			modelData.meshes_[meshCount].defaultTextureFilePath = directoryPath + "/" + textureFilePath.C_Str();
 		}
 	}
 
-	modelData.rootNode = ReadNode(scene->mRootNode);
+	modelData.rootNode_ = ReadNode(scene->mRootNode);
 
 	return modelData;
 }

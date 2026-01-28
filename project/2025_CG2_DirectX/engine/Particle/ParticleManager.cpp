@@ -1,8 +1,9 @@
 #include "ParticleManager.h"
-#include "../../engine/VertexData.h"
-#include "../../engine/TransformationMatrix.h"
+#include "VertexData.h"
+#include "TransformationMatrix.h"
 #include <numbers>
-#include "../debug/ImGui/ImGuiManager.h"
+#include "ImGuiManager.h"
+#include <TimeManager.h>
 
 using namespace MyMath;
 
@@ -61,42 +62,42 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	//UVTransformを単位行列で初期化
 	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
 
-	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
-	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
-		instancingData[index].WVP = Matrix4x4::MakeIdentity4x4();
-		instancingData[index].World = Matrix4x4::MakeIdentity4x4();
-		instancingData[index].color = Vector4( 1.0f, 1.0f, 1.0f, 1.0f );
+	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance_);
+	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
+	for (uint32_t index = 0; index < kNumMaxInstance_; ++index) {
+		instancingData_[index].WVP = Matrix4x4::MakeIdentity4x4();
+		instancingData_[index].World = Matrix4x4::MakeIdentity4x4();
+		instancingData_[index].color = Vector4( 1.0f, 1.0f, 1.0f, 1.0f );
 	}
 
 	srvIndex_ = srvManager_->Allocate();
-	srvManager_->CreateSRVforStructuredBuffer(srvIndex_, instancingResource_.Get(), kNumMaxInstance, sizeof(ParticleForGPU));
+	srvManager_->CreateSRVforStructuredBuffer(srvIndex_, instancingResource_.Get(), kNumMaxInstance_, sizeof(ParticleForGPU));
 	
 	/*for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 		particles[index] = MakeNewParticle(randomEngine);
 	}*/
 
-	emitter.count = 10;
-	emitter.frequency = 0.1f;
-	emitter.frequencyTime = 0.0f;
+	emitter_.count = 10;
+	emitter_.frequency = 0.1f;
+	emitter_.frequencyTime = 0.0f;
 
-	emitter.transform.translate = { 0.0f, 0.0f, 0.0f };
-	emitter.transform.rotate = { 0.0f, 0.0f, 0.0f };
-	emitter.transform.scale = { 1.0f, 1.0f, 1.0f };
+	emitter_.transform.translate = { 0.0f, 0.0f, 0.0f };
+	emitter_.transform.rotate = { 0.0f, 0.0f, 0.0f };
+	emitter_.transform.scale = { 1.0f, 1.0f, 1.0f };
 
-	accelerationField.acceleration = { 0.0f, 15.0f, 0.0f };
-	accelerationField.area.min = { -1.0f, -1.0f, -1.0f };
-	accelerationField.area.max = { 1.0f, 1.0f, 1.0f };
+	accelerationField_.acceleration = { 0.0f, 15.0f, 0.0f };
+	accelerationField_.area.min = { -1.0f, -1.0f, -1.0f };
+	accelerationField_.area.max = { 1.0f, 1.0f, 1.0f };
 	
 }
 
 void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 {
 
-	emitter.frequencyTime += kDeltaTime;
-	if (emitter.frequency <= emitter.frequencyTime) {
-		particles.splice(particles.end(), Emit(emitter, randomEngine));
-		emitter.frequencyTime -= emitter.frequency;
+	emitter_.frequencyTime += TimeManager::GetInstance()->GetDeltaTime();
+	if (emitter_.frequency <= emitter_.frequencyTime) {
+		particles_.splice(particles_.end(), Emit(emitter_, randomEngine));
+		emitter_.frequencyTime -= emitter_.frequency;
 	}
 
 #ifdef USE_IMGUI
@@ -104,8 +105,8 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 	/*if (ImGui::Button("Add Particle")) {
 		particles.splice(particles.end(), Emit(emitter, randomEngine));
 	}*/
-	ImGui::DragFloat3("EmitterTranslate", &emitter.transform.translate.x, 0.01f, -100.0f, 100.0f);
-	ImGui::Checkbox("isBillboard", &isBillboard);
+	ImGui::DragFloat3("EmitterTranslate", &emitter_.transform.translate.x, 0.01f, -100.0f, 100.0f);
+	ImGui::Checkbox("isBillboard", &isBillboard_);
 	ImGui::End();
 
 	
@@ -118,39 +119,39 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
 
-	numInstance = 0;
+	numInstance_ = 0;
 
-	for (std::list<Particle>::iterator particleIterator = particles.begin();
-		particleIterator != particles.end();) {
+	for (std::list<Particle>::iterator particleIterator = particles_.begin();
+		particleIterator != particles_.end();) {
 
 		if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
-			particleIterator = particles.erase(particleIterator);
+			particleIterator = particles_.erase(particleIterator);
 			continue;
 		}
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix((*particleIterator).transform.scale, (*particleIterator).transform.rotate, (*particleIterator).transform.translate);
-		if (isBillboard) {
+		if (isBillboard_) {
 			worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
 		}
 		Matrix4x4 worldViewProjectionMatrix = worldMatrix.Multiply(camera_->GetViewProjectionMatrix());
 
-		if (IsCollision(accelerationField.area, (*particleIterator).transform.translate)) {
-			(*particleIterator).velocity += accelerationField.acceleration * kDeltaTime;
+		if (IsCollision(accelerationField_.area, (*particleIterator).transform.translate)) {
+			(*particleIterator).velocity += accelerationField_.acceleration * TimeManager::GetInstance()->GetDeltaTime();
 		}
-		(*particleIterator).transform.translate += (*particleIterator).velocity * kDeltaTime;
-		(*particleIterator).currentTime += kDeltaTime;
+		(*particleIterator).transform.translate += (*particleIterator).velocity * TimeManager::GetInstance()->GetDeltaTime();
+		(*particleIterator).currentTime += TimeManager::GetInstance()->GetDeltaTime();
 		(*particleIterator).color = { (std::max)((*particleIterator).color.x -= 0.01f, 0.0f), (std::max)((*particleIterator).color.y -= 0.006f, 0.0f), (std::min)((*particleIterator).color.z += 0.004f, 1.0f) };
 
 
-		if (numInstance < kNumMaxInstance) {
-			instancingData[numInstance].WVP = worldViewProjectionMatrix;
-			instancingData[numInstance].World = worldMatrix;
-			instancingData[numInstance].color = (*particleIterator).color;
+		if (numInstance_ < kNumMaxInstance_) {
+			instancingData_[numInstance_].WVP = worldViewProjectionMatrix;
+			instancingData_[numInstance_].World = worldMatrix;
+			instancingData_[numInstance_].color = (*particleIterator).color;
 
 			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
-			instancingData[numInstance].color.w = alpha;
+			instancingData_[numInstance_].color.w = alpha;
 
-			++numInstance;
+			++numInstance_;
 		}
 
 		++particleIterator;
@@ -219,8 +220,8 @@ void ParticleManager::Draw()
 	//マテリアルCBufferの場所を設定
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//描画！(DrawCall/ドローコール)
-	if (numInstance) {
-		directXBasic_->GetCommandList()->DrawInstanced(1, numInstance, 0, 0);
+	if (numInstance_) {
+		directXBasic_->GetCommandList()->DrawInstanced(1, numInstance_, 0, 0);
 	}
 }
 

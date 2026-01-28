@@ -60,17 +60,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)externals\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)externals\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)externals\imgui;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -175,9 +175,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="externals\imgui\imgui_tables.cpp" />
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Input\Input.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\debug\Logger\Logger.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\FixFPS.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Debug\Logger\Logger.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Time\FixFPS.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Debug\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\Game.cpp" />
     <ClCompile Include="main.cpp">
@@ -204,6 +204,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\application\SampleScene\SampleScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\SceneManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Time\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
@@ -258,9 +259,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
   <ItemGroup>
     <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\CameraForGPU.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\D3DResourceLeakChecker.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Debug\D3DResourceLeakChecker.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\DebugCamera.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\Dump\ExportDump.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Debug\Dump\ExportDump.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\DirectXBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\DirectionalLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h" />
@@ -290,10 +291,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\MyMath.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Input\Input.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\WindowsApi.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\Logger\Logger.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Debug\Logger\Logger.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\StringUtility.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\FixFPS.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\debug\ImGui\ImGuiManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Time\FixFPS.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Debug\ImGui\ImGuiManager.h" />
     <ClInclude Include="2025_CG2_DirectX\application\GameScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Material.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h" />
@@ -314,6 +315,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\application\Game.h" />
     <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Time\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

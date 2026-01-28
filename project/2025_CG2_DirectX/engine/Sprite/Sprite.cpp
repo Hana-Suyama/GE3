@@ -1,6 +1,6 @@
 #include "Sprite.h"
-#include "../../../externals/DirectXTex/DirectXTex.h"
-#include "..//debug/ImGui/ImGuiManager.h"
+#include "DirectXTex.h"
+#include "ImGuiManager.h"
 
 using namespace MyMath;
 

@@ -3,28 +3,12 @@
 #define DIRECTINPUT_VERSION     0x0800	// DirectInputのバージョン指定
 #include <dinput.h>
 #include <wrl.h>
-#include "../WindowsApi.h"
-#include "../Utility/Math/Vector2.h"
+#include "WindowsApi.h"
+#include "Vector2.h"
 #include <memory>
+#include <Xinput.h>
 
-// EnumDeviceに渡すデータの構造体
-struct enumDeviceData
-{
-	LPDIRECTINPUT8 directInput;             // IDirectInput8のインターフェイス
-	LPDIRECTINPUTDEVICE8* ppPadDevice;		// 使用するデバイスを格納するポインタのポインタ
-};
-
-enum PadButton
-{
-	PAD_A = 0,
-	PAD_B = 1,
-	PAD_X = 2,
-	PAD_Y = 3,
-	PAD_LB = 4,
-	PAD_RB = 5,
-	PAD_BACK = 6,
-	PAD_START = 7,
-};
+#pragma comment(lib, "xinput.lib")
 
 class Input
 {
@@ -38,20 +22,13 @@ private:
 
 	/* --------- シングルトン化 --------- */
 
-	static std::unique_ptr<Input> instance;
+	static std::unique_ptr<Input> instance_;
 	
 	Input(const Input&) = delete;
 	Input& operator=(const Input&) = delete;
 public:
 	Input() = default;
 	~Input() = default;
-
-public:
-
-	/* --------- 静的メンバ関数 --------- */
-
-	//ゲームパッド
-	static BOOL CALLBACK DeviceFindCallBack(LPCDIDEVICEINSTANCE ipddi, LPVOID pvRef);
 
 public:
 
@@ -65,7 +42,7 @@ public:
 	// 初期化
 	void Initialize(WindowsApi* winApi);
 	// 更新
-	void Update();
+	void Update(float deltaTime);
 
 	/* --- キーボード --- */
 
@@ -84,19 +61,19 @@ public:
 	/* --- ゲームパッド --- */
 
 	// ゲームパッドボタンの押下をチェック
-	bool IsPadButton(int button);
+	bool IsPadButton(WORD button);
 
 	// ゲームパッドを押した瞬間かをチェック
-	bool IsPadButtonDown(int button);
+	bool IsPadButtonDown(WORD button);
 
 	// ゲームパッドを離した瞬間かをチェック
-	bool IsPadButtonUp(int button);
+	bool IsPadButtonUp(WORD button);
 
 	// 左スティックを取得
-	Vector2 GetLeftStick(float deadZone);
+	Vector2 GetLeftStick();
 
 	// 右スティックを取得
-	Vector2 GetRightStick(float deadZone);
+	Vector2 GetRightStick();
 
 	// 左トリガーの取得
 	float GetLeftTrigger();
@@ -104,32 +81,51 @@ public:
 	// 右トリガーの取得
 	float GetRightTrigger();
 
-	// デッドゾーンの適用
-	float ApplyDeadZone(float v, float dead);
+	bool IsPadConnected();
+
+	// --- 振動 ---
+
+	void SetVibration(float left, float right);
+	void PlayVibration(float left, float right, float time);
+	void StopVibration();
+	void UpdateVibration(float deltaTime);
+	bool IsVibrating() const;
+
+private:
+
+	/* --------- private関数 --------- */
+
+	static float NormalizeStick(short v);
 
 private:
 
 	/* --------- private変数 --------- */
 
 	// WindowsApi
-	WindowsApi* winApi = nullptr;
+	WindowsApi* winApi_ = nullptr;
 
 	// IDirectInput8のインターフェイス
-	Comptr<IDirectInput8> directInput = nullptr;
+	Comptr<IDirectInput8> directInput_ = nullptr;
 
 	// キーボード
-	Comptr<IDirectInputDevice8> keyboard;
-	// ゲームパッド
-	Comptr<IDirectInputDevice8> gamepad;
+	Comptr<IDirectInputDevice8> keyboard_;
 
 	// 全キーの入力状態
-	BYTE key[256] = {};
+	BYTE key_[256] = {};
 	// 前回の全キーの状態
-	BYTE keyPre[256] = {};
+	BYTE keyPre_[256] = {};
 
-	// ゲームパッドの入力状態
-	DIJOYSTATE padKey;
-	// 前フレームのゲームパッドの入力状態
-	DIJOYSTATE padKeyPre;
+	XINPUT_STATE padState_{};
+	XINPUT_STATE padStatePre_{};
+
+	bool isVibrating_ = false;
+	float vibrationTime_ = 0.0f;
+	float vibrationTimer_ = 0.0f;
+
+	float vibLeft_ = 0.0f;
+	float vibRight_ = 0.0f;
+
+	// デッドゾーン
+	float deadZone_ = 0.2f;
 };
 
