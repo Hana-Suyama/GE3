@@ -58,7 +58,7 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	//白
 	materialData_->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	//SpriteはLightingしないのでfalseを設定する
-	materialData_->enableLighting = Light::None;
+	materialData_->enableLighting = Reflectance::None;
 	//UVTransformを単位行列で初期化
 	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
 

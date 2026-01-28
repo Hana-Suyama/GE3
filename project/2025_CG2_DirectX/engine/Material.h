@@ -11,7 +11,7 @@ struct Material {
 	Matrix4x4 uvTransform;
 };
 
-enum Light {
+enum Reflectance {
 	None,
 	Lambert,
 	HalfLambert,

@@ -58,7 +58,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 		//今回は白を書き込んでみる
 		materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		//Lighting有効
-		materialData->enableLighting = Light::HalfLambert;
+		materialData->enableLighting = Reflectance::HalfLambert;
 		//UVTransformを単位行列で初期化
 		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
 
@@ -147,7 +147,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 		//今回は白を書き込んでみる
 		materialData->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 		//Lighting有効
-		materialData->enableLighting = Light::HalfLambert;
+		materialData->enableLighting = Reflectance::HalfLambert;
 		//UVTransformを単位行列で初期化
 		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
 
@@ -308,7 +308,7 @@ void ModelManager::CreateSphere()
 	//白
 	materialDataSphere->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	//SpriteはLightingしないのでfalseを設定する
-	materialDataSphere->enableLighting = Light::HalfLambert;
+	materialDataSphere->enableLighting = Reflectance::HalfLambert;
 	//UVTransformを単位行列で初期化
 	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity4x4();
 

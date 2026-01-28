@@ -45,15 +45,16 @@ private:
 
 	std::unique_ptr<Camera> camera = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> cameraForGPUResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> pointLightResource;
-	Microsoft::WRL::ComPtr<ID3D12Resource> spotLightResource;
 
-	DirectionalLight* directionalLightData = nullptr;
 	CameraForGPU* cameraForGPUData = nullptr;
-	PointLight* pointLightData = nullptr;
-	SpotLight* spotLightData = nullptr;
+
+	std::vector<std::unique_ptr<Light>> lights_;
+
+	// ライトを一括でGPUに送るためのバッファとデータ
+	Microsoft::WRL::ComPtr<ID3D12Resource> lightsBufferResource_;
+	LightBuffer* lightsBufferData_ = nullptr;
+
 
 	XAudio2Basic* xaudio2Basic_ = nullptr;
 

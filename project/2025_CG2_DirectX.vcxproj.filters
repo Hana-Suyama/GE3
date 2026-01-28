@@ -436,6 +436,15 @@
     <ClInclude Include="2025_CG2_DirectX\engine\Time\TimeManager.h">
       <Filter>ヘッダー ファイル\engine\Time</Filter>
     </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\Light.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\LightType.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\LightData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">

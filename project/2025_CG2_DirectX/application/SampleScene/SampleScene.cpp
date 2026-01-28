@@ -74,16 +74,6 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	object3dSphere = std::make_unique<Object3D>();
 	object3dSphere->Initialize(object3dBasic_, modelManager, "debug_sphere");
 
-	//DirectionalLight用のリソースを作る
-	directionalLightResource = directXBasic->CreateBufferResource(sizeof(DirectionalLight));
-	//データを書き込む
-	//書き込むためのアドレスを取得
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-	//デフォルト値はとりあえず以下のようにしておく
-	directionalLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	directionalLightData->direction = { 0.0f, -1.0f, 0.0f };
-	directionalLightData->intensity = 1.0f;
-
 	// カメラ位置転送用のリソースを作る
 	cameraForGPUResource = directXBasic->CreateBufferResource(sizeof(CameraForGPU));
 	// データを書き込む
@@ -91,25 +81,20 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	cameraForGPUResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPUData));
 	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
 
-	// pointLightリソース
-	pointLightResource = directXBasic->CreateBufferResource(sizeof(PointLight));
-	pointLightResource->Map(0, nullptr, reinterpret_cast<void**>(&pointLightData));
-	pointLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	pointLightData->intensity = 1.0f;
-	pointLightData->position = {};
-	pointLightData->decay = 1.0f;
-	pointLightData->radius = 30.0f;
+	lights_.push_back(std::make_unique<DirectionalLight>());
+	lights_.back()->Initialize();
 
-	// SpotLightリソース
-	spotLightResource = directXBasic->CreateBufferResource(sizeof(SpotLight));
-	spotLightResource->Map(0, nullptr, reinterpret_cast<void**>(&spotLightData));
-	spotLightData->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	spotLightData->cosAngle = std::cos(std::numbers::pi_v<float> / 3.0f);
-	spotLightData->decay = 2.0f;
-	spotLightData->direction = Vector3{ -1.0f, -1.0f, 0.0f }.Normalize();
-	spotLightData->distance = 7.0f;
-	spotLightData->intensity = 4.0f;
-	spotLightData->position = { 2.0f, 1.25f, 0.0f };
+	/*lights_.push_back(std::make_unique<PointLight>());
+	lights_.back()->Initialize();
+
+	lights_.push_back(std::make_unique<SpotLight>());
+	lights_.back()->Initialize();*/
+
+	// ライトを一括でGPUに送るためのバッファを作る
+	size_t alignedSize = (sizeof(LightBuffer) + 255) & ~255;
+	lightsBufferResource_ = directXBasic->CreateBufferResource(alignedSize);
+	// データを書き込む
+	lightsBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightsBufferData_));
 
 }
 
@@ -135,6 +120,10 @@ void SampleScene::Update()
 	object3dTerrain->Update();
 	object3dPlanegLTF->Update();
 	object3dSphere->Update();
+
+	for (auto& light : lights_) {
+		light->Update();
+	}
 
 	if (playSound) {
 		//音声再生
@@ -178,7 +167,7 @@ void SampleScene::Update()
 		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
 		ImGui::TreePop();
 	}
-	if (ImGui::TreeNode("Lighting")) {
+	/*if (ImGui::TreeNode("Lighting")) {
 		ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
 		ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
 		ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
@@ -202,7 +191,7 @@ void SampleScene::Update()
 		ImGui::SliderFloat("intensity", &spotLightData->intensity, 0.0f, 1.0f);
 		ImGui::SliderFloat("cosFallOffStart", &spotLightData->cosFalloffStart, 0.0f, 1.0f);
 		ImGui::TreePop();
-	}
+	}*/
 	if (ImGui::TreeNode("Sound")) {
 		if (ImGui::Button("play")) {
 			playSound = true;
@@ -231,23 +220,30 @@ void SampleScene::Update()
 	ImGui::End();
 #endif
 
-	directionalLightData->direction = directionalLightData->direction.Normalize();
-	spotLightData->direction = spotLightData->direction.Normalize();
-	if (spotLightData->cosAngle == spotLightData->cosFalloffStart) {
-		spotLightData->cosFalloffStart += 0.01f;
-	}
-
 	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
 
 }
 
 void SampleScene::SpriteDraw()
 {
+
+	// ライトデータを一括でライトバッファに書き込む
+
+	//GPUに送るためのLightDataベクターを作成
+	std::vector<LightData> lightDataVector;
+
+	for (auto& light : lights_) {
+		LightData data{};
+		light->WriteToLightData(data);
+		lightDataVector.push_back(data);
+	}
+	
+	lightsBufferData_->lightCount = static_cast<uint32_t>(lights_.size());
+	memcpy(lightsBufferData_->lights, lightDataVector.data(), sizeof(LightData) * lightsBufferData_->lightCount);
+
 	//directionalLight用のCBufferの場所を設定
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightsBufferResource_->GetGPUVirtualAddress());
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(5, pointLightResource->GetGPUVirtualAddress());
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(6, spotLightResource->GetGPUVirtualAddress());
 
 	sprite->Draw();
 	sprite2->Draw();
