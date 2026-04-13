@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <Vector2.h>
 #include <Vector3.h>
 #include <Vector4.h>
 
@@ -11,7 +12,7 @@ const uint32_t kMaxLights = 128; // 仮最大ライト数。あとでエンジ�
 struct LightData {
 	uint32_t type;      // Lightの種類
 	uint32_t enable;	// ライトの有効無効
-	float _pat0[2];		// パディング
+	Vector2 size;		// サイズ(Area)
 
 	Vector4 color;		// ライトの色
 

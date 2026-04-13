@@ -144,9 +144,6 @@
     <ClCompile Include="2025_CG2_DirectX\engine\Utility\Math\MyMath.cpp">
       <Filter>ソース ファイル\engine\utility</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Camera\DebugCamera.cpp">
-      <Filter>ソース ファイル\engine\debug</Filter>
-    </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Input\Input.cpp">
       <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
@@ -236,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Time\TimeManager.cpp">
       <Filter>ソース ファイル\engine\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Camera\DebugCamera.cpp">
+      <Filter>ソース ファイル\engine\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -443,6 +443,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Light\LightData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Light\AreaLight.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -174,7 +174,7 @@ private:
 	/// <summary>
 	/// 全てのディスクリプタヒープの作成生成
 	/// </summary>
-	void CreateAllDiscriptorHeap();
+	void CreateAllDescriptorHeap();
 
 	/// <summary>
 	/// レンダーターゲットビューの生成

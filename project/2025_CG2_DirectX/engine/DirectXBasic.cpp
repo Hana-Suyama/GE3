@@ -39,7 +39,7 @@ void DirectXBasic::Initialize(Logger* logger, WindowsApi* winApi)
 	CreateSwapChain();
 
 	//すべてのディスクリプタヒープの作成
-	CreateAllDiscriptorHeap();
+	CreateAllDescriptorHeap();
 
 	//RTVの作成
 	CreateRTV();
@@ -213,7 +213,7 @@ Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> DirectXBasic::CreateDescriptorHeap(
 	return descriptorHeap;
 }
 
-void DirectXBasic::CreateAllDiscriptorHeap()
+void DirectXBasic::CreateAllDescriptorHeap()
 {
 	//RTV用のヒープでディスクリプタの数は2。RTVはShader内で触るものではないので、ShaderVisibleはfalse
 	rtvDescriptorHeap_ = CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);

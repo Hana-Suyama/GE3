@@ -16,7 +16,6 @@ public:
 	TimeManager() = default;
 	~TimeManager() = default;
 
-
 public:
 
 	/* --------- public関数 --------- */

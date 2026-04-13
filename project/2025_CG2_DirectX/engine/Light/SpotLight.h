@@ -29,6 +29,27 @@ public:
 	}
 
 	/// <summary>
+	/// ImGuiのデバッグ描画仮想関数(オーバーライド)
+	/// </summary>
+	/// <param name="label">ImGuiのラベル名</param>
+	void DebugDrawImGui(std::string label) override
+	{
+#ifdef USE_IMGUI
+		if (ImGui::TreeNode((std::string("SpotLight") + label).c_str()))
+		{
+			Light::DebugDrawImGui(label);
+			ImGui::DragFloat3("Position", reinterpret_cast<float*>(&position_), 0.1f);
+			ImGui::SliderFloat("cosAngle", &cosAngle_, 0.0f, 1.0f);
+			ImGui::SliderFloat("decay", &decay_, 0.0f, 1.0f);
+			ImGui::SliderFloat3("direction", reinterpret_cast<float*>(&direction_), 0.0f, 1.0f);
+			ImGui::SliderFloat("radius", &radius_, 0.0f, 1.0f);
+			ImGui::SliderFloat("cosFallOffStart", &cosFalloffStart_, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+#endif
+	}
+
+	/// <summary>
 	/// タイプ取得関数(オーバーライド)
 	/// </summary>
 	/// <returns>ライトのタイプ</returns>
@@ -89,6 +110,7 @@ public:
 		out.decay = decay_;
 		out.cosAngle = cosAngle_;
 		out.cosFalloffStart = cosFalloffStart_;
+		out.size = {};
 		// cosAngleとcosFalloffStartが同じ値にならないようにする
 		if (out.cosAngle == out.cosFalloffStart) {
 			out.cosFalloffStart += 0.01f;

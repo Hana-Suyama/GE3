@@ -22,6 +22,22 @@ public:
 	}
 
 	/// <summary>
+	/// ImGuiのデバッグ描画仮想関数(オーバーライド)
+	/// </summary>
+	/// <param name="label">ImGuiのラベル名</param>
+	void DebugDrawImGui(std::string label) override
+	{
+#ifdef USE_IMGUI
+		if (ImGui::TreeNode((std::string("DirectionalLight") + label).c_str()))
+		{
+			Light::DebugDrawImGui(label);
+			ImGui::DragFloat3("Direction", reinterpret_cast<float*>(&direction_), 0.01f);
+			ImGui::TreePop();
+		}
+#endif
+	}
+
+	/// <summary>
 	/// タイプ取得関数(オーバーライド)
 	/// </summary>
 	/// <returns>ライトのタイプ</returns>
@@ -53,6 +69,7 @@ public:
 		out.cosAngle = 0.0f;
 		out.cosFalloffStart = 0.0f;
 		out.position = {};
+		out.size = {};
 	}
 
 private:

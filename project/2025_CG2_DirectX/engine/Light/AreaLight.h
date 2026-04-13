@@ -1,10 +1,11 @@
 #pragma once
 #include <Light.h>
+#include <Vector2.h>
 
 /// <summary>
-/// 点光源クラス
+/// エリアライトクラス
 /// </summary>
-class PointLight : public Light {
+class AreaLight : public Light {
 public:
 
 	/* --------- public関数 --------- */
@@ -12,14 +13,17 @@ public:
 	/// <summary>
 	/// 初期化(オーバーライド)
 	/// </summary>
-	/// <param name="directXBasic">DirectX基盤のポインタ</param>
 	virtual void Initialize() override {
 		// 基底クラスの初期化を呼び出す
 		Light::Initialize();
-		// PointLight固有の初期化
-		position_ = {};
-		decay_ = 1.0f;
-		radius_ = 30.0f;
+		// AreaLight固有の初期化
+		color_ = { 1.0f, 1.0f, 1.0f, 1.0f };
+		decay_ = 2.0f;
+		direction_ = Vector3{ 0.0f, -1.0f, 0.0f }.Normalize();
+		radius_ = 7.0f;
+		intensity_ = 4.0f;
+		position_ = { 2.0f, 1.25f, 0.0f };
+		size_ = Vector2{ 1.0f, 1.0f };
 	}
 
 	/// <summary>
@@ -29,12 +33,16 @@ public:
 	void DebugDrawImGui(std::string label) override
 	{
 #ifdef USE_IMGUI
-		if (ImGui::TreeNode((std::string("PointLight") + label).c_str()))
+		if (ImGui::TreeNode((std::string("AreaLight") + label).c_str()))
 		{
 			Light::DebugDrawImGui(label);
 			ImGui::DragFloat3("Position", reinterpret_cast<float*>(&position_), 0.1f);
-			ImGui::DragFloat("Radius", &radius_, 0.1f);
-			ImGui::DragFloat("Decay", &decay_, 0.01f);
+			ImGui::DragFloat("decay", &decay_, 0.1f);
+			if (ImGui::SliderFloat3("direction", reinterpret_cast<float*>(&direction_), -1.0f, 1.0f)){
+				direction_ = direction_.Normalize();
+			}
+			ImGui::DragFloat("radius", &radius_, 0.1f);
+			ImGui::DragFloat2("size", reinterpret_cast<float*>(&size_), 0.1f);
 			ImGui::TreePop();
 		}
 #endif
@@ -45,7 +53,7 @@ public:
 	/// </summary>
 	/// <returns>ライトのタイプ</returns>
 	LightType GetType() const override {
-		return LightType::Point;
+		return LightType::Area;
 	}
 
 	/// <summary>
@@ -53,6 +61,14 @@ public:
 	/// </summary>
 	/// <param name="pos">位置ベクトル</param>
 	void SetPosition(const Vector3& pos) { position_ = pos; }
+
+	/// <summary>
+	/// 向きのセッター
+	/// </summary>
+	/// <param name="dir">向きのベクトル</param>
+	void SetDirection(const Vector3& dir) {
+		direction_ = dir.Normalize();
+	}
 
 	/// <summary>
 	/// ライトの届く最大距離のセッター
@@ -67,6 +83,12 @@ public:
 	void SetDecay(float decay) { decay_ = decay; }
 
 	/// <summary>
+	/// サイズのセッター
+	/// </summary>
+	/// <param name="size"></param>
+	void SetSize(Vector2 size) { size_ = size; }
+
+	/// <summary>
 	/// ライトのデータをLightData構造体に書き込む(オーバーライド)
 	/// </summary>
 	/// <param name="out"> </param>
@@ -76,12 +98,10 @@ public:
 		out.color = color_;
 		out.intensity = intensity_;
 		out.position = position_;
+		out.direction = direction_;
 		out.radius = radius_;
-		out.direction = {};
 		out.decay = decay_;
-		out.cosAngle = 0.0f;
-		out.cosFalloffStart = 0.0f;
-		out.size = {};
+		out.size = size_;
 	}
 
 private:
@@ -90,9 +110,13 @@ private:
 
 	// 位置
 	Vector3 position_;
-	// 届く最大距離
+	// 向き
+	Vector3 direction_;
+	// ライトの届く最大距離
 	float radius_;
 	// 減衰率
 	float decay_;
+	// サイズ
+	Vector2 size_;
 
 };

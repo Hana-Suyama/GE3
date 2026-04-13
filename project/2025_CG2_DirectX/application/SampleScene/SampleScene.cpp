@@ -2,6 +2,7 @@
 #include <numbers>
 #include "../../engine/Utility/Math/Lerp.h"
 #include <TimeManager.h>
+#include <AreaLight.h>
 using namespace MyMath;
 
 void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
@@ -84,11 +85,13 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	lights_.push_back(std::make_unique<DirectionalLight>());
 	lights_.back()->Initialize();
 
-	/*lights_.push_back(std::make_unique<PointLight>());
+	lights_.push_back(std::make_unique<AreaLight>());
 	lights_.back()->Initialize();
 
 	lights_.push_back(std::make_unique<SpotLight>());
-	lights_.back()->Initialize();*/
+	lights_.back()->Initialize();
+	lights_.push_back(std::make_unique<SpotLight>());
+	lights_.back()->Initialize();
 
 	// ライトを一括でGPUに送るためのバッファを作る
 	size_t alignedSize = (sizeof(LightBuffer) + 255) & ~255;
@@ -167,31 +170,13 @@ void SampleScene::Update()
 		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
 		ImGui::TreePop();
 	}
-	/*if (ImGui::TreeNode("Lighting")) {
-		ImGui::SliderFloat3("Direction", reinterpret_cast<float*>(&directionalLightData->direction), -1, 1);
-		ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&directionalLightData->color));
-		ImGui::SliderFloat("Intensity", &directionalLightData->intensity, 0.0f, 1.0f);
+	if (ImGui::TreeNode("Light")) {
+		for (int32_t i = 0;  auto & light : lights_) {
+			light->DebugDrawImGui(std::to_string(i));
+			i++;
+		}
 		ImGui::TreePop();
 	}
-	if (ImGui::TreeNode("PointLighting")) {
-		ImGui::SliderFloat3("position", reinterpret_cast<float*>(&pointLightData->position), -10, 10);
-		ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&pointLightData->color));
-		ImGui::SliderFloat("Intensity", &pointLightData->intensity, 0.0f, 1.0f);
-		ImGui::SliderFloat("Radius", &pointLightData->radius, 0.0f, 100.0f);
-		ImGui::SliderFloat("Decay", &pointLightData->decay, 0.0f, 30.0f);
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("SpotLighting")) {
-		ImGui::SliderFloat3("position", reinterpret_cast<float*>(&spotLightData->position), -10, 10);
-		ImGui::ColorPicker4("Color", reinterpret_cast<float*>(&spotLightData->color));
-		ImGui::SliderFloat("cosAngle", &spotLightData->cosAngle, 0.0f, 1.0f);
-		ImGui::SliderFloat("decay", &spotLightData->decay, 0.0f, 1.0f);
-		ImGui::SliderFloat3("direction", reinterpret_cast<float*>(&spotLightData->direction), 0.0f, 1.0f);
-		ImGui::SliderFloat("distance", &spotLightData->distance, 0.0f, 1.0f);
-		ImGui::SliderFloat("intensity", &spotLightData->intensity, 0.0f, 1.0f);
-		ImGui::SliderFloat("cosFallOffStart", &spotLightData->cosFalloffStart, 0.0f, 1.0f);
-		ImGui::TreePop();
-	}*/
 	if (ImGui::TreeNode("Sound")) {
 		if (ImGui::Button("play")) {
 			playSound = true;

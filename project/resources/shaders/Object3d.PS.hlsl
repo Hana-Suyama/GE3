@@ -19,6 +19,7 @@ enum LightType
 	Directional,
 	Point,
 	Spot,
+    Area,
 };
 
 struct Material{
@@ -37,7 +38,7 @@ struct LightData
 {
     uint32_t type; // Lightの種類
     uint32_t enable; // ライトの有効無効
-    float32_t2 _pad0;
+    float32_t2 size; //サイズ(Area)
     
     float32_t4 color; // ライトの色
 
@@ -93,6 +94,9 @@ PixelShaderOutput main(GSOutput input)
             continue;
         }
         
+        // カメラからの向き
+        float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
+        
         if (gLightBuffer.lights[i].type == Directional)
         {
             // DirectionalLightの拡散反射
@@ -120,8 +124,6 @@ PixelShaderOutput main(GSOutput input)
     
             // DirectionalLightの鏡面反射
             // 鏡面反射の計算
-            // カメラからの向き
-            float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
             float32_t3 reflectLightDiffuse = reflect(gLightBuffer.lights[i].direction, normalize(input.normal));
             float specularPowDiffuse;
             float32_t3 specularDirectionalLight = float32_t3(0.0f, 0.0f, 0.0f);
@@ -172,7 +174,6 @@ PixelShaderOutput main(GSOutput input)
             // 鏡面反射の計算
             // カメラからの向き
             float32_t3 reflectLightPoint = reflect(pointLightDirection, normalize(input.normal));
-            float32_t3 toEye = normalize(gCamera.worldPosition - input.worldPosition);
             float specularPowPoint;
             float32_t3 specularPointLight = float32_t3(0.0f, 0.0f, 0.0f);
             if (gMaterial.enableReflection == PhongReflection)
@@ -244,6 +245,73 @@ PixelShaderOutput main(GSOutput input)
             
             output.color.rgb += diffuseSpotLight + specularSpotLight;
         }
+        else if (gLightBuffer.lights[i].type == Area)
+        {
+            // 1辺あたりのサンプル数（4なら合計16サンプル）
+            #define SAMPLES_PER_SIDE 4
+            #define TOTAL_SAMPLES (SAMPLES_PER_SIDE * SAMPLES_PER_SIDE)
+            
+            float3 lightNormal = normalize(gLightBuffer.lights[i].direction);
+
+            // 適当な up ベクトルを選ぶ（N と平行を避ける）
+            float3 tmpUp = abs(lightNormal.y) < 0.999f ? float3(0, 1, 0) : float3(1, 0, 0);
+
+            // 直交基底を作る
+            float3 right = normalize(cross(tmpUp, lightNormal));
+            float3 up = normalize(cross(lightNormal, right));
+            
+            for (int y = 0; y < SAMPLES_PER_SIDE; y++)
+            {
+                for (int x = 0; x < SAMPLES_PER_SIDE; x++)
+                {
+                    // 0.0 ～ 1.0 の値を計算し、-0.5 ～ 0.5 に変換
+                    // (0.5を足しているのは、マスの中心をサンプルするため)
+                    float u = ((float) x + 0.5f) / (float) SAMPLES_PER_SIDE - 0.5f;
+                    float v = ((float) y + 0.5f) / (float) SAMPLES_PER_SIDE - 0.5f;
+
+                    float3 lightPos = gLightBuffer.lights[i].position
+                            + (u * gLightBuffer.lights[i].size.x * right)
+                            + (v * gLightBuffer.lights[i].size.y * up);
+
+                    // --- 以降、光量計算ロジック（前述と同じ） ---
+                    
+                    float3 toLight = lightPos - input.worldPosition;
+                    float dist = length(toLight);
+                    float3 L = normalize(toLight);
+                    
+                    // 面の向きチェック（裏面は光らせない）
+                    float facing = saturate(dot(lightNormal, -L));
+            
+                    // 距離減衰
+                    float attenuation = pow(saturate(1.0 - dist / gLightBuffer.lights[i].radius), gLightBuffer.lights[i].decay);
+            
+                    // AreaLightの拡散反射
+                    float32_t3 diffuseAreaLight = float32_t3(0.0f, 0.0f, 0.0f);
+                    
+                    if (gMaterial.enableLighting == Lambert)
+                    {
+                    // Lambert
+                        float cos = saturate(dot(input.normal, L));
+                        diffuseAreaLight = gMaterial.color.rgb * gLightBuffer.lights[i].color.rgb * cos * gLightBuffer.lights[i].intensity * facing * attenuation;
+                    }
+                    else if (gMaterial.enableLighting == HalfLambert)
+                    {
+                    // HalfLambert
+                        float NdotL = dot(normalize(input.normal), L);
+                        float cos = pow(NdotL * 0.5f + 0.5f, 2.0f);
+                        diffuseAreaLight = gMaterial.color.rgb * gLightBuffer.lights[i].color.rgb * cos * gLightBuffer.lights[i].intensity * facing * attenuation;
+                    }
+                    // UVがあったらtexturecolorをかける
+                    if (!input.falseUV)
+                    {
+                        diffuseAreaLight *= textureColor.rgb;
+                    }
+            
+                    output.color.rgb += diffuseAreaLight / TOTAL_SAMPLES;
+                    
+                }
+            }
+        }
         
     }
     
@@ -254,7 +322,8 @@ PixelShaderOutput main(GSOutput input)
         output.color.a *= textureColor.a;
     }
     
-    if (textureColor.a == 0.0f){
+    if (textureColor.a == 0.0f)
+    {
         discard;
     }
     

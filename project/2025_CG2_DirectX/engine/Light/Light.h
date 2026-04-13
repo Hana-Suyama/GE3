@@ -1,6 +1,7 @@
 #pragma once
 #include <LightType.h>
 #include <LightData.h>
+#include <ImGuiManager.h>
 
 /// <summary>
 /// ライト基底クラス
@@ -35,6 +36,19 @@ public:
 	/// 更新の仮想関数
 	/// </summary>
 	virtual void Update() {}
+
+	/// <summary>
+	/// ImGuiのデバッグ描画仮想関数
+	/// </summary>
+	/// <param name="label">ImGuiのラベル名</param>
+	virtual void DebugDrawImGui(std::string label)
+	{
+#ifdef USE_IMGUI
+		ImGui::Checkbox("Enable", &enable_);
+		ImGui::ColorEdit3("Color", &color_.x);
+		ImGui::DragFloat("Intensity", &intensity_, 0.01f, 0.0f);
+#endif
+	}
 
 	/// <summary>
 	/// ライトのデータをLightData構造体に書き込む純粋仮想関数
