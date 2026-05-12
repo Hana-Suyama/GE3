@@ -350,6 +350,140 @@ void ModelManager::CreateSphere()
 	modelDatas_.push_back(newModel);
 }
 
+void ModelManager::CreateSkyBox()
+{
+	// すでにスカイボックスが構築されていたら構築しない
+	auto it = std::find_if(
+		modelDatas_.begin(),
+		modelDatas_.end(),
+		[&](Model& modelData) {return modelData.filePath_ == "debug_skybox"; }
+	);
+	if (it != modelDatas_.end()) {
+		return;
+	}
+
+	// モデル上限を超えて読み込もうとしたら止める
+	assert(modelDatas_.size() < kModelMax_);
+
+	// 新しく追加する空のモデルデータを作成
+	Model newModel;
+	newModel.meshes_.push_back(Model::Mesh{});
+
+	//ファイルパスを記録
+	newModel.filePath_ = "debug_skybox";
+		
+	VertexData vertexData[24];
+
+	// 右面。描画インデックスは[0,1,2][2,1,3]で内側を向く
+	vertexData[0].position = { 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexData[1].position = { 1.0f, 1.0f, -1.0f, 1.0f };
+	vertexData[2].position = { 1.0f, -1.0f, 1.0f, 1.0f };
+	vertexData[3].position = { 1.0f, -1.0f, -1.0f, 1.0f };
+
+	// 左面。描画インデックスは[4,5,6][6,5,7]
+	vertexData[4].position = { -1.0f, 1.0f, -1.0f, 1.0f };
+	vertexData[5].position = { -1.0f, 1.0f, 1.0f, 1.0f };
+	vertexData[6].position = { -1.0f, -1.0f, -1.0f, 1.0f };
+	vertexData[7].position = { -1.0f, -1.0f, 1.0f, 1.0f };
+
+	// 前面。描画インデックスは[8,9,10][10,9,11]
+	vertexData[8].position = { -1.0f, 1.0f, 1.0f, 1.0f };
+	vertexData[9].position = { 1.0f, 1.0f, 1.0f, 1.0f };
+	vertexData[10].position = { -1.0f, -1.0f, 1.0f, 1.0f };
+	vertexData[11].position = { 1.0f, -1.0f, 1.0f, 1.0f };
+
+	// 後面。描画インデックスは[12,13,14][14,13,15]
+	vertexData[12].position = { 1.0f, 1.0f, -1.0f, 1.0f };
+	vertexData[13].position = { -1.0f, 1.0f, -1.0f, 1.0f };
+	vertexData[14].position = { 1.0f, -1.0f, -1.0f, 1.0f };
+	vertexData[15].position = { -1.0f, -1.0f, -1.0f, 1.0f };
+
+	// 上面。描画インデックスは[16,17,18][18,17,19]
+	vertexData[16].position = { -1.0f, 1.0f, -1.0f, 1.0f };
+	vertexData[17].position = { 1.0f, 1.0f, -1.0f, 1.0f };
+	vertexData[18].position = { -1.0f, 1.0f, 1.0f, 1.0f };
+	vertexData[19].position = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+	// 下面。描画インデックスは[20,21,22][22,21,23]
+	vertexData[20].position = { -1.0f, -1.0f, 1.0f, 1.0f };
+	vertexData[21].position = { 1.0f, -1.0f, 1.0f, 1.0f };
+	vertexData[22].position = { -1.0f, -1.0f, -1.0f, 1.0f };
+	vertexData[23].position = { 1.0f, -1.0f, -1.0f, 1.0f };
+
+	for (int i = 0; i < 24; i++) {
+		vertexData[i].texcoord = { 0.0f, 0.0f };
+		vertexData[i].normal = { 0.0f, 0.0f, 0.0f };
+		vertexData[i].falseUV = false;
+	}
+
+
+	// 頂点データをモデルの頂点配列にコピーする
+
+	for (int i = 0; i < 6; i++) {
+		newModel.meshes_.at(0).vertices.push_back(vertexData[0 + 4 * i]);
+		newModel.meshes_.at(0).vertices.push_back(vertexData[1 + 4 * i]);
+		newModel.meshes_.at(0).vertices.push_back(vertexData[2 + 4 * i]);
+
+		newModel.meshes_.at(0).vertices.push_back(vertexData[2 + 4 * i]);
+		newModel.meshes_.at(0).vertices.push_back(vertexData[1 + 4 * i]);
+		newModel.meshes_.at(0).vertices.push_back(vertexData[3 + 4 * i]);
+	}
+
+	//球の頂点リソース
+	newModel.meshes_.at(0).vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * 24);
+	//リソースの先頭のアドレスから使う
+	newModel.meshes_.at(0).vertexBufferView.BufferLocation = newModel.meshes_.at(0).vertexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズは分割数×分割数×6のサイズ
+	newModel.meshes_.at(0).vertexBufferView.SizeInBytes = sizeof(VertexData) * 24;
+	//1頂点当たりのサイズ
+	newModel.meshes_.at(0).vertexBufferView.StrideInBytes = sizeof(VertexData);
+	////球の頂点リソースにデータを書き込む
+	VertexData* vertexDataSphere = nullptr;
+	//書き込むためのアドレスを取得
+	newModel.meshes_.at(0).vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDataSphere));
+	std::memcpy(vertexDataSphere, newModel.meshes_.at(0).vertices.data(), sizeof(VertexData) * newModel.meshes_.at(0).vertices.size());
+
+	//球用のマテリアルリソースを作る
+	newModel.meshes_.at(0).defaultMaterialResource = directXBasic_->CreateBufferResource(sizeof(Material));
+	//Sprite用のマテリアルにデータを書き込む
+	Material* materialDataSphere = nullptr;
+	//書き込むためのアドレスを取得
+	newModel.meshes_.at(0).defaultMaterialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialDataSphere));
+	//白
+	materialDataSphere->color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	//SpriteはLightingしないのでfalseを設定する
+	materialDataSphere->enableLighting = Reflectance::HalfLambert;
+	//UVTransformを単位行列で初期化
+	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity4x4();
+
+	materialDataSphere->shininess = 1.0f;
+
+	//球用のindexリソース
+	newModel.meshes_.at(0).indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * 24);
+	//リソースの先頭のアドレスから使う
+	newModel.meshes_.at(0).indexBufferView.BufferLocation = newModel.meshes_.at(0).indexResource->GetGPUVirtualAddress();
+	//使用するリソースのサイズはインデックス*vertexTotalNumberのサイズ
+	newModel.meshes_.at(0).indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * 24);
+	//インデックスはuint32_tとする
+	newModel.meshes_.at(0).indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+	//球用インデックスリソースにデータを書き込む
+	uint32_t* indexDataSkyBox = nullptr;
+	newModel.meshes_.at(0).indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSkyBox));
+	
+	for (int i = 0; i < 24; i++) {
+		indexDataSkyBox[i] = i;
+	}
+
+	// メッシュごとに使うテクスチャ番号を記録
+	// テクスチャが存在しない場合、white1x1を読み込み割り当てる
+	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
+	newModel.meshes_.at(0).defaultTextureFilePath = "resources/rostock_laage_airport_4k.dds";
+
+	newModel.rootNode_.localMatrix = Matrix4x4::MakeIdentity4x4();
+
+	modelDatas_.push_back(newModel);
+}
+
 uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 {
 	auto it = std::find_if(

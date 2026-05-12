@@ -21,6 +21,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	textureManager_->LoadTexture("resources/monsterBall.png");
 	textureManager_->LoadTexture("resources/particle.png");
 	//textureManager_->AllIntermediateResourceRelease();
+	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
 
 	modelManager_->LoadModelAssimp("resources", "plane.obj");
 	modelManager_->LoadModelAssimp("resources", "teapot.obj");
@@ -32,6 +33,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	modelManager_->LoadModel("resources", "terrain.obj");
 	modelManager_->LoadModelAssimp("resources", "plane.gltf");
 	modelManager_->CreateSphere();
+	modelManager_->CreateSkyBox();
 
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
@@ -40,6 +42,13 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 
 	particleManager = std::make_unique<ParticleManager>();
 	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/particle.png", camera.get());
+
+	skyBoxBasic_ = std::make_unique<SkyBoxBasic>();
+	skyBoxBasic_->Initialize(directXBasic, logger);
+	skyBoxBasic_->SetDefaultCamera(camera.get());
+
+	skyBox_ = std::make_unique<SkyBox>();
+	skyBox_->Initialize(skyBoxBasic_.get(), modelManager, "debug_skybox");
 
 	//sprite
 	sprite = std::make_unique<Sprite>();
@@ -124,6 +133,8 @@ void SampleScene::Update()
 	object3dPlanegLTF->Update();
 	object3dSphere->Update();
 
+	skyBox_->Update();
+
 	for (auto& light : lights_) {
 		light->Update();
 	}
@@ -149,14 +160,6 @@ void SampleScene::Update()
 	sprite2->DebugDraw("Sprite 2");
 
 	object3d->DebugDraw("plane");
-	///*if (ImGui::TreeNode("Sphere")) {
-	//	ImGui::Checkbox("drawSphere", &drawSphere);
-	//	ImGui::SliderFloat3("Scale", reinterpret_cast<float*>(&transformSphere.scale), -5, 5);
-	//	ImGui::SliderFloat3("Rotate", reinterpret_cast<float*>(&transformSphere.rotate), -5, 5);
-	//	ImGui::SliderFloat3("Translate", reinterpret_cast<float*>(&transformSphere.translate), -5, 5);
-	//	ImGui::Combo("Lighting", &materialDataSphere->enableLighting, "None\0Lambert\0Half Lambert\0\0");
-	//	ImGui::TreePop();
-	//}*/
 	object3dTeapot->DebugDraw("teapot");
 	object3dBunny->DebugDraw("Bunny");
 	object3dMultiMesh->DebugDraw("MultiMesh");
@@ -165,6 +168,9 @@ void SampleScene::Update()
 	object3dTerrain->DebugDraw("Terrain");
 	object3dPlanegLTF->DebugDraw("planegltf");
 	object3dSphere->DebugDraw("Sphere");
+
+	skyBox_->DebugDraw("SkyBox");
+
 	if (ImGui::TreeNode("Camera")) {
 		ImGui::DragFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), 0.1f, -30.0f, 30.0f);
 		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
@@ -247,6 +253,9 @@ void SampleScene::ModelDraw()
 	object3dSphere->Draw();
 
 	particleManager->Draw();
+
+	skyBoxBasic_->SkyBoxPreDraw();
+	skyBox_->Draw();
 }
 
 void SampleScene::Finalize()

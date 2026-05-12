@@ -51,6 +51,11 @@ public:
 	void CreateSphere();
 
 	/// <summary>
+	/// スカイボックスのモデルを構築
+	/// </summary>
+	void CreateSkyBox();
+
+	/// <summary>
 	///	モデルの要素番号を返す
 	/// </summary>
 	/// <param name="filePath">ファイルパス</param>

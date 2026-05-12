@@ -1,5 +1,7 @@
 #pragma once
 #include "../../engine/Scene/BaseScene.h"
+#include <Skybox/SkyBoxBasic.h>
+#include <Skybox/SkyBox.h>
 
 class SampleScene : public BaseScene
 {
@@ -42,6 +44,9 @@ private:
 	std::unique_ptr<Object3D> object3dTerrain = nullptr;
 	std::unique_ptr<Object3D> object3dPlanegLTF = nullptr;
 	std::unique_ptr<Object3D> object3dSphere = nullptr;
+
+	std::unique_ptr<SkyBoxBasic> skyBoxBasic_ = nullptr;
+	std::unique_ptr<SkyBox> skyBox_ = nullptr;
 
 	std::unique_ptr<Camera> camera = nullptr;
 
