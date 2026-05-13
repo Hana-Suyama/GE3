@@ -32,6 +32,7 @@ struct Material{
 ConstantBuffer<Material> gMaterial : register(b0);
 
 Texture2D<float32_t4> gTexture : register(t0);
+TextureCube<float32_t4> gEnvironmentTexture : register(t1);
 SamplerState gSampler : register(s0);
 
 struct LightData
@@ -314,6 +315,13 @@ PixelShaderOutput main(GSOutput input)
         }
         
     }
+    
+    // 環境マップ
+    float32_t3 cameraToPosition = normalize(input.worldPosition - gCamera.worldPosition);
+    float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
+    float32_t4 environmentColor = gEnvironmentTexture.Sample(gSampler, reflectedVector);
+    
+    output.color.rgb += environmentColor.rgb;
     
     // 透明度の計算
     output.color.a = gMaterial.color.a;

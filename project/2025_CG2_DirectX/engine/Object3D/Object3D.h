@@ -133,6 +133,8 @@ private:
 
 	// 使用するテクスチャ。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<std::string> textureFilePaths_;
+	// 映り込み用のテクスチャ
+	std::string cubeTextureFilePaths_;
 
 	// トランスフォーム
 	struct Transform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };

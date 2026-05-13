@@ -18,6 +18,9 @@ void Object3D::Initialize(Object3DBasic* object3DBasic, ModelManager* modelManag
 
 	camera_ = object3DBasic_->GetDefaultCamera();
 
+	// とりあえず映り込み用のテクスチャをセット
+	cubeTextureFilePaths_ = "resources/rostock_laage_airport_4k.dds";
+
 }
 
 void Object3D::Update()
@@ -53,6 +56,8 @@ void Object3D::Draw()
 		for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
 			// テクスチャを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetSrvHandleGPU(textureFilePaths_.at(i)));
+			// 映り込み用のテクスチャを設定
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(5, modelManager_->GetTextureManager()->GetSrvHandleGPU(cubeTextureFilePaths_));
 			// VBVを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &modelData_->meshes_.at(i).vertexBufferView);
 			// wvp用のCBufferの場所を設定
