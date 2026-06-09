@@ -34,21 +34,39 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	CreatePSO();
 
 	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData));
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点1つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData);
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//スプライト用の頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 
-	vertexData[0].position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	// GS用
+	/*vertexData[0].position = { 0.0f, 0.0f, 0.0f, 1.0f };
 	vertexData[0].texcoord = { 0.0f, 1.0f };
-	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };
+	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };*/
+
+	vertexData[0].position = { -1.0f, -1.0f, 0.0f, 1.0f };
+	vertexData[0].texcoord = { 0.0f, 1.0f };
+
+	vertexData[1].position = { -1.0f,  1.0f, 0.0f, 1.0f };
+	vertexData[1].texcoord = { 0.0f, 0.0f };
+
+	vertexData[2].position = { 1.0f, -1.0f, 0.0f, 1.0f };
+	vertexData[2].texcoord = { 1.0f, 1.0f };
+
+	vertexData[3].position = { 1.0f,  1.0f, 0.0f, 1.0f };
+	vertexData[3].texcoord = { 1.0f, 0.0f };
+
+	for (uint32_t i = 0; i < 4; ++i) {
+		vertexData[i].normal = { 0.0f, 0.0f, -1.0f };
+		vertexData[i].falseUV = false;
+	}
 
 	//Sprite用のマテリアルリソースを作る
 	materialResource_ = directXBasic_->CreateBufferResource(sizeof(Material));
@@ -68,6 +86,7 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 		instancingData_[index].WVP = Matrix4x4::MakeIdentity4x4();
 		instancingData_[index].World = Matrix4x4::MakeIdentity4x4();
 		instancingData_[index].color = Vector4( 1.0f, 1.0f, 1.0f, 1.0f );
+		instancingData_[index].scale = Vector3(1.0f, 1.0f, 1.0f);
 	}
 
 	srvIndex_ = srvManager_->Allocate();
@@ -77,13 +96,7 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 		particles[index] = MakeNewParticle(randomEngine);
 	}*/
 
-	emitter_.count = 10;
-	emitter_.frequency = 0.1f;
-	emitter_.frequencyTime = 0.0f;
-
-	emitter_.transform.translate = { 0.0f, 0.0f, 0.0f };
-	emitter_.transform.rotate = { 0.0f, 0.0f, 0.0f };
-	emitter_.transform.scale = { 1.0f, 1.0f, 1.0f };
+	emitter_.Initialize(&particles_, this);
 
 	accelerationField_.acceleration = { 0.0f, 15.0f, 0.0f };
 	accelerationField_.area.min = { -1.0f, -1.0f, -1.0f };
@@ -94,22 +107,14 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 {
 
-	emitter_.frequencyTime += TimeManager::GetInstance()->GetDeltaTime();
-	if (emitter_.frequency <= emitter_.frequencyTime) {
-		particles_.splice(particles_.end(), Emit(emitter_, randomEngine));
-		emitter_.frequencyTime -= emitter_.frequency;
-	}
+	emitter_.Update(randomEngine);
 
 #ifdef USE_IMGUI
-	ImGui::Begin("Particle");
-	/*if (ImGui::Button("Add Particle")) {
-		particles.splice(particles.end(), Emit(emitter, randomEngine));
-	}*/
-	ImGui::DragFloat3("EmitterTranslate", &emitter_.transform.translate.x, 0.01f, -100.0f, 100.0f);
+	ImGui::Begin("AllParticle");
+
 	ImGui::Checkbox("isBillboard", &isBillboard_);
 	ImGui::End();
 
-	
 #endif
 
 	Matrix4x4 billboardMatrix = Matrix4x4::MakeIdentity4x4();
@@ -196,7 +201,7 @@ void ParticleManager::Draw()
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());	//PSOを設定
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	//テクスチャを指定
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
@@ -221,7 +226,7 @@ void ParticleManager::Draw()
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//描画！(DrawCall/ドローコール)
 	if (numInstance_) {
-		directXBasic_->GetCommandList()->DrawInstanced(1, numInstance_, 0, 0);
+		directXBasic_->GetCommandList()->DrawInstanced(4, numInstance_, 0, 0);
 	}
 }
 
@@ -355,8 +360,9 @@ void ParticleManager::CreatePSO()
 	vertexShaderBlob->GetBufferSize() };//VertexShader
 	graphicsPipelineStateDesc.PS = { pixelShaderBlob->GetBufferPointer(),
 	pixelShaderBlob->GetBufferSize() };//PixelShader
-	graphicsPipelineStateDesc.GS = { geometryShaderBlob->GetBufferPointer(),
-	geometryShaderBlob->GetBufferSize() };//GeometryShader
+	//graphicsPipelineStateDesc.GS = { geometryShaderBlob->GetBufferPointer(),
+	//geometryShaderBlob->GetBufferSize() };//GeometryShader
+	graphicsPipelineStateDesc.GS = {};//GeometryShader
 	graphicsPipelineStateDesc.BlendState = blendDesc;//BlendState
 	graphicsPipelineStateDesc.RasterizerState = rasterizerDesc;//RasterizerState
 	//書き込むRTVの情報
@@ -364,7 +370,7 @@ void ParticleManager::CreatePSO()
 	graphicsPipelineStateDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 	//利用するトポロジ(形状)のタイプ。点の情報だけ送るようにしたので点
 	graphicsPipelineStateDesc.PrimitiveTopologyType =
-		D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+		D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	//どのように画面に色を打ち込むかの設定(気にしなくて良い)
 	graphicsPipelineStateDesc.SampleDesc.Count = 1;
 	graphicsPipelineStateDesc.SampleMask = D3D12_DEFAULT_SAMPLE_MASK;
@@ -390,11 +396,11 @@ void ParticleManager::CreateVertexResource()
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 }
 
-std::list<Particle> ParticleManager::Emit(const Emitter& emitter, std::mt19937& randomEngine)
+std::list<Particle> ParticleManager::Emit(const ParticleEmitter& emitter, std::mt19937& randomEngine)
 {
 	std::list<Particle> particles;
-	for (uint32_t count = 0; count < emitter.count; ++count) {
-		particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
+	for (uint32_t count = 0; count < emitter.GetCount(); ++count) {
+		particles.push_back(MakeNewParticle(randomEngine, emitter.GetTransform().translate));
 	}
 	return particles;
 }
@@ -417,7 +423,8 @@ std::list<Particle> ParticleManager::Emit(const Emitter& emitter, std::mt19937& 
 
 Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate)
 {
-	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	// 一旦標準のパーティクルをコメントアウト。あとで切り替えられるようにする
+	/*std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
 	Particle particle;
 	particle.transform.scale = { 3.0f, 3.0f, 1.0f };
 	particle.transform.rotate = { 0.0f, -3.14f ,0.0f };
@@ -430,7 +437,20 @@ Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vect
 
 	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
 	particle.lifeTime = distTime(randomEngine);
-	particle.currentTime = 0;
+	particle.currentTime = 0;*/
+
+	// エフェクト用のパーティクル
+	Particle particle;
+	particle.transform.scale = { 0.05f, 1.0f, 1.0f };// 横に潰す
+	particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
+	particle.transform.translate = translate;
+	particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない
+	particle.color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	particle.lifeTime = 1.0f;// 1秒で消える
+	particle.currentTime = 0.0f;
+
+	std::uniform_real_distribution<float> distRotate(-std::numbers::pi_v<float>);
+	particle.transform.rotate.z = distRotate(randomEngine);
 
 	return particle;
 }

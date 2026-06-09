@@ -207,6 +207,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\SceneManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Time\TimeManager.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
@@ -334,6 +335,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Time\TimeManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

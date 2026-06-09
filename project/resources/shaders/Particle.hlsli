@@ -5,6 +5,7 @@ struct VertexShaderOutput
     float32_t3 normal : NORMAL0;
     int32_t falseUV : FALSEUV0;
     float32_t4 color : COLOR0;
+    float32_t3 scale : SCALE0;
 };
 
 struct GSOutput
@@ -14,4 +15,5 @@ struct GSOutput
     float32_t3 normal : NORMAL0;
     int32_t falseUV : FALSEUV0;
     float32_t4 color : COLOR0;
+    float32_t3 scale : SCALE0;
 };

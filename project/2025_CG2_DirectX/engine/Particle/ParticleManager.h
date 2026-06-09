@@ -4,6 +4,7 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include <random>
+#include <ParticleEmitter.h>
 
 struct Particle {
 	struct Transform transform;
@@ -17,13 +18,8 @@ struct ParticleForGPU {
 	Matrix4x4 WVP;
 	Matrix4x4 World;
 	Vector4 color;
-};
-
-struct Emitter {
-	struct Transform transform;
-	uint32_t count;
-	float frequency;
-	float frequencyTime;
+	Vector3 scale;
+	float padding;
 };
 
 struct AccelerationField {
@@ -62,7 +58,7 @@ public:
 
 	void CreateVertexResource();
 
-	std::list<Particle> Emit(const Emitter& emitter, std::mt19937& randomEngine);
+	std::list<Particle> Emit(const ParticleEmitter& emitter, std::mt19937& randomEngine);
 
 	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate);
 
@@ -115,9 +111,9 @@ private:
 	// マテリアルリソース
 	Comptr<ID3D12Resource> materialResource_ = nullptr;
 
-	Emitter emitter_{};
+	ParticleEmitter emitter_{};
 	AccelerationField accelerationField_;
 
-	bool isBillboard_ = true;
+	bool isBillboard_ = false;
 };
 

@@ -5,6 +5,8 @@ struct ParticleForGPU
     float32_t4x4 WVP;
     float32_t4x4 World;
     float32_t4 color;
+    float32_t3 scale;
+    float32_t padding;
 };
 
 StructuredBuffer<ParticleForGPU> gParticle : register(t0);
@@ -25,5 +27,6 @@ VertexShaderOutput main(VertexShaderInput input, uint32_t instanceId : SV_Instan
     output.normal = normalize(mul(input.normal, (float32_t3x3)gParticle[instanceId].World));
     output.falseUV = input.falseUV;
     output.color = gParticle[instanceId].color;
+    output.scale = gParticle[instanceId].scale;
     return output;
 }
