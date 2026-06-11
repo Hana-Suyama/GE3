@@ -6,7 +6,7 @@
 void ParticleEmitter::Initialize(std::list<Particle>* particlesPtr, ParticleManager* particleManager)
 {
 	count_ = 1;
-	frequency_ = 2.0f;
+	frequency_ = 10.0f;
 	frequencyTime_ = 0.0f;
 
 	transform_.translate = { 0.0f, 3.0f, 0.0f };

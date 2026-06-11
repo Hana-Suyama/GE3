@@ -33,18 +33,24 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 
 	CreatePSO();
 
-	const uint32_t kRingDivide = 32;
+	/*const uint32_t kRingDivide = 32;
 	const float kOuterRadius = 1.0f;
 	const float kInnerRadius = 0.2f;
-	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);*/
+
+	const uint32_t kCylinderDivide = 32;
+	const float kTopRadius = 1.0f;
+	const float kBottomRadius = 1.0f;
+	const float kHeight = 3.0f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kCylinderDivide);
 
 	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * kRingDivide * 6);
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * kCylinderDivide * 6);
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点1つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * kRingDivide * 6;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * kCylinderDivide * 6;
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//スプライト用の頂点リソースにデータを書き込む
@@ -74,7 +80,7 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 		vertexData[i].falseUV = false;
 	}*/
 
-	for (uint32_t index = 0; index < kRingDivide; ++index) {
+	/*for (uint32_t index = 0; index < kRingDivide; ++index) {
 		float sin = std::sin(index * radianPerDivide);
 		float cos = std::cos(index * radianPerDivide);
 		float sinNext = std::sin((index + 1) * radianPerDivide);
@@ -100,6 +106,34 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	for (uint32_t i = 0; i < kRingDivide * 6; ++i) {
 		vertexData[i].normal = { 0.0f, 0.0f, 1.0f };
 		vertexData[i].falseUV = false;
+	}*/
+
+	for (uint32_t index = 0; index < kCylinderDivide; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float sinNext = std::sin((index + 1) * radianPerDivide);
+		float cosNext = std::cos((index + 1) * radianPerDivide);
+		float u = float(index) / float(kCylinderDivide);
+		float uNext = float(index + 1) / float(kCylinderDivide);
+
+		vertexData[index * 6].position = { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f };
+		vertexData[index * 6].texcoord = { u, 0.0f };
+		vertexData[index * 6].normal = { -sin, 0.0f, cos };
+		vertexData[index * 6 + 1].position = { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f };
+		vertexData[index * 6 + 1].texcoord = { uNext, 0.0f };
+		vertexData[index * 6 + 1].normal = { -sinNext, 0.0f, cosNext };
+		vertexData[index * 6 + 2].position = { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f };
+		vertexData[index * 6 + 2].texcoord = { u, 1.0f };
+		vertexData[index * 6 + 2].normal = { -sin, 0.0f, cos };
+		vertexData[index * 6 + 3].position = { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f };
+		vertexData[index * 6 + 3].texcoord = { u, 1.0f };
+		vertexData[index * 6 + 3].normal = { -sin, 0.0f, cos };
+		vertexData[index * 6 + 4].position = { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f };
+		vertexData[index * 6 + 4].texcoord = { uNext, 0.0f };
+		vertexData[index * 6 + 4].normal = { -sinNext, 0.0f, cosNext };
+		vertexData[index * 6 + 5].position = { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f };
+		vertexData[index * 6 + 5].texcoord = { uNext, 1.0f };
+		vertexData[index * 6 + 5].normal = { -sinNext, 0.0f, cosNext };
 	}
 
 	//Sprite用のマテリアルリソースを作る
@@ -158,6 +192,16 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
 
+
+
+	uvTransform_.translate.x += 0.001f;
+
+	//パラメータからUVTransform用の行列を生成する
+	Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransform_.scale);
+	uvTransformMatrix = uvTransformMatrix.Multiply(MakeRotateZMatrix(uvTransform_.rotate.z));
+	uvTransformMatrix = uvTransformMatrix.Multiply(MakeTranslateMatrix(uvTransform_.translate));
+	materialData_->uvTransform = uvTransformMatrix;
+
 	numInstance_ = 0;
 
 	for (std::list<Particle>::iterator particleIterator = particles_.begin();
@@ -187,7 +231,8 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 			instancingData_[numInstance_].World = worldMatrix;
 			instancingData_[numInstance_].color = (*particleIterator).color;
 
-			float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+			//float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
+			float alpha = 1.0f;
 			instancingData_[numInstance_].color.w = alpha;
 
 			++numInstance_;
@@ -479,12 +524,12 @@ Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vect
 	particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
 	particle.transform.translate = translate;
 	particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない
-	particle.color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	particle.lifeTime = 1.0f;// 1秒で消える
+	particle.color = { 0.0f, 0.0f, 1.0f, 1.0f };
+	particle.lifeTime = 10.0f;// 10秒で消える
 	particle.currentTime = 0.0f;
 
-	std::uniform_real_distribution<float> distRotate(-std::numbers::pi_v<float>);
-	particle.transform.rotate.z = distRotate(randomEngine);
+	//std::uniform_real_distribution<float> distRotate(-std::numbers::pi_v<float>);
+	//particle.transform.rotate.z = distRotate(randomEngine);
 
 	return particle;
 }

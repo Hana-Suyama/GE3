@@ -115,5 +115,7 @@ private:
 	AccelerationField accelerationField_;
 
 	bool isBillboard_ = false;
+
+	struct Transform uvTransform_ { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 };
 
