@@ -5,7 +5,7 @@
 
 void ParticleEmitter::Initialize(std::list<Particle>* particlesPtr, ParticleManager* particleManager)
 {
-	count_ = 8;
+	count_ = 1;
 	frequency_ = 2.0f;
 	frequencyTime_ = 0.0f;
 

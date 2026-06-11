@@ -33,13 +33,18 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 
 	CreatePSO();
 
+	const uint32_t kRingDivide = 32;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);
+
 	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * 4);
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * kRingDivide * 6);
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点1つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * 4;
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * kRingDivide * 6;
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//スプライト用の頂点リソースにデータを書き込む
@@ -51,7 +56,8 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	vertexData[0].texcoord = { 0.0f, 1.0f };
 	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };*/
 
-	vertexData[0].position = { -1.0f, -1.0f, 0.0f, 1.0f };
+	// HitEffect用
+	/*vertexData[0].position = { -1.0f, -1.0f, 0.0f, 1.0f };
 	vertexData[0].texcoord = { 0.0f, 1.0f };
 
 	vertexData[1].position = { -1.0f,  1.0f, 0.0f, 1.0f };
@@ -65,6 +71,34 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 
 	for (uint32_t i = 0; i < 4; ++i) {
 		vertexData[i].normal = { 0.0f, 0.0f, -1.0f };
+		vertexData[i].falseUV = false;
+	}*/
+
+	for (uint32_t index = 0; index < kRingDivide; ++index) {
+		float sin = std::sin(index * radianPerDivide);
+		float cos = std::cos(index * radianPerDivide);
+		float sinNext = std::sin((index + 1) * radianPerDivide);
+		float cosNext = std::cos((index + 1) * radianPerDivide);
+		float u = float(index) / float(kRingDivide);
+		float uNext = float(index + 1) / float(kRingDivide);
+
+		vertexData[index * 6].position = {-sin * kOuterRadius, cos * kOuterRadius, 0.0f, 1.0f};
+		vertexData[index * 6].texcoord = { u, 0.0f };
+		vertexData[index * 6 + 1].position = {-sinNext * kOuterRadius, cosNext * kOuterRadius, 0.0f, 1.0f};
+		vertexData[index * 6 + 1].texcoord = { uNext, 0.0f };
+		vertexData[index * 6 + 2].position = { -sin * kInnerRadius, cos * kInnerRadius, 0.0f, 1.0f };
+		vertexData[index * 6 + 2].texcoord = { u, 1.0f };
+
+		vertexData[index * 6 + 3].position = { -sin * kInnerRadius, cos * kInnerRadius, 0.0f, 1.0f };
+		vertexData[index * 6 + 3].texcoord = { u, 1.0f };
+		vertexData[index * 6 + 4].position = { -sinNext * kOuterRadius, cosNext * kOuterRadius, 0.0f, 1.0f };
+		vertexData[index * 6 + 4].texcoord = { uNext, 0.0f };
+		vertexData[index * 6 + 5].position = { -sinNext * kInnerRadius, cosNext * kInnerRadius, 0.0f, 1.0f };
+		vertexData[index * 6 + 5].texcoord = { uNext, 1.0f };
+	}
+
+	for (uint32_t i = 0; i < kRingDivide * 6; ++i) {
+		vertexData[i].normal = { 0.0f, 0.0f, 1.0f };
 		vertexData[i].falseUV = false;
 	}
 
@@ -201,7 +235,7 @@ void ParticleManager::Draw()
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
 	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());	//PSOを設定
 	//形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
-	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	//テクスチャを指定
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureManager_->GetSrvHandleGPU(textureFilePath_));
@@ -226,7 +260,7 @@ void ParticleManager::Draw()
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//描画！(DrawCall/ドローコール)
 	if (numInstance_) {
-		directXBasic_->GetCommandList()->DrawInstanced(4, numInstance_, 0, 0);
+		directXBasic_->GetCommandList()->DrawInstanced(32 * 6, numInstance_, 0, 0);
 	}
 }
 
@@ -266,7 +300,7 @@ void ParticleManager::CreatePSO()
 	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
 	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//バイリニアフィルタ
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//0~1の範囲外をリビート
-	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;	//ありったけのMipMapを使う
@@ -327,7 +361,7 @@ void ParticleManager::CreatePSO()
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	//裏面(時計回り)を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
@@ -441,7 +475,7 @@ Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vect
 
 	// エフェクト用のパーティクル
 	Particle particle;
-	particle.transform.scale = { 0.05f, 1.0f, 1.0f };// 横に潰す
+	particle.transform.scale = { 1.0f, 1.0f, 1.0f };// 横に潰す
 	particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
 	particle.transform.translate = translate;
 	particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない

@@ -19,7 +19,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 
 	textureManager_->LoadTexture("resources/uvChecker.png");
 	textureManager_->LoadTexture("resources/monsterBall.png");
-	textureManager_->LoadTexture("resources/particle.png");
+	textureManager_->LoadTexture("resources/gradationLine.png");
 	//textureManager_->AllIntermediateResourceRelease();
 	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
 
@@ -41,7 +41,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	object3dBasic_->SetDefaultCamera(camera.get());
 
 	particleManager = std::make_unique<ParticleManager>();
-	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/particle.png", camera.get());
+	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/gradationLine.png", camera.get());
 
 	skyBoxBasic_ = std::make_unique<SkyBoxBasic>();
 	skyBoxBasic_->Initialize(directXBasic, logger);
