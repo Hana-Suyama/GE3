@@ -108,6 +108,8 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	// データを書き込む
 	lightsBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightsBufferData_));
 
+	GenerateLevelObjects();
+
 }
 
 void SampleScene::Update()
@@ -132,6 +134,10 @@ void SampleScene::Update()
 	object3dTerrain->Update();
 	object3dPlanegLTF->Update();
 	object3dSphere->Update();
+
+	for (auto& object : levelObjects_) {
+		object->Update();
+	}
 
 	skyBox_->Update();
 
@@ -252,10 +258,15 @@ void SampleScene::ModelDraw()
 	object3dPlanegLTF->Draw();
 	object3dSphere->Draw();
 
+	for (auto& object : levelObjects_) {
+		object->Draw();
+	}
+
 	particleManager->Draw();
 
 	skyBoxBasic_->SkyBoxPreDraw();
 	skyBox_->Draw();
+
 }
 
 void SampleScene::Finalize()
@@ -268,3 +279,31 @@ void SampleScene::SetLight()
 	
 }
 
+void SampleScene::GenerateLevelObjects()
+{
+	LevelLoader levelLoader;
+	levelData_.reset(levelLoader.LoadLevel("stage01"));
+
+	// レベルデータからオブジェクトを生成、配置
+	for (auto& objectData : levelData_->objects) {
+
+		modelManager_->LoadModel("resources", objectData.fileName + ".obj");
+
+		// モデルを指定して3Dオブジェクトを生成
+		std::unique_ptr<Object3D> newObject = std::make_unique<Object3D>();
+		newObject->Initialize(
+			object3dBasic_,
+			modelManager_,
+			"resources/" + objectData.fileName + ".obj"
+		);
+
+		// 座標
+		newObject->SetTranslate(objectData.transform.translate);
+		// 回転角
+		newObject->SetRotate(objectData.transform.rotate);
+		// スケール
+		newObject->SetScale(objectData.transform.scale);
+		// 配列に登録
+		levelObjects_.push_back(std::move(newObject));
+	}
+}

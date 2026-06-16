@@ -2,6 +2,7 @@
 #include "../../engine/Scene/BaseScene.h"
 #include <Skybox/SkyBoxBasic.h>
 #include <Skybox/SkyBox.h>
+#include "../../LevelLoader.h"
 
 class SampleScene : public BaseScene
 {
@@ -18,6 +19,9 @@ public:
 	virtual void Finalize();
 
 	void SetLight();
+
+	void GenerateLevelObjects();
+
 
 private:
 
@@ -70,7 +74,8 @@ private:
 
 	Vector3 EmitterPosition{};
 
-
+	std::unique_ptr<LevelData> levelData_;
+	std::vector<std::unique_ptr<Object3D>> levelObjects_;
 
 };
 
