@@ -8,6 +8,7 @@
 #include "DirectXTex.h"
 #include "d3dx12.h"
 #include "FixFPS.h"
+#include <Vector4.h>
 
 class DirectXBasic
 {
@@ -42,6 +43,11 @@ public:
 	/// 描画前処理
 	/// </summary>
 	void PreDraw();
+
+	/// <summary>
+	/// レンダーテクスチャ描画前処理
+	/// </summary>
+	void PreDrawRenderTexture();
 
 	/// <summary>
 	/// 描画後処理
@@ -105,6 +111,10 @@ public:
 	/// <param name="shaderVisible">shaderVisible</param>
 	Comptr<ID3D12DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT numDescriptors, bool shaderVisible);
 
+	Comptr<ID3D12Resource> CreateRenderTextureResource(Comptr<ID3D12Device> device, uint32_t width, uint32_t height, DXGI_FORMAT format, const Vector4& clearColor);
+
+	void CreateRenderTexturePSO();
+
 	/* --------- ゲッター --------- */
 
 	/// <summary>
@@ -151,6 +161,42 @@ public:
 	/// RTVデスクのゲッター
 	/// </summary>
 	D3D12_RENDER_TARGET_VIEW_DESC GetRtvDesc() const { return rtvDesc_; };
+
+	ID3D12Resource* GetRenderTextureResource() const { return renderTextureResource_.Get(); }
+
+	/// <summary>
+	/// スワップチェーンのゲッター
+	/// </summary>
+	IDXGISwapChain4* GetSwapChain() const { return swapChain_.Get(); }
+
+	/// <summary>
+	/// スワップチェーンリソースのゲッター
+	/// </summary>
+	ID3D12Resource* GetSwapChainResource(uint32_t index) const { return swapChainResources_[index].Get(); }
+
+	/// <summary>
+	/// RTVハンドルのゲッター
+	/// </summary>
+	const D3D12_CPU_DESCRIPTOR_HANDLE& GetRtvHandle(uint32_t index) const { return rtvHandles_[index]; }
+
+	/// <summary>
+	/// シザー矩形のゲッター
+	/// </summary>
+	const D3D12_RECT& GetScissorRect() const { return scissorRect_; }
+
+	/// <summary>
+	/// ビューポートのゲッター
+	/// </summary>
+	const D3D12_VIEWPORT& GetViewport() const { return viewport_; }
+
+	/// <summary>
+	/// レンダーテクスチャルートシグネチャのゲッター
+	/// </summary>
+	ID3D12RootSignature* GetRootSignatureRenderTexture() const { return rootSignatureRenderTexture_.Get(); }
+	/// <summary>
+	/// レンダーテクスチャグラフィックスパイプラインステートのゲッター
+	/// </summary>
+	ID3D12PipelineState* GetGraphicsPipelineStateRenderTexture() const { return graphicsPipelineStateRenderTexture_.Get(); }
 
 private:
 
@@ -248,7 +294,7 @@ private:
 	Comptr<ID3D12Resource> depthStencilResource_ = nullptr;
 
 	// RTV
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[3];
 	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 
 	// DXCコンパイラー
@@ -277,6 +323,15 @@ private:
 
 	// FPS固定システム
 	std::unique_ptr<FixFPS> fixFps_;
+
+	// オフスクリーンレンダリング用のテクスチャリソース
+	Comptr<ID3D12Resource> renderTextureResource_ = nullptr;
+	const Vector4 kRenderTargetClearValue{ 1.0f, 0.0f, 0.0f, 1.0f };// 一旦分かりやすいように赤
+
+	// ルートシグネチャ
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureRenderTexture_ = nullptr;
+	// グラフィックスパイプラインステート
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateRenderTexture_ = nullptr;
 
 };
 

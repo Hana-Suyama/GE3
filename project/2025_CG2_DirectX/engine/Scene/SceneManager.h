@@ -15,6 +15,8 @@ public:
 
 	void ModelDraw();
 
+	void ImGuiDraw();
+
 	void SetNextScene(std::unique_ptr<BaseScene> nextScene) { nextScene_ = move(nextScene); }
 
 private:

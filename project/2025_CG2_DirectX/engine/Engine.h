@@ -59,6 +59,7 @@ public:
 	void PreDraw();
 	void SpritePreDraw();
 	void ModelPreDraw();
+	void ImGuiPreDraw();
 	void PostDraw();
 
 	virtual void Finalize();
@@ -91,6 +92,8 @@ protected:
 	std::mt19937 randomEngine_{ std::random_device{}() };
 
 	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
+
+	uint32_t renderTextureSrvIndex;
 
 };
 

@@ -43,6 +43,14 @@ public:
 	void CreateSRVforStructuredBuffer(uint32_t srvIndex, ID3D12Resource* pResource, UINT numElements, UINT structureByteStride);
 
 	/// <summary>
+	///	RenderTarget用のSRVを生成
+	/// </summary>
+	/// <param name="srvIndex"></param>
+	/// <param name="pResource"></param>
+	/// <param name="Format"></param>
+	void CreateSRVforRendertargetTexture(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format);
+
+	/// <summary>
 	///	SRVヒープをセット
 	/// </summary>
 	void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex);

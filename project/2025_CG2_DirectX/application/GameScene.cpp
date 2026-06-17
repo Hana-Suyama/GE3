@@ -151,6 +151,10 @@ void GameScene::ModelDraw()
 	flag_->Draw();
 }
 
+void GameScene::ImGuiDraw()
+{
+}
+
 void GameScene::Finalize()
 {
 
