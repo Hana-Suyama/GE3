@@ -13,9 +13,11 @@ class ImGuiManager
 {
 public:
 
-	void Initialize(WindowsApi* winApi, DirectXBasic* directXBasic, SRVManager* srvManager);
+	void Initialize(WindowsApi* winApi, DirectXBasic* directXBasic, SRVManager* srvManager, uint32_t* renderTextureSrvIndex);
 
 	void Update();
+
+	void ImGuiPreDraw();
 
 	void Draw();
 
@@ -34,6 +36,11 @@ private:
 	DirectXBasic* directXBasic_ = nullptr;
 
 	SRVManager* srvManager_ = nullptr;
+
+	// バリア
+	D3D12_RESOURCE_BARRIER barrier_{};
+
+	uint32_t* renderTextureSrvIndex_ = nullptr;
 
 };
 

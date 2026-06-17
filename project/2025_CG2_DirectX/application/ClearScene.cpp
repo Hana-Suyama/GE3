@@ -95,6 +95,10 @@ void ClearScene::ModelDraw()
 	object_->Draw();
 }
 
+void ClearScene::ImGuiDraw()
+{
+}
+
 void ClearScene::Finalize()
 {
 	

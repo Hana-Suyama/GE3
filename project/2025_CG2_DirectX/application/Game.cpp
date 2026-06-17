@@ -36,6 +36,8 @@ void Game::Update()
 	//}
 #endif
 
+	sceneManager_->ImGuiDraw();
+
 	//ゲームの処理
 
 	imguiManager_->UpdateEnd();
@@ -51,6 +53,7 @@ void Game::Draw()
 
 	Engine::ModelPreDraw();
 
+	Engine::ImGuiPreDraw();
 	imguiManager_->Draw();
 
 	Engine::PostDraw();

@@ -28,6 +28,8 @@ public:
 
 	virtual void ModelDraw() = 0;
 
+	virtual void ImGuiDraw() = 0;
+
 	virtual void Finalize() = 0;
 
 	virtual void SetSceneManager(SceneManager* sceneManager) { sceneManager_ = sceneManager; }

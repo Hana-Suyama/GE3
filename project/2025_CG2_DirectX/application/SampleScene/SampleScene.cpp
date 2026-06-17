@@ -156,67 +156,6 @@ void SampleScene::Update()
 		Input::GetInstance()->PlayVibration(1.0f, 0.3f, 0.2f);
 	}
 
-#ifdef USE_IMGUI
-	////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
-	ImGui::Begin("ImGui");
-
-	ImGui::Text("Application average %.1f FPS", ImGui::GetIO().Framerate);
-
-	sprite->DebugDraw("Sprite 1");
-	sprite2->DebugDraw("Sprite 2");
-
-	object3d->DebugDraw("plane");
-	object3dTeapot->DebugDraw("teapot");
-	object3dBunny->DebugDraw("Bunny");
-	object3dMultiMesh->DebugDraw("MultiMesh");
-	object3dMultiMaterial->DebugDraw("MultiMaterial");
-	object3dSuzanne->DebugDraw("Suzanne");
-	object3dTerrain->DebugDraw("Terrain");
-	object3dPlanegLTF->DebugDraw("planegltf");
-	object3dSphere->DebugDraw("Sphere");
-
-	skyBox_->DebugDraw("SkyBox");
-
-	if (ImGui::TreeNode("Camera")) {
-		ImGui::DragFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), 0.1f, -30.0f, 30.0f);
-		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("Light")) {
-		for (int32_t i = 0;  auto & light : lights_) {
-			light->DebugDrawImGui(std::to_string(i));
-			i++;
-		}
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("Sound")) {
-		if (ImGui::Button("play")) {
-			playSound = true;
-		}
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("Key")) {
-		ImGui::Text("PushKey : %d", Input::GetInstance()->IsPushKey(DIK_SPACE));
-		ImGui::Text("TriggerKey : %d", Input::GetInstance()->IsTriggerKey(DIK_SPACE));
-		ImGui::Text("PadButton : A %d", Input::GetInstance()->IsPadButton(XINPUT_GAMEPAD_A));
-		ImGui::Text("Gamepad RightJoy : %f %f", Input::GetInstance()->GetRightStick().x, Input::GetInstance()->GetRightStick().y);
-		ImGui::Text("Gamepad LeftJoy : %f %f", Input::GetInstance()->GetLeftStick().x, Input::GetInstance()->GetLeftStick().y);
-		ImGui::Text("Gamepad RightTrigger : %f", Input::GetInstance()->GetRightTrigger());
-		ImGui::Text("Gamepad LeftTrigger : %f", Input::GetInstance()->GetLeftTrigger());
-		ImGui::TreePop();
-	}
-	if (ImGui::TreeNode("Time")) {
-		ImGui::Text("DeltaTime : %f", TimeManager::GetInstance()->GetDeltaTime());
-		ImGui::Text("UnscaledDeltaTime : %f", TimeManager::GetInstance()->GetUnscaledDeltaTime());
-		ImGui::Text("TimeScale : %f", TimeManager::GetInstance()->GetTimeScale());
-		if (ImGui::Button("Scale 0.1")) {
-			TimeManager::GetInstance()->SetTimeScale(0.1f);
-		}
-		ImGui::TreePop();
-	}
-	ImGui::End();
-#endif
-
 	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
 
 }
@@ -267,6 +206,70 @@ void SampleScene::ModelDraw()
 	skyBoxBasic_->SkyBoxPreDraw();
 	skyBox_->Draw();
 
+}
+
+void SampleScene::ImGuiDraw()
+{
+#ifdef USE_IMGUI
+	////開発用UIの処理。実際に開発用のUIを出す場合はここをゲーム固有の処理に置き換える
+	ImGui::Begin("ImGui");
+
+	ImGui::Text("Application average %.1f FPS", ImGui::GetIO().Framerate);
+
+	sprite->DebugDraw("Sprite 1");
+	sprite2->DebugDraw("Sprite 2");
+
+	object3d->DebugDraw("plane");
+	object3dTeapot->DebugDraw("teapot");
+	object3dBunny->DebugDraw("Bunny");
+	object3dMultiMesh->DebugDraw("MultiMesh");
+	object3dMultiMaterial->DebugDraw("MultiMaterial");
+	object3dSuzanne->DebugDraw("Suzanne");
+	object3dTerrain->DebugDraw("Terrain");
+	object3dPlanegLTF->DebugDraw("planegltf");
+	object3dSphere->DebugDraw("Sphere");
+
+	skyBox_->DebugDraw("SkyBox");
+
+	if (ImGui::TreeNode("Camera")) {
+		ImGui::DragFloat3("Rotate", reinterpret_cast<float*>(&cameraTransform.rotate), 0.1f, -30.0f, 30.0f);
+		ImGui::DragFloat3("Translate", reinterpret_cast<float*>(&cameraTransform.translate), 0.1f, -100.0, 100.0f);
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Light")) {
+		for (int32_t i = 0; auto& light : lights_) {
+			light->DebugDrawImGui(std::to_string(i));
+			i++;
+		}
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Sound")) {
+		if (ImGui::Button("play")) {
+			playSound = true;
+		}
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Key")) {
+		ImGui::Text("PushKey : %d", Input::GetInstance()->IsPushKey(DIK_SPACE));
+		ImGui::Text("TriggerKey : %d", Input::GetInstance()->IsTriggerKey(DIK_SPACE));
+		ImGui::Text("PadButton : A %d", Input::GetInstance()->IsPadButton(XINPUT_GAMEPAD_A));
+		ImGui::Text("Gamepad RightJoy : %f %f", Input::GetInstance()->GetRightStick().x, Input::GetInstance()->GetRightStick().y);
+		ImGui::Text("Gamepad LeftJoy : %f %f", Input::GetInstance()->GetLeftStick().x, Input::GetInstance()->GetLeftStick().y);
+		ImGui::Text("Gamepad RightTrigger : %f", Input::GetInstance()->GetRightTrigger());
+		ImGui::Text("Gamepad LeftTrigger : %f", Input::GetInstance()->GetLeftTrigger());
+		ImGui::TreePop();
+	}
+	if (ImGui::TreeNode("Time")) {
+		ImGui::Text("DeltaTime : %f", TimeManager::GetInstance()->GetDeltaTime());
+		ImGui::Text("UnscaledDeltaTime : %f", TimeManager::GetInstance()->GetUnscaledDeltaTime());
+		ImGui::Text("TimeScale : %f", TimeManager::GetInstance()->GetTimeScale());
+		if (ImGui::Button("Scale 0.1")) {
+			TimeManager::GetInstance()->SetTimeScale(0.1f);
+		}
+		ImGui::TreePop();
+	}
+	ImGui::End();
+#endif
 }
 
 void SampleScene::Finalize()

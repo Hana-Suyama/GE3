@@ -16,6 +16,8 @@ public:
 
 	virtual void ModelDraw();
 
+	virtual void ImGuiDraw();
+
 	virtual void Finalize();
 
 	void SetLight();

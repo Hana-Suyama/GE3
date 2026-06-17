@@ -52,3 +52,8 @@ void SceneManager::ModelDraw()
 	scene_->ModelDraw();
 }
 
+void SceneManager::ImGuiDraw()
+{
+	scene_->ImGuiDraw();
+}
+

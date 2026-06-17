@@ -96,6 +96,10 @@ void TitleScene::ModelDraw()
 	object_->Draw();
 }
 
+void TitleScene::ImGuiDraw()
+{
+}
+
 void TitleScene::Finalize()
 {
 	

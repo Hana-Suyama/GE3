@@ -26,8 +26,16 @@ void Engine::Initialize()
 	srvManager_ = std::make_unique<SRVManager>();
 	srvManager_->Initialize(directXBasic_.get());
 
+	// ここでレンダーテクスチャ用SRVを作る
+	renderTextureSrvIndex = srvManager_->Allocate();
+	srvManager_->CreateSRVforRendertargetTexture(
+		renderTextureSrvIndex,
+		directXBasic_->GetRenderTextureResource(),
+		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
+	);
+
 	imguiManager_ = std::make_unique<ImGuiManager>();
-	imguiManager_->Initialize(winApi_.get(), directXBasic_.get(), srvManager_.get());
+	imguiManager_->Initialize(winApi_.get(), directXBasic_.get(), srvManager_.get(), &renderTextureSrvIndex);
 
 	//テクスチャマネージャの初期化
 	textureManager_ = std::make_unique<TextureManager>();
@@ -83,7 +91,8 @@ void Engine::Update()
 
 void Engine::PreDraw()
 {
-	directXBasic_->PreDraw();
+	//directXBasic_->PreDraw();
+	directXBasic_->PreDrawRenderTexture();
 	srvManager_->PreDraw();
 
 }
@@ -100,6 +109,11 @@ void Engine::ModelPreDraw()
 	object3DBasic_->Object3DPreDraw();
 
 	sceneManager_->ModelDraw();
+}
+
+void Engine::ImGuiPreDraw()
+{
+	imguiManager_->ImGuiPreDraw();
 }
 
 void Engine::PostDraw()

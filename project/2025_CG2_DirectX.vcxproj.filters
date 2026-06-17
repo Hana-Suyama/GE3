@@ -271,6 +271,8 @@
     </FxCompile>
     <FxCompile Include="resources\shaders\SkyBox.PS.hlsl" />
     <FxCompile Include="resources\shaders\SkyBox.VS.hlsl" />
+    <FxCompile Include="resources\shaders\CopyImage.VS.hlsl" />
+    <FxCompile Include="resources\shaders\CopyImage.PS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -488,5 +490,6 @@
       <Filter>Shader</Filter>
     </None>
     <None Include="resources\shaders\SkyBox.hlsli" />
+    <None Include="resources\shaders\CopyImage.hlsli" />
   </ItemGroup>
 </Project>
