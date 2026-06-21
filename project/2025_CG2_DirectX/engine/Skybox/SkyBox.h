@@ -135,7 +135,7 @@ private:
 	std::vector<std::string> textureFilePaths_;
 
 	// トランスフォーム
-	struct Transform transform_ { { 50.0f, 50.0f, 50.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	struct Transform transform_ { { 50.0f, 50.0f, 50.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	// UVトランスフォーム。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<struct Transform> uvTransforms_;
 	

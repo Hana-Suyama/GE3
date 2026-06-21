@@ -2,7 +2,7 @@
 #include "../../engine/Scene/BaseScene.h"
 #include <Skybox/SkyBoxBasic.h>
 #include <Skybox/SkyBox.h>
-#include "../../LevelLoader.h"
+#include "../../engine/LevelLoader/LevelLoader.h"
 
 class SampleScene : public BaseScene
 {

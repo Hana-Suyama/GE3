@@ -553,20 +553,24 @@ void DirectXBasic::PreDraw()
 
 void DirectXBasic::PreDrawRenderTexture()
 {
-	//TransitionBarrierの設定
-	barrier_ = {};
-	//今回のバリアはTransition
-	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//Noneにしておく
-	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	//バリアを張る対象のリソース。
-	barrier_.Transition.pResource = renderTextureResource_.Get();
-	//遷移前(現在)のResourceState
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//遷移後のResourceState
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-	//TransitionBarrierを張る
-	commandList_->ResourceBarrier(1, &barrier_);
+	if (isBarrierSkipped_) {
+		//TransitionBarrierの設定
+		barrier_ = {};
+		//今回のバリアはTransition
+		barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		//Noneにしておく
+		barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		//バリアを張る対象のリソース。
+		barrier_.Transition.pResource = renderTextureResource_.Get();
+		//遷移前(現在)のResourceState
+		barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		//遷移後のResourceState
+		barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+		//TransitionBarrierを張る
+		commandList_->ResourceBarrier(1, &barrier_);
+	} else {
+		isBarrierSkipped_ = true;
+	}
 
 	//描画先のRTVとDSVを設定する
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = GetCPUDescriptorHandle(dsvDescriptorHeap_.Get(), descriptorSizeDSV_, 0);
@@ -588,7 +592,18 @@ void DirectXBasic::PostDraw()
 {
 	//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
 	//今回はRenderTargetからPresentにする
+
+	//TransitionBarrierの設定
+	barrier_ = {};
+	//今回のバリアはTransition
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//Noneにしておく
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//バリアを張る対象のリソース。
+	barrier_.Transition.pResource = swapChainResources_[swapChain_->GetCurrentBackBufferIndex()].Get();
+	//遷移前(現在)のResourceState
 	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//遷移後のResourceState
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 	//TransitionBarrierを張る
 	commandList_->ResourceBarrier(1, &barrier_);

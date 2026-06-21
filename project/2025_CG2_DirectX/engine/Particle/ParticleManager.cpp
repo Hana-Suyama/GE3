@@ -1,9 +1,11 @@
 #include "ParticleManager.h"
 #include "VertexData.h"
 #include "TransformationMatrix.h"
+#include <algorithm>
 #include <numbers>
 #include "ImGuiManager.h"
 #include <TimeManager.h>
+#include "../Primitive/Primitive.h"
 
 using namespace MyMath;
 
@@ -33,108 +35,15 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 
 	CreatePSO();
 
-	/*const uint32_t kRingDivide = 32;
-	const float kOuterRadius = 1.0f;
-	const float kInnerRadius = 0.2f;
-	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kRingDivide);*/
+	CreateVertexResource(kCylinderDivide * 6);
 
-	const uint32_t kCylinderDivide = 32;
-	const float kTopRadius = 1.0f;
-	const float kBottomRadius = 1.0f;
-	const float kHeight = 3.0f;
-	const float radianPerDivide = 2.0f * std::numbers::pi_v<float> / float(kCylinderDivide);
-
-	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * kCylinderDivide * 6);
-	//スプライト用頂点バッファビューを作成する
-	//リソースの先頭のアドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点1つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData) * kCylinderDivide * 6;
-	//1頂点当たりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 	//スプライト用の頂点リソースにデータを書き込む
+	ParticleMeshData meshData = Primitive::CreateCylinder(kCylinderDivide, kTopRadius, kBottomRadius, kHeight);
 	VertexData* vertexData = nullptr;
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-
-	// GS用
-	/*vertexData[0].position = { 0.0f, 0.0f, 0.0f, 1.0f };
-	vertexData[0].texcoord = { 0.0f, 1.0f };
-	vertexData[0].normal = { 0.0f, 0.0f, -1.0f };*/
-
-	// HitEffect用
-	/*vertexData[0].position = { -1.0f, -1.0f, 0.0f, 1.0f };
-	vertexData[0].texcoord = { 0.0f, 1.0f };
-
-	vertexData[1].position = { -1.0f,  1.0f, 0.0f, 1.0f };
-	vertexData[1].texcoord = { 0.0f, 0.0f };
-
-	vertexData[2].position = { 1.0f, -1.0f, 0.0f, 1.0f };
-	vertexData[2].texcoord = { 1.0f, 1.0f };
-
-	vertexData[3].position = { 1.0f,  1.0f, 0.0f, 1.0f };
-	vertexData[3].texcoord = { 1.0f, 0.0f };
-
-	for (uint32_t i = 0; i < 4; ++i) {
-		vertexData[i].normal = { 0.0f, 0.0f, -1.0f };
-		vertexData[i].falseUV = false;
-	}*/
-
-	/*for (uint32_t index = 0; index < kRingDivide; ++index) {
-		float sin = std::sin(index * radianPerDivide);
-		float cos = std::cos(index * radianPerDivide);
-		float sinNext = std::sin((index + 1) * radianPerDivide);
-		float cosNext = std::cos((index + 1) * radianPerDivide);
-		float u = float(index) / float(kRingDivide);
-		float uNext = float(index + 1) / float(kRingDivide);
-
-		vertexData[index * 6].position = {-sin * kOuterRadius, cos * kOuterRadius, 0.0f, 1.0f};
-		vertexData[index * 6].texcoord = { u, 0.0f };
-		vertexData[index * 6 + 1].position = {-sinNext * kOuterRadius, cosNext * kOuterRadius, 0.0f, 1.0f};
-		vertexData[index * 6 + 1].texcoord = { uNext, 0.0f };
-		vertexData[index * 6 + 2].position = { -sin * kInnerRadius, cos * kInnerRadius, 0.0f, 1.0f };
-		vertexData[index * 6 + 2].texcoord = { u, 1.0f };
-
-		vertexData[index * 6 + 3].position = { -sin * kInnerRadius, cos * kInnerRadius, 0.0f, 1.0f };
-		vertexData[index * 6 + 3].texcoord = { u, 1.0f };
-		vertexData[index * 6 + 4].position = { -sinNext * kOuterRadius, cosNext * kOuterRadius, 0.0f, 1.0f };
-		vertexData[index * 6 + 4].texcoord = { uNext, 0.0f };
-		vertexData[index * 6 + 5].position = { -sinNext * kInnerRadius, cosNext * kInnerRadius, 0.0f, 1.0f };
-		vertexData[index * 6 + 5].texcoord = { uNext, 1.0f };
-	}
-
-	for (uint32_t i = 0; i < kRingDivide * 6; ++i) {
-		vertexData[i].normal = { 0.0f, 0.0f, 1.0f };
-		vertexData[i].falseUV = false;
-	}*/
-
-	for (uint32_t index = 0; index < kCylinderDivide; ++index) {
-		float sin = std::sin(index * radianPerDivide);
-		float cos = std::cos(index * radianPerDivide);
-		float sinNext = std::sin((index + 1) * radianPerDivide);
-		float cosNext = std::cos((index + 1) * radianPerDivide);
-		float u = float(index) / float(kCylinderDivide);
-		float uNext = float(index + 1) / float(kCylinderDivide);
-
-		vertexData[index * 6].position = { -sin * kTopRadius, kHeight, cos * kTopRadius, 1.0f };
-		vertexData[index * 6].texcoord = { u, 0.0f };
-		vertexData[index * 6].normal = { -sin, 0.0f, cos };
-		vertexData[index * 6 + 1].position = { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f };
-		vertexData[index * 6 + 1].texcoord = { uNext, 0.0f };
-		vertexData[index * 6 + 1].normal = { -sinNext, 0.0f, cosNext };
-		vertexData[index * 6 + 2].position = { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f };
-		vertexData[index * 6 + 2].texcoord = { u, 1.0f };
-		vertexData[index * 6 + 2].normal = { -sin, 0.0f, cos };
-		vertexData[index * 6 + 3].position = { -sin * kBottomRadius, 0.0f, cos * kBottomRadius, 1.0f };
-		vertexData[index * 6 + 3].texcoord = { u, 1.0f };
-		vertexData[index * 6 + 3].normal = { -sin, 0.0f, cos };
-		vertexData[index * 6 + 4].position = { -sinNext * kTopRadius, kHeight, cosNext * kTopRadius, 1.0f };
-		vertexData[index * 6 + 4].texcoord = { uNext, 0.0f };
-		vertexData[index * 6 + 4].normal = { -sinNext, 0.0f, cosNext };
-		vertexData[index * 6 + 5].position = { -sinNext * kBottomRadius, 0.0f, cosNext * kBottomRadius, 1.0f };
-		vertexData[index * 6 + 5].texcoord = { uNext, 1.0f };
-		vertexData[index * 6 + 5].normal = { -sinNext, 0.0f, cosNext };
-	}
+	std::memcpy(vertexData, meshData.vertices.data(), sizeof(VertexData) * meshData.vertices.size());
+	vertexCount_ = static_cast<uint32_t>(meshData.vertices.size());
+	vertexResource_->Unmap(0, nullptr);
 
 	//Sprite用のマテリアルリソースを作る
 	materialResource_ = directXBasic_->CreateBufferResource(sizeof(Material));
@@ -164,18 +73,61 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 		particles[index] = MakeNewParticle(randomEngine);
 	}*/
 
-	emitter_.Initialize(&particles_, this);
-
 	accelerationField_.acceleration = { 0.0f, 15.0f, 0.0f };
 	accelerationField_.area.min = { -1.0f, -1.0f, -1.0f };
 	accelerationField_.area.max = { 1.0f, 1.0f, 1.0f };
+
+	spawnSettings_[ParticleEffectType::Hit] = {
+	.scale = { 1.0f, 1.0f, 1.0f },
+	.velocityMin = { 0.0f, 0.0f, 0.0f },
+	.velocityMax = { 0.0f, 0.0f, 0.0f },
+	.color = { 0.0f, 0.0f, 1.0f, 1.0f },
+	.lifeTime = 10.0f,
+	};
+
+	spawnSettings_[ParticleEffectType::Smoke] = {
+		.scale = { 2.0f, 2.0f, 2.0f },
+		.velocityMin = { -0.2f, 0.5f, -0.2f },
+		.velocityMax = { 0.2f, 1.2f, 0.2f },
+		.color = { 0.4f, 0.4f, 0.4f, 0.6f },
+		.lifeTime = 2.0f,
+	};
+
+	spawnSettings_[ParticleEffectType::Circle] = {
+		.scale = { 2.0f, 2.0f, 2.0f },
+		.velocityMin = { -0.2f, 0.5f, -0.2f },
+		.velocityMax = { 0.2f, 1.2f, 0.2f },
+		.color = { 0.4f, 0.4f, 0.4f, 0.6f },
+		.lifeTime = 2.0f,
+	};
+
+	spawnSettings_[ParticleEffectType::Cylinder] = {
+		.scale = { 2.0f, 2.0f, 2.0f },
+		.velocityMin = { -0.2f, 0.5f, -0.2f },
+		.velocityMax = { 0.2f, 1.2f, 0.2f },
+		.color = { 0.4f, 0.4f, 0.4f, 0.6f },
+		.lifeTime = 2.0f,
+	};
 	
+	/*emitters_.emplace_back();
+	emitters_.back().Initialize(&particles_, this, ParticleEffectType::Hit);
+
+	emitters_.emplace_back();
+	emitters_.back().Initialize(&particles_, this, ParticleEffectType::Smoke);
+
+	emitters_.emplace_back();
+	emitters_.back().Initialize(&particles_, this, ParticleEffectType::Circle);*/
+
+	emitters_.emplace_back();
+	emitters_.back().Initialize(&particles_, this, ParticleEffectType::Cylinder);
 }
 
 void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 {
 
-	emitter_.Update(randomEngine);
+	for (auto& emitter : emitters_) {
+		emitter.Update(randomEngine);
+	}
 
 #ifdef USE_IMGUI
 	ImGui::Begin("AllParticle");
@@ -191,8 +143,6 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 		billboardMatrix.m[3][0] = 0.0f;
 		billboardMatrix.m[3][1] = 0.0f;
 		billboardMatrix.m[3][2] = 0.0f;
-
-
 
 	uvTransform_.translate.x += 0.001f;
 
@@ -212,18 +162,34 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 			continue;
 		}
 
-		Matrix4x4 worldMatrix = MakeAffineMatrix((*particleIterator).transform.scale, (*particleIterator).transform.rotate, (*particleIterator).transform.translate);
-		if (isBillboard_) {
-			worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
-		}
-		Matrix4x4 worldViewProjectionMatrix = worldMatrix.Multiply(camera_->GetViewProjectionMatrix());
-
 		if (IsCollision(accelerationField_.area, (*particleIterator).transform.translate)) {
 			(*particleIterator).velocity += accelerationField_.acceleration * TimeManager::GetInstance()->GetDeltaTime();
 		}
 		(*particleIterator).transform.translate += (*particleIterator).velocity * TimeManager::GetInstance()->GetDeltaTime();
 		(*particleIterator).currentTime += TimeManager::GetInstance()->GetDeltaTime();
-		(*particleIterator).color = { (std::max)((*particleIterator).color.x -= 0.01f, 0.0f), (std::max)((*particleIterator).color.y -= 0.006f, 0.0f), (std::min)((*particleIterator).color.z += 0.004f, 1.0f) };
+
+		if ((*particleIterator).effectType == ParticleEffectType::Cylinder) {
+			float t = (*particleIterator).currentTime / (*particleIterator).lifeTime;
+			t = std::clamp(t, 0.0f, 1.0f);
+
+			float bounce = std::sin(t * std::numbers::pi_v<float>);
+			float expand = 0.2f + t * 2.8f;
+
+			(*particleIterator).transform.scale = {
+				expand,
+				0.05f + bounce * 0.45f,
+				expand
+			};
+			(*particleIterator).color.w = 1.0f - t;
+		} else {
+			(*particleIterator).color = { (std::max)((*particleIterator).color.x -= 0.01f, 0.0f), (std::max)((*particleIterator).color.y -= 0.006f, 0.0f), (std::min)((*particleIterator).color.z += 0.004f, 1.0f) };
+		}
+
+		Matrix4x4 worldMatrix = MakeAffineMatrix((*particleIterator).transform.scale, (*particleIterator).transform.rotate, (*particleIterator).transform.translate);
+		if (isBillboard_) {
+			worldMatrix = MakeScaleMatrix((*particleIterator).transform.scale) * billboardMatrix * MakeTranslateMatrix((*particleIterator).transform.translate);
+		}
+		Matrix4x4 worldViewProjectionMatrix = worldMatrix.Multiply(camera_->GetViewProjectionMatrix());
 
 
 		if (numInstance_ < kNumMaxInstance_) {
@@ -231,9 +197,7 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 			instancingData_[numInstance_].World = worldMatrix;
 			instancingData_[numInstance_].color = (*particleIterator).color;
 
-			//float alpha = 1.0f - ((*particleIterator).currentTime / (*particleIterator).lifeTime);
-			float alpha = 1.0f;
-			instancingData_[numInstance_].color.w = alpha;
+			instancingData_[numInstance_].color.w = (*particleIterator).color.w;
 
 			++numInstance_;
 		}
@@ -305,7 +269,7 @@ void ParticleManager::Draw()
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
 	//描画！(DrawCall/ドローコール)
 	if (numInstance_) {
-		directXBasic_->GetCommandList()->DrawInstanced(32 * 6, numInstance_, 0, 0);
+		directXBasic_->GetCommandList()->DrawInstanced(vertexCount_, numInstance_, 0, 0);
 	}
 }
 
@@ -462,15 +426,15 @@ void ParticleManager::CreatePSO()
 	assert(SUCCEEDED(hr));
 }
 
-void ParticleManager::CreateVertexResource()
+void ParticleManager::CreateVertexResource(uint32_t vertexCount)
 {
 	//Sprite用の頂点リソースを作る
-	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData));
+	vertexResource_ = directXBasic_->CreateBufferResource(sizeof(VertexData) * vertexCount);
 	//スプライト用頂点バッファビューを作成する
 	//リソースの先頭のアドレスから使う
 	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
 	//使用するリソースのサイズは頂点1つ分のサイズ
-	vertexBufferView_.SizeInBytes = sizeof(VertexData);
+	vertexBufferView_.SizeInBytes = sizeof(VertexData) * vertexCount;
 	//1頂点当たりのサイズ
 	vertexBufferView_.StrideInBytes = sizeof(VertexData);
 }
@@ -479,7 +443,7 @@ std::list<Particle> ParticleManager::Emit(const ParticleEmitter& emitter, std::m
 {
 	std::list<Particle> particles;
 	for (uint32_t count = 0; count < emitter.GetCount(); ++count) {
-		particles.push_back(MakeNewParticle(randomEngine, emitter.GetTransform().translate));
+		particles.push_back(MakeNewParticle(randomEngine, emitter.GetTransform().translate, emitter.GetEffectType()));
 	}
 	return particles;
 }
@@ -500,37 +464,64 @@ std::list<Particle> ParticleManager::Emit(const ParticleEmitter& emitter, std::m
 //	
 //}
 
-Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate)
+Particle ParticleManager::MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate, ParticleEffectType effectType)
 {
-	// 一旦標準のパーティクルをコメントアウト。あとで切り替えられるようにする
-	/*std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-	Particle particle;
-	particle.transform.scale = { 3.0f, 3.0f, 1.0f };
-	particle.transform.rotate = { 0.0f, -3.14f ,0.0f };
-	Vector3 randomTranslate{ distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
-	particle.transform.translate = translate + randomTranslate;
-	particle.velocity = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
-	
-	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
-	particle.color = { 0.5f, 0.2f, 0.8f, 1.0f };
+	Particle particle{};
 
-	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
-	particle.lifeTime = distTime(randomEngine);
-	particle.currentTime = 0;*/
+	switch (effectType) {
+		case ParticleEffectType::Hit: {
+			particle.transform.scale = { 0.05f, 1.0f, 1.0f };// 横に潰す
+			particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
+			particle.transform.translate = translate;
+			particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない
+			particle.color = { 0.0f, 0.0f, 1.0f, 1.0f };
+			particle.lifeTime = 1.0f;// 1秒で消える
+			particle.currentTime = 0.0f;
 
-	// エフェクト用のパーティクル
-	Particle particle;
-	particle.transform.scale = { 1.0f, 1.0f, 1.0f };// 横に潰す
-	particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
-	particle.transform.translate = translate;
-	particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない
-	particle.color = { 0.0f, 0.0f, 1.0f, 1.0f };
-	particle.lifeTime = 10.0f;// 10秒で消える
-	particle.currentTime = 0.0f;
+			std::uniform_real_distribution<float> distRotate(-std::numbers::pi_v<float>, std::numbers::pi_v<float>);
+			particle.transform.rotate.z = distRotate(randomEngine);
+			break;
+		}
+		case ParticleEffectType::Smoke: {
+			std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+			
+			particle.transform.scale = { 3.0f, 3.0f, 1.0f };
+			particle.transform.rotate = { 0.0f, -3.14f ,0.0f };
+			Vector3 randomTranslate{ distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
+			particle.transform.translate = translate + randomTranslate;
+			particle.velocity = { distribution(randomEngine), distribution(randomEngine), distribution(randomEngine) };
 
-	//std::uniform_real_distribution<float> distRotate(-std::numbers::pi_v<float>);
-	//particle.transform.rotate.z = distRotate(randomEngine);
+			std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
+			particle.color = { 0.5f, 0.2f, 0.8f, 1.0f };
 
+			std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
+			particle.lifeTime = distTime(randomEngine);
+			particle.currentTime = 0;
+			break;
+		}
+		case ParticleEffectType::Circle: {
+			particle.transform.scale = { 1.0f, 1.0f, 1.0f };// 横に潰す
+			particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
+			particle.transform.translate = translate;
+			particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない
+			particle.color = { 0.0f, 0.0f, 1.0f, 1.0f };
+			particle.lifeTime = 1.0f;// 1秒で消える
+			particle.currentTime = 0.0f;
+			break;
+		}
+		case ParticleEffectType::Cylinder: {
+			particle.transform.scale = { 1.0f, 1.0f, 1.0f };// 横に潰す
+			particle.transform.rotate = { 0.0f, 0.0f ,0.0f };
+			particle.transform.translate = translate;
+			particle.velocity = { 0.0f, 0.0f, 0.0f };// 動かない
+			particle.color = { 0.0f, 0.0f, 1.0f, 1.0f };
+			particle.lifeTime = 10.0f;// 10秒で消える
+			particle.currentTime = 0.0f;
+			break;
+		}
+	}
+
+	particle.effectType = effectType;
 	return particle;
 }
 

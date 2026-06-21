@@ -3,7 +3,7 @@
 #include "ImGuiManager.h"
 #include "ParticleManager.h"
 
-void ParticleEmitter::Initialize(std::list<Particle>* particlesPtr, ParticleManager* particleManager)
+void ParticleEmitter::Initialize(std::list<Particle>* particlesPtr, ParticleManager* particleManager, ParticleEffectType effectType)
 {
 	count_ = 1;
 	frequency_ = 10.0f;
@@ -15,6 +15,7 @@ void ParticleEmitter::Initialize(std::list<Particle>* particlesPtr, ParticleMana
 
 	particlesPtr_ = particlesPtr;
 	particleManager_ = particleManager;
+	effectType_ = effectType;
 }
 
 void ParticleEmitter::Update(std::mt19937& randomEngine)

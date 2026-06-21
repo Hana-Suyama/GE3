@@ -3,7 +3,7 @@
 #include <fstream>
 #include "MyMath.h"
 
-LevelData* LevelLoader::LoadLevel(const std::string& fileName)
+std::unique_ptr<LevelData> LevelLoader::LoadLevel(const std::string& fileName)
 {
 	const std::string fullpath = kDefaultBaseDirectory + fileName + kExtension;
 
@@ -26,11 +26,11 @@ LevelData* LevelLoader::LoadLevel(const std::string& fileName)
 	assert(deserialized.contains("objects"));
 	assert(deserialized["objects"].is_array());
 
-	LevelData* levelData = new LevelData();
+	std::unique_ptr<LevelData> levelData = std::make_unique<LevelData>();
 
 	for (const nlohmann::json& object : deserialized["objects"]) {
-		LoadObjectRecursive(object, levelData);
-	}
+		LoadObjectRecursive(object, levelData.get());
+	}	
 
 	return levelData;
 }

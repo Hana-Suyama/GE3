@@ -285,7 +285,7 @@ void SampleScene::SetLight()
 void SampleScene::GenerateLevelObjects()
 {
 	LevelLoader levelLoader;
-	levelData_.reset(levelLoader.LoadLevel("stage01"));
+	levelData_ = levelLoader.LoadLevel("stage01");
 
 	// レベルデータからオブジェクトを生成、配置
 	for (auto& objectData : levelData_->objects) {

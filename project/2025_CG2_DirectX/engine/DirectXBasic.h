@@ -326,12 +326,14 @@ private:
 
 	// オフスクリーンレンダリング用のテクスチャリソース
 	Comptr<ID3D12Resource> renderTextureResource_ = nullptr;
-	const Vector4 kRenderTargetClearValue{ 1.0f, 0.0f, 0.0f, 1.0f };// 一旦分かりやすいように赤
+	const Vector4 kRenderTargetClearValue{ 0.0f, 0.0f, 0.0f, 0.0f };// 一旦分かりやすいように赤
 
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureRenderTexture_ = nullptr;
 	// グラフィックスパイプラインステート
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateRenderTexture_ = nullptr;
+
+	bool isBarrierSkipped_ = false;
 
 };
 

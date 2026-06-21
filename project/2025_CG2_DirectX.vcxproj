@@ -182,7 +182,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Debug\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\Game.cpp" />
-    <ClCompile Include="LevelLoader.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\LevelLoader\LevelLoader.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -209,6 +209,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\SceneManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Time\TimeManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Primitive\Primitive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
@@ -353,7 +354,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Time\TimeManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.h" />
-    <ClInclude Include="LevelLoader.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\LevelLoader\LevelLoader.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Primitive\Primitive.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

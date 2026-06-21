@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "2025_CG2_DirectX/engine/Utility/Math/Transform.h"
-#include "externals/nlohmann_json/json.hpp"
+#include "../Utility/Math/Transform.h"
+#include "../../../externals/nlohmann_json/json.hpp"
 
 struct LevelData {
 	struct ObjectData {
@@ -16,7 +16,7 @@ struct LevelData {
 class LevelLoader
 {
 public:
-	LevelData* LoadLevel(const std::string& fileName);
+	std::unique_ptr<LevelData> LoadLevel(const std::string& fileName);
 
 private:
 	void LoadObjectRecursive(const nlohmann::json& object, LevelData* levelData);

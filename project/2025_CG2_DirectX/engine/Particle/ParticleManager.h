@@ -4,6 +4,8 @@
 #include "Material.h"
 #include "TransformationMatrix.h"
 #include <random>
+#include <unordered_map>
+#include <vector>
 #include <ParticleEmitter.h>
 
 struct Particle {
@@ -12,6 +14,7 @@ struct Particle {
 	Vector4 color;
 	float lifeTime;
 	float currentTime;
+	ParticleEffectType effectType;
 };
 
 struct ParticleForGPU {
@@ -56,11 +59,11 @@ public:
 	/// </summary>
 	void CreatePSO();
 
-	void CreateVertexResource();
+	void CreateVertexResource(uint32_t vertexCount);
 
 	std::list<Particle> Emit(const ParticleEmitter& emitter, std::mt19937& randomEngine);
 
-	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate);
+	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate, ParticleEffectType effectType);
 
 	bool IsCollision(const MyMath::AABB& aabb, const Vector3& point);
 
@@ -111,11 +114,24 @@ private:
 	// マテリアルリソース
 	Comptr<ID3D12Resource> materialResource_ = nullptr;
 
-	ParticleEmitter emitter_{};
+	std::vector<ParticleEmitter> emitters_;
+	std::unordered_map<ParticleEffectType, ParticleSpawnSettings> spawnSettings_;
 	AccelerationField accelerationField_;
 
 	bool isBillboard_ = false;
 
 	struct Transform uvTransform_ { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+
+	const uint32_t kCylinderDivide = 32;
+	const float kTopRadius = 4.0f;
+	const float kBottomRadius = 1.0f;
+	const float kHeight = 1.0f;
+
+	const uint32_t kRingDivide = 32;
+	const float kOuterRadius = 1.0f;
+	const float kInnerRadius = 0.2f;
+
+	uint32_t vertexCount_ = 0;
+
 };
 

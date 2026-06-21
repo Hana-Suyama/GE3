@@ -45,11 +45,11 @@ void ImGuiManager::ImGuiPreDraw()
 	//Noneにしておく
 	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 	//バリアを張る対象のリソース。現在のバックバッファに対して行う
-	barrier_.Transition.pResource = directXBasic_->GetSwapChainResource(backBufferIndex);
+	barrier_.Transition.pResource = directXBasic_->GetRenderTextureResource();
 	//遷移前(現在)のResourceState
-	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	//遷移後のResourceState
-	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//TransitionBarrierを張る
 	directXBasic_->GetCommandList()->ResourceBarrier(1, &barrier_);
 
