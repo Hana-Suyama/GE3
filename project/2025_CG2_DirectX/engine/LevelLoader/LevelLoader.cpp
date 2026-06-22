@@ -42,6 +42,15 @@ void LevelLoader::LoadObjectRecursive(const nlohmann::json& object, LevelData* l
 	assert(object.contains("type"));
 	assert(object["type"].is_string());
 
+	if (object.contains("false")) {
+		// 有効無効フラグ
+		bool disabled = object["false"].get<bool>();
+		if (disabled) {
+			// 配置しない(スキップ)
+			return;
+		}
+	}
+
 	const std::string type = object["type"].get<std::string>();
 
 	if (type.compare("MESH") == 0) {
