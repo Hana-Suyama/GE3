@@ -282,6 +282,10 @@
     <FxCompile Include="resources\shaders\Sepia.VS.hlsl" />
     <FxCompile Include="resources\shaders\Vignette.PS.hlsl" />
     <FxCompile Include="resources\shaders\Vignette.VS.hlsl" />
+    <FxCompile Include="resources\shaders\BoxFilter3x3.PS.hlsl" />
+    <FxCompile Include="resources\shaders\BoxFilter3x3.VS.hlsl" />
+    <FxCompile Include="resources\shaders\BoxFilter5x5.PS.hlsl" />
+    <FxCompile Include="resources\shaders\BoxFilter5x5.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -506,5 +510,7 @@
     <None Include="resources\shaders\Grayscale.hlsli" />
     <None Include="resources\shaders\Sepia.hlsli" />
     <None Include="resources\shaders\Vignette.hlsli" />
+    <None Include="resources\shaders\BoxFilter3x3.hlsli" />
+    <None Include="resources\shaders\BoxFilter5x5.hlsli" />
   </ItemGroup>
 </Project>
