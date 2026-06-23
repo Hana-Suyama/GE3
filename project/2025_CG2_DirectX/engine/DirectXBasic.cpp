@@ -342,11 +342,11 @@ void DirectXBasic::CreateRenderTexturePSO()
 	depthStencilDesc.DepthEnable = false;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/CopyImage.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/Grayscale.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/CopyImage.PS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/Grayscale.PS.hlsl",
 		L"ps_6_0", logger_);
 	assert(pixelShaderBlob != nullptr);
 
