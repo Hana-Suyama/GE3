@@ -280,6 +280,8 @@
     <FxCompile Include="resources\shaders\Grayscale.VS.hlsl" />
     <FxCompile Include="resources\shaders\Sepia.PS.hlsl" />
     <FxCompile Include="resources\shaders\Sepia.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Vignette.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Vignette.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -503,5 +505,6 @@
     <None Include="resources\shaders\Fullscreen.hlsli" />
     <None Include="resources\shaders\Grayscale.hlsli" />
     <None Include="resources\shaders\Sepia.hlsli" />
+    <None Include="resources\shaders\Vignette.hlsli" />
   </ItemGroup>
 </Project>
