@@ -53,7 +53,8 @@ void Game::Draw()
 
 	Engine::ModelPreDraw();
 
-	Engine::ImGuiPreDraw();
+	Engine::BackBufferPreDraw();
+	Engine::DrawRenderTexture();
 	imguiManager_->Draw();
 
 	Engine::PostDraw();

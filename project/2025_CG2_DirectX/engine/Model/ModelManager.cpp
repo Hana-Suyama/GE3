@@ -430,11 +430,11 @@ void ModelManager::CreateSkyBox()
 	}
 
 	//球の頂点リソース
-	newModel.meshes_.at(0).vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * 24);
+	newModel.meshes_.at(0).vertexResource = directXBasic_->CreateBufferResource(sizeof(VertexData) * newModel.meshes_.at(0).vertices.size());
 	//リソースの先頭のアドレスから使う
 	newModel.meshes_.at(0).vertexBufferView.BufferLocation = newModel.meshes_.at(0).vertexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズは分割数×分割数×6のサイズ
-	newModel.meshes_.at(0).vertexBufferView.SizeInBytes = sizeof(VertexData) * 24;
+	newModel.meshes_.at(0).vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * newModel.meshes_.at(0).vertices.size());
 	//1頂点当たりのサイズ
 	newModel.meshes_.at(0).vertexBufferView.StrideInBytes = sizeof(VertexData);
 	////球の頂点リソースにデータを書き込む
@@ -459,18 +459,18 @@ void ModelManager::CreateSkyBox()
 	materialDataSphere->shininess = 1.0f;
 
 	//球用のindexリソース
-	newModel.meshes_.at(0).indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * 24);
+	newModel.meshes_.at(0).indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * newModel.meshes_.at(0).vertices.size());
 	//リソースの先頭のアドレスから使う
 	newModel.meshes_.at(0).indexBufferView.BufferLocation = newModel.meshes_.at(0).indexResource->GetGPUVirtualAddress();
 	//使用するリソースのサイズはインデックス*vertexTotalNumberのサイズ
-	newModel.meshes_.at(0).indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * 24);
+	newModel.meshes_.at(0).indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * newModel.meshes_.at(0).vertices.size());
 	//インデックスはuint32_tとする
 	newModel.meshes_.at(0).indexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	//球用インデックスリソースにデータを書き込む
 	uint32_t* indexDataSkyBox = nullptr;
 	newModel.meshes_.at(0).indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexDataSkyBox));
 	
-	for (int i = 0; i < 24; i++) {
+	for (int i = 0; i < newModel.meshes_.at(0).vertices.size(); i++) {
 		indexDataSkyBox[i] = i;
 	}
 

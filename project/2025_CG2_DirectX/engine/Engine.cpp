@@ -35,7 +35,7 @@ void Engine::Initialize()
 	);
 
 	imguiManager_ = std::make_unique<ImGuiManager>();
-	imguiManager_->Initialize(winApi_.get(), directXBasic_.get(), srvManager_.get(), &renderTextureSrvIndex);
+	imguiManager_->Initialize(winApi_.get(), directXBasic_.get(), srvManager_.get());
 
 	//テクスチャマネージャの初期化
 	textureManager_ = std::make_unique<TextureManager>();
@@ -97,6 +97,11 @@ void Engine::PreDraw()
 
 }
 
+void Engine::BackBufferPreDraw()
+{
+	directXBasic_->PreDrawBackBuffer();
+}
+
 void Engine::SpritePreDraw()
 {
 	spriteBasic_->SpritePreDraw();
@@ -111,9 +116,25 @@ void Engine::ModelPreDraw()
 	sceneManager_->ModelDraw();
 }
 
-void Engine::ImGuiPreDraw()
+void Engine::DrawRenderTexture()
 {
-	imguiManager_->ImGuiPreDraw();
+
+	ID3D12DescriptorHeap* heaps[] = { srvManager_->GetDescriptorHeap() };
+	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, heaps);
+
+	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
+	directXBasic_->GetCommandList()->SetGraphicsRootSignature(directXBasic_->GetRootSignatureRenderTexture());
+	directXBasic_->GetCommandList()->SetPipelineState(directXBasic_->GetGraphicsPipelineStateRenderTexture());	//PSOを設定
+
+	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(
+		2,
+		srvManager_->GetGPUDescriptorHandle(renderTextureSrvIndex)
+	);
+
+	// 頂点3つ描画
+	directXBasic_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
 }
 
 void Engine::PostDraw()

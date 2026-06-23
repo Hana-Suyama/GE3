@@ -588,6 +588,50 @@ void DirectXBasic::PreDrawRenderTexture()
 	commandList_->RSSetScissorRects(1, &scissorRect_);	//Scissorを設定
 }
 
+void DirectXBasic::PreDrawBackBuffer()
+{
+	//TransitionBarrierの設定
+	barrier_ = {};
+	//今回のバリアはTransition
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//Noneにしておく
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//バリアを張る対象のリソース。現在のバックバッファに対して行う
+	barrier_.Transition.pResource = GetRenderTextureResource();
+	//遷移前(現在)のResourceState
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//遷移後のResourceState
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	//TransitionBarrierを張る
+	GetCommandList()->ResourceBarrier(1, &barrier_);
+
+	//これから書き込むバックバッファのインデックスを取得
+	UINT backBufferIndex = GetSwapChain()->GetCurrentBackBufferIndex();
+
+	//TransitionBarrierの設定
+	barrier_ = {};
+	//今回のバリアはTransition
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	//Noneにしておく
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//バリアを張る対象のリソース。現在のバックバッファに対して行う
+	barrier_.Transition.pResource = GetSwapChainResource(backBufferIndex);
+	//遷移前(現在)のResourceState
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+	//遷移後のResourceState
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	//TransitionBarrierを張る
+	GetCommandList()->ResourceBarrier(1, &barrier_);
+
+	GetCommandList()->OMSetRenderTargets(1, &GetRtvHandle(backBufferIndex), false, nullptr);
+	//指定した色で画面全体をクリアする
+	float clearColor[] = { 0.1f, 0.25f, 0.5f, 1.0f };	//青っぽい色。RGBAの順
+	GetCommandList()->ClearRenderTargetView(GetRtvHandle(backBufferIndex), clearColor, 0, nullptr);
+
+	GetCommandList()->RSSetViewports(1, &GetViewport());	//Viewportを設定
+	GetCommandList()->RSSetScissorRects(1, &GetScissorRect());	//Scissorを設定
+}
+
 void DirectXBasic::PostDraw()
 {
 	//画面に描く処理はすべて終わり、画面に映すので、状態を遷移
@@ -794,7 +838,7 @@ DirectX::ScratchImage DirectXBasic::LoadTexture(const std::string& filePath) {
 	DirectX::ScratchImage image{};
 	std::wstring filePathW = StringUtility::ConvertString(filePath);
 
-	HRESULT hr;
+	HRESULT hr{};
 	if (filePathW.ends_with(L".dds")) {
 		hr = DirectX::LoadFromDDSFile(filePathW.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image);
 	} else {

@@ -57,9 +57,10 @@ public:
 	virtual void Draw() = 0;
 
 	void PreDraw();
+	void BackBufferPreDraw();
 	void SpritePreDraw();
 	void ModelPreDraw();
-	void ImGuiPreDraw();
+	void DrawRenderTexture();
 	void PostDraw();
 
 	virtual void Finalize();

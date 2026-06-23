@@ -50,6 +50,11 @@ public:
 	void PreDrawRenderTexture();
 
 	/// <summary>
+	/// バックバッファ描画前処理
+	/// </summary>
+	void PreDrawBackBuffer();
+
+	/// <summary>
 	/// 描画後処理
 	/// </summary>
 	void PostDraw();
