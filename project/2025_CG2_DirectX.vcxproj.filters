@@ -286,6 +286,8 @@
     <FxCompile Include="resources\shaders\BoxFilter3x3.VS.hlsl" />
     <FxCompile Include="resources\shaders\BoxFilter5x5.PS.hlsl" />
     <FxCompile Include="resources\shaders\BoxFilter5x5.VS.hlsl" />
+    <FxCompile Include="resources\shaders\GaussianFilter.PS.hlsl" />
+    <FxCompile Include="resources\shaders\GaussianFilter.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -512,5 +514,6 @@
     <None Include="resources\shaders\Vignette.hlsli" />
     <None Include="resources\shaders\BoxFilter3x3.hlsli" />
     <None Include="resources\shaders\BoxFilter5x5.hlsli" />
+    <None Include="resources\shaders\GaussianFilter.hlsli" />
   </ItemGroup>
 </Project>
