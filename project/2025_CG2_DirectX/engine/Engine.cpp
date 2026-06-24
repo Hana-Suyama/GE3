@@ -48,6 +48,9 @@ void Engine::Initialize()
 	textureManager_ = std::make_unique<TextureManager>();
 	textureManager_->Initialize(directXBasic_.get(), srvManager_.get());
 
+	// Dissolve用ノイズテクスチャを読み込む
+	textureManager_->LoadTexture("resources/noise0.png");
+
 	//モデルマネージャの初期化
 	modelManager_ = std::make_unique<ModelManager>();
 	modelManager_->Initialize(directXBasic_.get(), textureManager_.get());
@@ -146,6 +149,11 @@ void Engine::DrawRenderTexture()
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(
 		2,
 		srvManager_->GetGPUDescriptorHandle(renderTextureSrvIndex)
+	);
+
+	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(
+		5,
+		textureManager_->GetSrvHandleGPU("resources/noise0.png")
 	);
 
 	// 頂点3つ描画

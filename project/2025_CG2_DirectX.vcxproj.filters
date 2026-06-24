@@ -294,6 +294,8 @@
     <FxCompile Include="resources\shaders\DepthBasedOutline.VS.hlsl" />
     <FxCompile Include="resources\shaders\RadialBlur.PS.hlsl" />
     <FxCompile Include="resources\shaders\RadialBlur.VS.hlsl" />
+    <FxCompile Include="resources\shaders\Dissolve.PS.hlsl" />
+    <FxCompile Include="resources\shaders\Dissolve.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -527,5 +529,6 @@
     <None Include="resources\shaders\LuminanceBasedOutline.hlsli" />
     <None Include="resources\shaders\DepthBasedOutline.hlsli" />
     <None Include="resources\shaders\RadialBlur.hlsli" />
+    <None Include="resources\shaders\Dissolve.hlsli" />
   </ItemGroup>
 </Project>
