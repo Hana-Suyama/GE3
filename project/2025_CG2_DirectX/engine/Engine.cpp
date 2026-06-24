@@ -139,6 +139,8 @@ void Engine::DrawRenderTexture()
 	postEffectTime_ += TimeManager::GetInstance()->GetDeltaTime();
 	outlineMaterialData_->time = postEffectTime_;
 
+	outlineMaterialData_->threshold = threshold_;
+
 	ID3D12DescriptorHeap* heaps[] = { srvManager_->GetDescriptorHeap() };
 	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 
@@ -166,6 +168,17 @@ void Engine::DrawRenderTexture()
 void Engine::PostDraw()
 {
 	directXBasic_->PostDraw();
+}
+
+void Engine::PostEffectImGuiDraw()
+{
+#ifdef _DEBUG
+	ImGui::Begin("PostEffect");
+
+	ImGui::SliderFloat("Threshold", &threshold_, 0.0f, 1.0f);
+
+	ImGui::End();
+#endif
 }
 
 void Engine::Finalize()

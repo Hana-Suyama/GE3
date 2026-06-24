@@ -9,7 +9,8 @@ struct PostEffectMaterial
 {
     float32_t4x4 projectionInverse;
     float32_t time;
-    float32_t3 padding;
+    float32_t threshold;
+    float32_t2 padding;
 };
 
 ConstantBuffer<PostEffectMaterial> gMaterial : register(b0);

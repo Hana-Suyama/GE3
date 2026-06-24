@@ -37,6 +37,7 @@ void Game::Update()
 #endif
 
 	sceneManager_->ImGuiDraw();
+	Engine::PostEffectImGuiDraw();
 
 	//ゲームの処理
 

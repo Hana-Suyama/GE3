@@ -5,5 +5,6 @@ struct PostEffectMaterial
 {
     Matrix4x4 projectionInverse;
     float time;
-    float padding[3];
+    float threshold;
+    float padding[2];
 };

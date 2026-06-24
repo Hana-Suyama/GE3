@@ -4,6 +4,16 @@ Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
 Texture2D<float32_t> gMaskTexture : register(t2);
 
+struct PostEffectMaterial
+{
+    float32_t4x4 projectionInverse;
+    float32_t time;
+    float32_t threshold;
+    float32_t2 padding;
+};
+
+ConstantBuffer<PostEffectMaterial> gMaterial : register(b0);
+
 struct PixelShaderOutput
 {
     float32_t4 color : SV_TARGET0;
@@ -16,7 +26,7 @@ PixelShaderOutput main(VertexShaderOutput input)
     
     float32_t mask = gMaskTexture.Sample(gSampler, input.texcoord);
     
-    if (mask <= 0.5f)
+    if (mask <= gMaterial.threshold)
     {
         discard;
     }

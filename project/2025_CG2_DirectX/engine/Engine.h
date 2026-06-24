@@ -63,6 +63,7 @@ public:
 	void ModelPreDraw();
 	void DrawRenderTexture();
 	void PostDraw();
+	void PostEffectImGuiDraw();
 
 	virtual void Finalize();
 
@@ -102,6 +103,8 @@ protected:
 	PostEffectMaterial* outlineMaterialData_ = nullptr;
 
 	float postEffectTime_ = 0.0f;
+
+	float threshold_ = 1.0f;
 };
 
 
