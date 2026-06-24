@@ -5,12 +5,14 @@ SamplerState gSampler : register(s0);
 Texture2D<float32_t> gDepthTexture : register(t1);
 SamplerState gSamplerPoint : register(s1);
 
-struct OutlineMaterial
+struct PostEffectMaterial
 {
     float32_t4x4 projectionInverse;
+    float32_t time;
+    float32_t3 padding;
 };
 
-ConstantBuffer<OutlineMaterial> gMaterial : register(b0);
+ConstantBuffer<PostEffectMaterial> gMaterial : register(b0);
 
 struct PixelShaderOutput
 {

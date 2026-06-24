@@ -39,7 +39,7 @@
 #include "Logger.h"
 #include <dxcapi.h>
 #include "SceneManager.h"
-#include <OutlineMaterial.h>
+#include <PostEffectMaterial.h>
 
 using namespace MyMath;
 
@@ -99,7 +99,9 @@ protected:
 	uint32_t depthTextureSrvIndex;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> outlineMaterialResource_;
-	OutlineMaterial* outlineMaterialData_ = nullptr;
+	PostEffectMaterial* outlineMaterialData_ = nullptr;
+
+	float postEffectTime_ = 0.0f;
 };
 
 

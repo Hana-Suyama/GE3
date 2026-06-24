@@ -72,7 +72,7 @@ void Engine::Initialize()
 	defaultCamera_->SetRotate({ 0.0f, 0.0f, 0.0f });
 	defaultCamera_->SetTranslate({ 0.0f, 0.0f, -10.0f });
 
-	outlineMaterialResource_ = directXBasic_->CreateBufferResource(sizeof(OutlineMaterial));
+	outlineMaterialResource_ = directXBasic_->CreateBufferResource(sizeof(PostEffectMaterial));
 	outlineMaterialResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineMaterialData_));
 	outlineMaterialData_->projectionInverse = defaultCamera_->GetProjectionMatrix().Inverse();
 
@@ -135,6 +135,9 @@ void Engine::DrawRenderTexture()
 	Camera* camera = object3DBasic_->GetDefaultCamera();
 	outlineMaterialData_->projectionInverse =
 		camera->GetProjectionMatrix().Inverse();
+
+	postEffectTime_ += TimeManager::GetInstance()->GetDeltaTime();
+	outlineMaterialData_->time = postEffectTime_;
 
 	ID3D12DescriptorHeap* heaps[] = { srvManager_->GetDescriptorHeap() };
 	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, heaps);
