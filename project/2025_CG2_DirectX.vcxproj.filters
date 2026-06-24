@@ -288,6 +288,10 @@
     <FxCompile Include="resources\shaders\BoxFilter5x5.VS.hlsl" />
     <FxCompile Include="resources\shaders\GaussianFilter.PS.hlsl" />
     <FxCompile Include="resources\shaders\GaussianFilter.VS.hlsl" />
+    <FxCompile Include="resources\shaders\LuminanceBasedOutline.PS.hlsl" />
+    <FxCompile Include="resources\shaders\LuminanceBasedOutline.VS.hlsl" />
+    <FxCompile Include="resources\shaders\DepthBasedOutline.PS.hlsl" />
+    <FxCompile Include="resources\shaders\DepthBasedOutline.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -494,6 +498,9 @@
     <ClInclude Include="2025_CG2_DirectX\engine\Primitive\Primitive.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\OutlineMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt">
@@ -515,5 +522,7 @@
     <None Include="resources\shaders\BoxFilter3x3.hlsli" />
     <None Include="resources\shaders\BoxFilter5x5.hlsli" />
     <None Include="resources\shaders\GaussianFilter.hlsli" />
+    <None Include="resources\shaders\LuminanceBasedOutline.hlsli" />
+    <None Include="resources\shaders\DepthBasedOutline.hlsli" />
   </ItemGroup>
 </Project>

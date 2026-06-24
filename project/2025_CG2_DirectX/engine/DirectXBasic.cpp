@@ -262,7 +262,7 @@ void DirectXBasic::CreateRenderTexturePSO()
 
 	D3D12_DESCRIPTOR_RANGE descriptorRange[1] = {};
 	descriptorRange[0].BaseShaderRegister = 0;	//0から始まる
-	descriptorRange[0].NumDescriptors = 1;	//数は1つ
+	descriptorRange[0].NumDescriptors = 2;	//数は1つ
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	//SRVを使う
 	descriptorRange[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
 
@@ -287,15 +287,23 @@ void DirectXBasic::CreateRenderTexturePSO()
 	descriptionRootSignature.pParameters = rootParameters;	//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);	//配列の長さ
 
-	D3D12_STATIC_SAMPLER_DESC staticSamplers[1] = {};
-	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//バイリニアフィルタ
+	D3D12_STATIC_SAMPLER_DESC staticSamplers[2] = {};
+	staticSamplers[0].Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;	//ポイントフィルタ
 	staticSamplers[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//0~1の範囲外をリビート
 	staticSamplers[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
 	staticSamplers[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
 	staticSamplers[0].MaxLOD = D3D12_FLOAT32_MAX;	//ありったけのMipMapを使う
-	staticSamplers[0].ShaderRegister = 0;	//レジスタ番号0を使う
+	staticSamplers[0].ShaderRegister = 1;	//レジスタ番号1を使う
 	staticSamplers[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
+	staticSamplers[1].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;	//バイリニアフィルタ
+	staticSamplers[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;	//0~1の範囲外をリビート
+	staticSamplers[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers[1].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;	//比較しない
+	staticSamplers[1].MaxLOD = D3D12_FLOAT32_MAX;	//ありったけのMipMapを使う
+	staticSamplers[1].ShaderRegister = 0;	//レジスタ番号0を使う
+	staticSamplers[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
 	descriptionRootSignature.pStaticSamplers = staticSamplers;
 	descriptionRootSignature.NumStaticSamplers = _countof(staticSamplers);
 
@@ -342,11 +350,11 @@ void DirectXBasic::CreateRenderTexturePSO()
 	depthStencilDesc.DepthEnable = false;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/GaussianFilter.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/DepthBasedOutline.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/GaussianFilter.PS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/DepthBasedOutline.PS.hlsl",
 		L"ps_6_0", logger_);
 	assert(pixelShaderBlob != nullptr);
 
@@ -478,7 +486,7 @@ void DirectXBasic::CreateDepthBuffer()
 	resourceDesc.Height = WindowsApi::kClientHeight;	//Textureの高さ
 	resourceDesc.MipLevels = 1;	//mipmapの数
 	resourceDesc.DepthOrArraySize = 1;	//奥行き or 配列Textureの配列数
-	resourceDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	//DepthStencilとして利用可能なフォーマット
+	resourceDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;;	//DepthStencilとして利用可能なフォーマット
 	resourceDesc.SampleDesc.Count = 1;	//サンプリングカウント。1固定
 	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;	//2次元
 	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;	//DepthStencilとして使う通知
@@ -568,6 +576,14 @@ void DirectXBasic::PreDrawRenderTexture()
 		barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		//TransitionBarrierを張る
 		commandList_->ResourceBarrier(1, &barrier_);
+
+		barrier_ = {};
+		barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+		barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+		barrier_.Transition.pResource = depthStencilResource_.Get();
+		barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+		commandList_->ResourceBarrier(1, &barrier_);
 	} else {
 		isBarrierSkipped_ = true;
 	}
@@ -604,6 +620,14 @@ void DirectXBasic::PreDrawBackBuffer()
 	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
 	//TransitionBarrierを張る
 	GetCommandList()->ResourceBarrier(1, &barrier_);
+
+	barrier_ = {};
+	barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier_.Transition.pResource = depthStencilResource_.Get();
+	barrier_.Transition.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE;
+	barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	commandList_->ResourceBarrier(1, &barrier_);
 
 	//これから書き込むバックバッファのインデックスを取得
 	UINT backBufferIndex = GetSwapChain()->GetCurrentBackBufferIndex();

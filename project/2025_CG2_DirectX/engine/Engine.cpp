@@ -34,6 +34,13 @@ void Engine::Initialize()
 		DXGI_FORMAT_R8G8B8A8_UNORM_SRGB
 	);
 
+	// DepthTexture用SRVを作る
+	depthTextureSrvIndex = srvManager_->Allocate();
+	srvManager_->CreateSRVforDepthTexture(
+		depthTextureSrvIndex,
+		directXBasic_->GetDepthStencilResource()
+	);
+
 	imguiManager_ = std::make_unique<ImGuiManager>();
 	imguiManager_->Initialize(winApi_.get(), directXBasic_.get(), srvManager_.get());
 
@@ -61,6 +68,10 @@ void Engine::Initialize()
 	defaultCamera_ = std::make_unique<Camera>();
 	defaultCamera_->SetRotate({ 0.0f, 0.0f, 0.0f });
 	defaultCamera_->SetTranslate({ 0.0f, 0.0f, -10.0f });
+
+	outlineMaterialResource_ = directXBasic_->CreateBufferResource(sizeof(OutlineMaterial));
+	outlineMaterialResource_->Map(0, nullptr, reinterpret_cast<void**>(&outlineMaterialData_));
+	outlineMaterialData_->projectionInverse = defaultCamera_->GetProjectionMatrix().Inverse();
 
 	//3Dオブジェクト基盤
 	object3DBasic_ = std::make_unique<Object3DBasic>();
@@ -118,6 +129,9 @@ void Engine::ModelPreDraw()
 
 void Engine::DrawRenderTexture()
 {
+	Camera* camera = object3DBasic_->GetDefaultCamera();
+	outlineMaterialData_->projectionInverse =
+		camera->GetProjectionMatrix().Inverse();
 
 	ID3D12DescriptorHeap* heaps[] = { srvManager_->GetDescriptorHeap() };
 	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, heaps);
@@ -125,6 +139,7 @@ void Engine::DrawRenderTexture()
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(directXBasic_->GetRootSignatureRenderTexture());
 	directXBasic_->GetCommandList()->SetPipelineState(directXBasic_->GetGraphicsPipelineStateRenderTexture());	//PSOを設定
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, outlineMaterialResource_->GetGPUVirtualAddress());
 
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

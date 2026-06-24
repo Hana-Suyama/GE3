@@ -39,6 +39,7 @@
 #include "Logger.h"
 #include <dxcapi.h>
 #include "SceneManager.h"
+#include <OutlineMaterial.h>
 
 using namespace MyMath;
 
@@ -95,7 +96,10 @@ protected:
 	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
 
 	uint32_t renderTextureSrvIndex;
+	uint32_t depthTextureSrvIndex;
 
+	Microsoft::WRL::ComPtr<ID3D12Resource> outlineMaterialResource_;
+	OutlineMaterial* outlineMaterialData_ = nullptr;
 };
 
 

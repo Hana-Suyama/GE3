@@ -51,6 +51,15 @@ public:
 	void CreateSRVforRendertargetTexture(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT Format);
 
 	/// <summary>
+	/// DepthTexture用のSRVを生成
+	/// </summary>
+	/// <param name="srvIndex"></param>
+	/// <param name="pResource"></param>
+	/// <param name="Format"></param>
+	/// <param name="MipLevels"></param>
+	void CreateSRVforDepthTexture(uint32_t srvIndex, ID3D12Resource* pResource);
+
+	/// <summary>
 	///	SRVヒープをセット
 	/// </summary>
 	void SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex);

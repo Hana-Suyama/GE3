@@ -58,6 +58,17 @@ void SRVManager::CreateSRVforRendertargetTexture(uint32_t srvIndex, ID3D12Resour
 	directXBasic_->GetDevice()->CreateShaderResourceView(pResource, &renderTextureSrvDesc, GetCPUDescriptorHandle(srvIndex));
 }
 
+void SRVManager::CreateSRVforDepthTexture(uint32_t srvIndex, ID3D12Resource* pResource)
+{
+	D3D12_SHADER_RESOURCE_VIEW_DESC depthTextureSrvDesc{};
+	// DXGI_FORMAT_D24_UNORM_S8_UINTのDepthを読むときはDXGI_FORMAT_R24_UNORM_X8_TYPELESS
+	depthTextureSrvDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	depthTextureSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	depthTextureSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	depthTextureSrvDesc.Texture2D.MipLevels = 1;
+	directXBasic_->GetDevice()->CreateShaderResourceView(pResource, &depthTextureSrvDesc, GetCPUDescriptorHandle(srvIndex));
+}
+
 void SRVManager::SetGraphicsRootDescriptorTable(UINT RootParameterIndex, uint32_t srvIndex)
 {
 	directXBasic_->GetCommandList()->SetGraphicsRootDescriptorTable(RootParameterIndex, GetGPUDescriptorHandle(srvIndex));

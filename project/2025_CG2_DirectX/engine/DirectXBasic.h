@@ -203,6 +203,12 @@ public:
 	/// </summary>
 	ID3D12PipelineState* GetGraphicsPipelineStateRenderTexture() const { return graphicsPipelineStateRenderTexture_.Get(); }
 
+	/// <summary>
+	/// GetDepthStencilResourceのゲッター
+	/// </summary>
+	/// <returns></returns>
+	ID3D12Resource* GetDepthStencilResource() const { return depthStencilResource_.Get(); }
+
 private:
 
 	/* --------- private関数 --------- */
@@ -331,7 +337,7 @@ private:
 
 	// オフスクリーンレンダリング用のテクスチャリソース
 	Comptr<ID3D12Resource> renderTextureResource_ = nullptr;
-	const Vector4 kRenderTargetClearValue{ 0.0f, 0.0f, 0.0f, 0.0f };// 一旦分かりやすいように赤
+	const Vector4 kRenderTargetClearValue{ 0.1f, 0.25f, 0.5f, 1.0f };// 一旦分かりやすいように赤
 
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureRenderTexture_ = nullptr;
