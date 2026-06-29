@@ -35,6 +35,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	modelManager_->CreateSphere();
 	modelManager_->CreateSkyBox();
 	modelManager_->LoadModelAssimp("resources", "player.obj");
+	modelManager_->LoadModelAssimp("resources", "enemy.obj");
 
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
@@ -144,6 +145,10 @@ void SampleScene::Update()
 		object->Update();
 	}
 
+	for (auto& enemy : enemyObjects_) {
+		enemy->Update();
+	}
+
 	skyBox_->Update();
 
 	for (auto& light : lights_) {
@@ -205,6 +210,10 @@ void SampleScene::ModelDraw()
 
 	for (auto& object : levelObjects_) {
 		object->Draw();
+	}
+
+	for (auto& enemy : enemyObjects_) {
+		enemy->Draw();
 	}
 
 	particleManager->Draw();
@@ -322,5 +331,16 @@ void SampleScene::GenerateLevelObjects()
 		auto& playerData = levelData_->players[0];
 		object3dPlayer->SetTranslate(playerData.translation);
 		object3dPlayer->SetRotate(playerData.rotation);
+	}
+
+	for (auto& enemyData : levelData_->enemies) {
+		// 敵の生成
+		// モデルを指定して3Dオブジェクトを生成
+		std::unique_ptr<Object3D> newEnemy = std::make_unique<Object3D>();
+		newEnemy->Initialize(object3dBasic_, modelManager_, "resources/enemy.obj");
+		newEnemy->SetTranslate(enemyData.translation);
+		newEnemy->SetRotate(enemyData.rotation);
+		// 敵リストに追加
+		enemyObjects_.push_back(std::move(newEnemy));
 	}
 }

@@ -79,6 +79,7 @@ private:
 
 	std::unique_ptr<LevelData> levelData_;
 	std::vector<std::unique_ptr<Object3D>> levelObjects_;
+	std::vector<std::unique_ptr<Object3D>> enemyObjects_;
 
 };
 

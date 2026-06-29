@@ -12,6 +12,16 @@ struct PlayerSpawnData {
 	Vector3 rotation;
 };
 
+// 敵キャラの生成データ
+struct EnemySpawnData {
+	// ファイル名
+	std::string fileName;
+	// 平行移動
+	Vector3 translation;
+	// 回転角
+	Vector3 rotation;
+};
+
 struct LevelData {
 	struct ObjectData {
 		std::string fileName;
@@ -20,6 +30,7 @@ struct LevelData {
 
 	std::vector<ObjectData> objects;
 	std::vector<PlayerSpawnData> players;
+	std::vector<EnemySpawnData> enemies;
 };
 
 class LevelLoader

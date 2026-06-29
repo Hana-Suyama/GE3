@@ -90,6 +90,25 @@ void LevelLoader::LoadObjectRecursive(const nlohmann::json& object, LevelData* l
 		playerData.rotation.x = MyMath::DEGtoRAD(-(float)transform["rotation"][0]);
 		playerData.rotation.y = MyMath::DEGtoRAD(-(float)transform["rotation"][2]);
 		playerData.rotation.z = MyMath::DEGtoRAD(-(float)transform["rotation"][1]);
+	} else if (type.compare("EnemySpawn") == 0) {
+		levelData->enemies.emplace_back(EnemySpawnData{});
+		EnemySpawnData& enemyData = levelData->enemies.back();
+
+		assert(object.contains("transform"));
+		const nlohmann::json& transform = object["transform"];
+
+		enemyData.translation.x = (float)transform["translation"][0];
+		enemyData.translation.y = (float)transform["translation"][2];
+		enemyData.translation.z = (float)transform["translation"][1];
+
+		enemyData.rotation.x = MyMath::DEGtoRAD(-(float)transform["rotation"][0]);
+		enemyData.rotation.y = MyMath::DEGtoRAD(-(float)transform["rotation"][2]);
+		enemyData.rotation.z = MyMath::DEGtoRAD(-(float)transform["rotation"][1]);
+
+		if (object.contains("file_name")) {
+			assert(object["file_name"].is_string());
+			enemyData.fileName = object["file_name"].get<std::string>();
+		}
 	}
 
 	if (object.contains("children")) {
