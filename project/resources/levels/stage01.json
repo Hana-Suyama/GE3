@@ -67,6 +67,27 @@
             },
             "false": true,
             "file_name": "suzanne"
+        },
+        {
+            "type": "PlayerSpawn",
+            "name": "PlayerSpawn",
+            "transform": {
+                "translation": [
+                    0.0,
+                    -5.383576393127441,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    -90.00000762939453
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
         }
     ]
 }

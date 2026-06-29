@@ -34,6 +34,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	modelManager_->LoadModelAssimp("resources", "plane.gltf");
 	modelManager_->CreateSphere();
 	modelManager_->CreateSkyBox();
+	modelManager_->LoadModelAssimp("resources", "player.obj");
 
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
@@ -83,6 +84,9 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 
 	object3dSphere = std::make_unique<Object3D>();
 	object3dSphere->Initialize(object3dBasic_, modelManager, "debug_sphere");
+
+	object3dPlayer = std::make_unique<Object3D>();
+	object3dPlayer->Initialize(object3dBasic_, modelManager, "resources/player.obj");
 
 	// カメラ位置転送用のリソースを作る
 	cameraForGPUResource = directXBasic->CreateBufferResource(sizeof(CameraForGPU));
@@ -134,6 +138,7 @@ void SampleScene::Update()
 	object3dTerrain->Update();
 	object3dPlanegLTF->Update();
 	object3dSphere->Update();
+	object3dPlayer->Update();
 
 	for (auto& object : levelObjects_) {
 		object->Update();
@@ -196,6 +201,7 @@ void SampleScene::ModelDraw()
 	object3dTerrain->Draw();
 	object3dPlanegLTF->Draw();
 	object3dSphere->Draw();
+	object3dPlayer->Draw();
 
 	for (auto& object : levelObjects_) {
 		object->Draw();
@@ -228,6 +234,7 @@ void SampleScene::ImGuiDraw()
 	object3dTerrain->DebugDraw("Terrain");
 	object3dPlanegLTF->DebugDraw("planegltf");
 	object3dSphere->DebugDraw("Sphere");
+	object3dPlayer->DebugDraw("Player");
 
 	skyBox_->DebugDraw("SkyBox");
 
@@ -308,5 +315,12 @@ void SampleScene::GenerateLevelObjects()
 		newObject->SetScale(objectData.transform.scale);
 		// 配列に登録
 		levelObjects_.push_back(std::move(newObject));
+	}
+
+	// プレイヤーは一データからプレイヤーを配置
+	if (!levelData_->players.empty()) {
+		auto& playerData = levelData_->players[0];
+		object3dPlayer->SetTranslate(playerData.translation);
+		object3dPlayer->SetRotate(playerData.rotation);
 	}
 }

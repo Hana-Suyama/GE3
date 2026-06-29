@@ -76,6 +76,20 @@ void LevelLoader::LoadObjectRecursive(const nlohmann::json& object, LevelData* l
 		objectData.transform.scale.x = (float)transform["scaling"][0];
 		objectData.transform.scale.y = (float)transform["scaling"][2];
 		objectData.transform.scale.z = (float)transform["scaling"][1];
+	} else if (type.compare("PlayerSpawn") == 0) {
+		levelData->players.emplace_back(PlayerSpawnData{});
+		PlayerSpawnData& playerData = levelData->players.back();
+
+		assert(object.contains("transform"));
+		const nlohmann::json& transform = object["transform"];
+
+		playerData.translation.x = (float)transform["translation"][0];
+		playerData.translation.y = (float)transform["translation"][2];
+		playerData.translation.z = (float)transform["translation"][1];
+
+		playerData.rotation.x = MyMath::DEGtoRAD(-(float)transform["rotation"][0]);
+		playerData.rotation.y = MyMath::DEGtoRAD(-(float)transform["rotation"][2]);
+		playerData.rotation.z = MyMath::DEGtoRAD(-(float)transform["rotation"][1]);
 	}
 
 	if (object.contains("children")) {
