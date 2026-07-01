@@ -33,6 +33,10 @@ struct Animation {
 	std::map<std::string, NodeAnimation> nodeAnimations;
 };
 
-class Animation {
-	Animation LoadAnimetionFile(const std::string& directoryPath, const std::string& filename);
+class AnimationManager {
+public:
+	static Animation LoadAnimetionFile(const std::string& directoryPath, const std::string& filename);
+
+	static Vector3 CalculateValue(const std::vector<KeyframeVector3>& keyframes, float time);
+	static Quaternion CalculateValue(const std::vector<KeyframeQuaternion>& keyframes, float time);
 };

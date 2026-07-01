@@ -3,6 +3,7 @@
 #include "../../engine/Utility/Math/Lerp.h"
 #include <TimeManager.h>
 #include <AreaLight.h>
+#include "../../../AnimationManager.h"
 using namespace MyMath;
 
 void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
@@ -34,6 +35,8 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	modelManager_->LoadModelAssimp("resources", "plane.gltf");
 	modelManager_->CreateSphere();
 	modelManager_->CreateSkyBox();
+	modelManager_->LoadModelAssimp("resources", "AnimatedCube.gltf");
+	animation = AnimationManager::LoadAnimetionFile("resources", "AnimatedCube.gltf");
 
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
@@ -84,6 +87,10 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	object3dSphere = std::make_unique<Object3D>();
 	object3dSphere->Initialize(object3dBasic_, modelManager, "debug_sphere");
 
+	object3dAnimCube = std::make_unique<Object3D>();
+	object3dAnimCube->Initialize(object3dBasic_, modelManager, "resources/AnimatedCube.gltf");
+	object3dAnimCube->SetAnimation(animation);
+
 	// カメラ位置転送用のリソースを作る
 	cameraForGPUResource = directXBasic->CreateBufferResource(sizeof(CameraForGPU));
 	// データを書き込む
@@ -114,7 +121,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 
 void SampleScene::Update()
 {
-
+	
 	camera->Update();
 
 	camera->SetTranslate(cameraTransform.translate);
@@ -134,6 +141,7 @@ void SampleScene::Update()
 	object3dTerrain->Update();
 	object3dPlanegLTF->Update();
 	object3dSphere->Update();
+	object3dAnimCube->Update();
 
 	for (auto& object : levelObjects_) {
 		object->Update();
@@ -196,6 +204,7 @@ void SampleScene::ModelDraw()
 	object3dTerrain->Draw();
 	object3dPlanegLTF->Draw();
 	object3dSphere->Draw();
+	object3dAnimCube->Draw();
 
 	for (auto& object : levelObjects_) {
 		object->Draw();
@@ -228,6 +237,7 @@ void SampleScene::ImGuiDraw()
 	object3dTerrain->DebugDraw("Terrain");
 	object3dPlanegLTF->DebugDraw("planegltf");
 	object3dSphere->DebugDraw("Sphere");
+	object3dAnimCube->DebugDraw("AnimatedCube");
 
 	skyBox_->DebugDraw("SkyBox");
 
