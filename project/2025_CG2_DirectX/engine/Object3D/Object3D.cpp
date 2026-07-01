@@ -39,6 +39,21 @@ void Object3D::Update()
 	transformationMatrixData_->World = modelData_->rootNode_.localMatrix * worldMatrix;
 	transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
 
+	// アニメーションがある場合は更新する
+	if (animation_ != nullptr) {
+		animationTime += 1.0f / 60.0f;
+		animationTime = std::fmod(animationTime, animation_->duration);
+		NodeAnimation& rootNodeAnimation = animation_->nodeAnimations[modelData_->rootNode_.name];
+		Vector3 translate = AnimationManager::CalculateValue(rootNodeAnimation.translate.keyframes, animationTime);
+		Quaternion rotate = AnimationManager::CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime);
+		Vector3 scale = AnimationManager::CalculateValue(rootNodeAnimation.scale.keyframes, animationTime);
+		Matrix4x4 localMatrix = MakeAffineMatrix(scale, rotate, translate);
+
+		transformationMatrixData_->WVP = localMatrix * worldViewProjectionMatrix;
+		transformationMatrixData_->World = localMatrix * worldMatrix;
+		transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
+	}
+
 	for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
 		//パラメータからUVTransform用の行列を生成する
 		Matrix4x4 uvTransformMatrix = MakeScaleMatrix(uvTransforms_.at(i).scale);
@@ -157,5 +172,6 @@ void Object3D::CreateMTUV()
 		textureFilePaths_.push_back(modelData_->meshes_.at(i).defaultTextureFilePath);
 	}
 }
+
 
 

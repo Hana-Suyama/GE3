@@ -169,6 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\BaseScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Skybox\SkyBox.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Skybox\SkyBoxBasic.cpp" />
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -428,6 +429,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\application\CameraController.h" />
     <ClInclude Include="2025_CG2_DirectX\application\ClearScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\BaseScene.h" />
+    <ClInclude Include="AnimationManager.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />

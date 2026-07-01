@@ -924,5 +924,12 @@ namespace MyMath {
 		return result;
 	}
 
-}
+	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {
+		Matrix4x4 result{};
+		result = MakeScaleMatrix(scale);
+		result = result.Multiply(MakeRotateMatrix(rotate));
+		result = result.Multiply(MakeTranslateMatrix(translate));
+		return result;
+	}
 
+}

@@ -50,6 +50,7 @@ private:
 	std::unique_ptr<Object3D> object3dTerrain = nullptr;
 	std::unique_ptr<Object3D> object3dPlanegLTF = nullptr;
 	std::unique_ptr<Object3D> object3dSphere = nullptr;
+	std::unique_ptr<Object3D> object3dAnimCube = nullptr;
 	std::unique_ptr<Object3D> object3dPlayer = nullptr;
 
 	std::unique_ptr<SkyBoxBasic> skyBoxBasic_ = nullptr;
@@ -79,6 +80,7 @@ private:
 
 	std::unique_ptr<LevelData> levelData_;
 	std::vector<std::unique_ptr<Object3D>> levelObjects_;
+	Animation animation;
 	std::vector<std::unique_ptr<Object3D>> enemyObjects_;
 
 };

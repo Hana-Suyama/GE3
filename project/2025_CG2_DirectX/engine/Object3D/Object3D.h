@@ -5,6 +5,7 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Material.h"
+#include "../../../AnimationManager.h"
 
 class Object3D
 {
@@ -46,6 +47,12 @@ public:
 	///	モデルデータのセット
 	/// </summary>
 	void SetModelData(std::string modelFilePath);
+
+	/// <summary>
+	/// アニメーションデータのセット
+	/// </summary>
+	/// <param name="animation">アニメーションデータ</param>
+	void SetAnimation(Animation& animation) { animation_ = &animation; }
 
 	/* --------- ゲッター --------- */
 
@@ -146,5 +153,11 @@ private:
 
 	// カメラ
 	Camera* camera_ = nullptr;
+
+	// アニメーション
+	Animation* animation_ = nullptr;
+	// アニメーションの再生時間
+	float animationTime = 0.0f;
+	
 };
 
