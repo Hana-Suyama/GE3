@@ -38,7 +38,9 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	modelManager_->LoadModelAssimp("resources", "player.obj");
 	modelManager_->LoadModelAssimp("resources", "enemy.obj");
 	modelManager_->LoadModelAssimp("resources", "AnimatedCube.gltf");
+	modelManager_->LoadModelAssimp("resources/human", "walk.gltf");
 	animation = AnimationManager::LoadAnimetionFile("resources", "AnimatedCube.gltf");
+	walkAnimation = AnimationManager::LoadAnimetionFile("resources/human", "walk.gltf");
 
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
@@ -96,6 +98,10 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	object3dAnimCube->Initialize(object3dBasic_, modelManager, "resources/AnimatedCube.gltf");
 	object3dAnimCube->SetAnimation(animation);
 
+	object3dWalk = std::make_unique<Object3D>();
+	object3dWalk->Initialize(object3dBasic_, modelManager, "resources/human/walk.gltf");
+	object3dWalk->SetAnimation(walkAnimation);
+
 	// カメラ位置転送用のリソースを作る
 	cameraForGPUResource = directXBasic->CreateBufferResource(sizeof(CameraForGPU));
 	// データを書き込む
@@ -148,6 +154,7 @@ void SampleScene::Update()
 	object3dSphere->Update();
 	object3dAnimCube->Update();
 	object3dPlayer->Update();
+	object3dWalk->Update();
 
 	for (auto& object : levelObjects_) {
 		object->Update();
@@ -216,6 +223,7 @@ void SampleScene::ModelDraw()
 	object3dSphere->Draw();
 	object3dAnimCube->Draw();
 	object3dPlayer->Draw();
+	object3dWalk->Draw();
 
 	for (auto& object : levelObjects_) {
 		object->Draw();
@@ -254,6 +262,7 @@ void SampleScene::ImGuiDraw()
 	object3dSphere->DebugDraw("Sphere");
 	object3dAnimCube->DebugDraw("AnimatedCube");
 	object3dPlayer->DebugDraw("Player");
+	object3dWalk->DebugDraw("Walk");
 
 	skyBox_->DebugDraw("SkyBox");
 

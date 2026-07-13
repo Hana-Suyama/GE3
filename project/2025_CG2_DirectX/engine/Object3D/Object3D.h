@@ -64,7 +64,7 @@ public:
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
-	const struct Transform& GetTransform() const { return transform_; }
+	const struct EulerTransform& GetTransform() const { return transform_; }
 
 	/// <summary>
 	///	マテリアルデータのゲッター
@@ -144,9 +144,9 @@ private:
 	std::string cubeTextureFilePaths_;
 
 	// トランスフォーム
-	struct Transform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	struct EulerTransform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	// UVトランスフォーム。使用するモデルのメッシュ数と同じだけ要素を持つ
-	std::vector<struct Transform> uvTransforms_;
+	std::vector<struct EulerTransform> uvTransforms_;
 	
 	// 表示フラグ
 	bool isDraw_ = true;
@@ -158,6 +158,8 @@ private:
 	Animation* animation_ = nullptr;
 	// アニメーションの再生時間
 	float animationTime = 0.0f;
+	// スケルトン
+	Skeleton skeleton_;
 	
 };
 

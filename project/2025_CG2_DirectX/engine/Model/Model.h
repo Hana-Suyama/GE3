@@ -4,12 +4,14 @@
 #include "VertexData.h"
 #include <wrl.h>
 #include <d3d12.h>
+#include <Transform.h>
 
 class Model
 {
 public:
 
 	struct Node {
+		QuaternionTransform transform;
 		Matrix4x4 localMatrix;
 		std::string name;
 		std::vector<Node> children;

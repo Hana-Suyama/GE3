@@ -91,7 +91,7 @@ public:
 private:
 
 	// トランスフォーム
-	struct Transform transform_;
+	struct EulerTransform transform_;
 
 	// ワールド行列
 	Matrix4x4 worldMatrix_;

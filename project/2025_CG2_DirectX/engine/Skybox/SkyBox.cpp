@@ -141,7 +141,7 @@ void SkyBox::CreateMTUV()
 		materialResources_.push_back(materialResource);
 
 		// uvTransformを生成
-		struct Transform uvTransform = {
+		struct EulerTransform uvTransform = {
 	   { 1.0f, 1.0f, 1.0f },
 	   { 0.0f, 0.0f, 0.0f },
 	   { 0.0f, 0.0f, 0.0f },

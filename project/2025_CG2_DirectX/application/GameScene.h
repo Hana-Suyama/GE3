@@ -50,7 +50,7 @@ private:
 	XAudio2Basic* xaudio2Basic_ = nullptr;
 
 	//カメラ用変数を作る
-	struct Transform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -30.0f } };
+	struct EulerTransform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -30.0f } };
 
 	//カメラコントローラ
 	std::unique_ptr<CameraController> cameraController_ = nullptr;

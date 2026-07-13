@@ -9,7 +9,7 @@
 #include <ParticleEmitter.h>
 
 struct Particle {
-	struct Transform transform;
+	struct EulerTransform transform;
 	Vector3 velocity;
 	Vector4 color;
 	float lifeTime;
@@ -120,7 +120,7 @@ private:
 
 	bool isBillboard_ = false;
 
-	struct Transform uvTransform_ { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
+	struct EulerTransform uvTransform_ { {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f} };
 
 	const uint32_t kCylinderDivide = 32;
 	const float kTopRadius = 4.0f;

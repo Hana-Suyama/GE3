@@ -21,6 +21,9 @@ void Object3D::Initialize(Object3DBasic* object3DBasic, ModelManager* modelManag
 	// とりあえず映り込み用のテクスチャをセット
 	cubeTextureFilePaths_ = "resources/rostock_laage_airport_4k.dds";
 
+	// スケルトンを作成する
+	skeleton_ = AnimationManager::CreateSkeleton(modelData_->rootNode_);
+
 }
 
 void Object3D::Update()
@@ -52,6 +55,9 @@ void Object3D::Update()
 		transformationMatrixData_->WVP = localMatrix * worldViewProjectionMatrix;
 		transformationMatrixData_->World = localMatrix * worldMatrix;
 		transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
+
+		AnimationManager::ApplyAnimation(skeleton_, *animation_, animationTime);
+		AnimationManager::Update(skeleton_);
 	}
 
 	for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
@@ -161,7 +167,7 @@ void Object3D::CreateMTUV()
 		materialResources_.push_back(materialResource);
 
 		// uvTransformを生成
-		struct Transform uvTransform = {
+		struct EulerTransform uvTransform = {
 	   { 1.0f, 1.0f, 1.0f },
 	   { 0.0f, 0.0f, 0.0f },
 	   { 0.0f, 0.0f, 0.0f },

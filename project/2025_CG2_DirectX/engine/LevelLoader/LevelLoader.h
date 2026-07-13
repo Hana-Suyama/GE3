@@ -25,7 +25,7 @@ struct EnemySpawnData {
 struct LevelData {
 	struct ObjectData {
 		std::string fileName;
-		struct Transform transform;
+		struct EulerTransform transform;
 	};
 
 	std::vector<ObjectData> objects;

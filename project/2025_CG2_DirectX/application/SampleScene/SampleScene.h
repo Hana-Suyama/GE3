@@ -52,6 +52,7 @@ private:
 	std::unique_ptr<Object3D> object3dSphere = nullptr;
 	std::unique_ptr<Object3D> object3dAnimCube = nullptr;
 	std::unique_ptr<Object3D> object3dPlayer = nullptr;
+	std::unique_ptr<Object3D> object3dWalk = nullptr;
 
 	std::unique_ptr<SkyBoxBasic> skyBoxBasic_ = nullptr;
 	std::unique_ptr<SkyBox> skyBox_ = nullptr;
@@ -72,7 +73,7 @@ private:
 	XAudio2Basic* xaudio2Basic_ = nullptr;
 
 	//カメラ用変数を作る
-	struct Transform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -30.0f } };
+	struct EulerTransform cameraTransform { { 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, -30.0f } };
 
 	bool playSound = false;
 
@@ -82,6 +83,7 @@ private:
 	std::vector<std::unique_ptr<Object3D>> levelObjects_;
 	Animation animation;
 	std::vector<std::unique_ptr<Object3D>> enemyObjects_;
+	Animation walkAnimation;
 
 };
 

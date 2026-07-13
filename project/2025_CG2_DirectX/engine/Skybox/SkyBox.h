@@ -57,7 +57,7 @@ public:
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
-	const struct Transform& GetTransform() const { return transform_; }
+	const struct EulerTransform& GetTransform() const { return transform_; }
 
 	/// <summary>
 	///	マテリアルデータのゲッター
@@ -135,9 +135,9 @@ private:
 	std::vector<std::string> textureFilePaths_;
 
 	// トランスフォーム
-	struct Transform transform_ { { 50.0f, 50.0f, 50.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	struct EulerTransform transform_ { { 50.0f, 50.0f, 50.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	// UVトランスフォーム。使用するモデルのメッシュ数と同じだけ要素を持つ
-	std::vector<struct Transform> uvTransforms_;
+	std::vector<struct EulerTransform> uvTransforms_;
 	
 	// 表示フラグ
 	bool isDraw_ = true;
