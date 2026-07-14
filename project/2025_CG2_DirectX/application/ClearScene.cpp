@@ -23,6 +23,8 @@ void ClearScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dB
 
 	modelManager->LoadModel("resources", "clear.obj");
 
+	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
+
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
 	camera->SetTranslate({ 0.0f, 0.0f, -10.0f });
