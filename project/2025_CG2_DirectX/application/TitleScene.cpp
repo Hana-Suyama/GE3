@@ -21,6 +21,8 @@ void TitleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dB
 	xaudio2Basic_ = xaudio2Basic;
 	randomEngine_ = randomEngine;
 
+	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
+
 	modelManager_->LoadModel("resources", "title.obj");
 
 	camera = std::make_unique<Camera>();

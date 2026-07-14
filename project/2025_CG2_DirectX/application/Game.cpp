@@ -7,11 +7,11 @@ void Game::Initialize()
 
 	currentScene_ = Scene::SampleScene;
 
-	sampleScene = std::make_unique<SampleScene>();
-	sceneManager_->SetNextScene(move(sampleScene));
+	/*sampleScene = std::make_unique<SampleScene>();
+	sceneManager_->SetNextScene(move(sampleScene));*/
 
-	/*titleScene = std::make_unique<TitleScene>();
-	sceneManager_->SetNextScene(move(titleScene));*/
+	titleScene = std::make_unique<TitleScene>();
+	sceneManager_->SetNextScene(move(titleScene));
 
 }
 

@@ -25,6 +25,8 @@ void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBa
 	modelManager->LoadModel("resources", "Block.obj");
 	modelManager->LoadModel("resources", "flag.obj");
 
+	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
+
 	camera = std::make_unique<Camera>();
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
 	camera->SetTranslate({ 0.0f, 0.0f, -10.0f });
@@ -50,6 +52,8 @@ void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBa
 	playerModel_ = std::make_unique<Object3D>();
 	playerModel_->Initialize(object3dBasic_, modelManager_, "resources/player.obj");
 	playerModel_->SetTranslate(mapChipField_->GetMapChipPositionByIndex(3, 18));
+
+	GenerateLevelObjects();
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize(object3dBasic_, modelManager_, playerModel_.get(), camera.get());
@@ -187,6 +191,43 @@ void GameScene::GenerateBlocks()
 				blocks_.push_back(move(object));
 			}
 		}
+	}
+
+}
+
+void GameScene::GenerateLevelObjects()
+{
+	LevelLoader levelLoader;
+	levelData_ = levelLoader.LoadLevel("game_stage01");
+
+	// レベルデータからオブジェクトを生成、配置
+	for (auto& objectData : levelData_->objects) {
+
+		modelManager_->LoadModel("resources", objectData.fileName + ".obj");
+
+		// モデルを指定して3Dオブジェクトを生成
+		std::unique_ptr<Object3D> newObject = std::make_unique<Object3D>();
+		newObject->Initialize(
+			object3dBasic_,
+			modelManager_,
+			"resources/" + objectData.fileName + ".obj"
+		);
+
+		// 座標
+		newObject->SetTranslate(objectData.transform.translate);
+		// 回転角
+		newObject->SetRotate(objectData.transform.rotate);
+		// スケール
+		newObject->SetScale(objectData.transform.scale);
+		// 配列に登録
+		levelObjects_.push_back(std::move(newObject));
+	}
+
+	// プレイヤーは一データからプレイヤーを配置
+	if (!levelData_->players.empty()) {
+		auto& playerData = levelData_->players[0];
+		playerModel_->SetTranslate(playerData.translation);
+		playerModel_->SetRotate(playerData.rotation);
 	}
 
 }

@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "CameraController.h"
 #include "../engine/Scene/BaseScene.h"
+#include <LevelLoader/LevelLoader.h>
 
 class GameScene : public BaseScene
 {
@@ -22,6 +23,8 @@ public:
 	void GenerateBlocks();
 
 	bool GetIsClear() { return isClear_; };
+
+	void GenerateLevelObjects();
 
 private:
 
@@ -73,6 +76,9 @@ private:
 	std::unique_ptr<Player> player_ = nullptr;
 
 	std::unique_ptr<Vector3> planePosition{};
+
+	std::unique_ptr<LevelData> levelData_;
+	std::vector<std::unique_ptr<Object3D>> levelObjects_;
 
 };
 
