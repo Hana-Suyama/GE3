@@ -512,6 +512,7 @@ Model::Node ModelManager::ReadNode(aiNode* node)
 	transform.scale = { scale.x, scale.y, scale.z }; // Scaleはそのまま
 	transform.rotate = { rotate.x, -rotate.y, -rotate.z, rotate.w }; // x軸を反転、さらに回転方向が逆なので軸を反転させる
 	transform.translate = { -translate.x, translate.y, translate.z }; // x軸を反転
+	result.transform = transform;
 	result.localMatrix = MyMath::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 	result.name = node->mName.C_Str();	// Node名を格納

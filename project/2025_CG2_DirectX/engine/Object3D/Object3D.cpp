@@ -12,6 +12,8 @@ void Object3D::Initialize(Object3DBasic* object3DBasic, ModelManager* modelManag
 
 	CreateWVPResource();
 
+	modelManager_->CreateSphere();
+
 	modelData_ = modelManager->GetModelPointer(modelManager->GetModelIndexByFilePath(modelFilePath));
 
 	CreateMTUV();
@@ -38,15 +40,15 @@ void Object3D::Update()
 		worldViewProjectionMatrix = worldMatrix;
 	}
 
-	transformationMatrixData_->WVP = modelData_->rootNode_.localMatrix * worldViewProjectionMatrix;
-	transformationMatrixData_->World = modelData_->rootNode_.localMatrix * worldMatrix;
+	transformationMatrixData_->WVP = worldViewProjectionMatrix;
+	transformationMatrixData_->World = worldMatrix;
 	transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
 
 	// アニメーションがある場合は更新する
 	if (animation_ != nullptr) {
 		animationTime += 1.0f / 60.0f;
 		animationTime = std::fmod(animationTime, animation_->duration);
-		NodeAnimation& rootNodeAnimation = animation_->nodeAnimations[modelData_->rootNode_.name];
+		/*NodeAnimation& rootNodeAnimation = animation_->nodeAnimations[modelData_->rootNode_.name];
 		Vector3 translate = AnimationManager::CalculateValue(rootNodeAnimation.translate.keyframes, animationTime);
 		Quaternion rotate = AnimationManager::CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime);
 		Vector3 scale = AnimationManager::CalculateValue(rootNodeAnimation.scale.keyframes, animationTime);
@@ -54,7 +56,7 @@ void Object3D::Update()
 
 		transformationMatrixData_->WVP = localMatrix * worldViewProjectionMatrix;
 		transformationMatrixData_->World = localMatrix * worldMatrix;
-		transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
+		transformationMatrixData_->WorldInverseTranspose = worldMatrix.Inverse().Transpose();*/
 
 		AnimationManager::ApplyAnimation(skeleton_, *animation_, animationTime);
 		AnimationManager::Update(skeleton_);
@@ -91,6 +93,53 @@ void Object3D::Draw()
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(UINT(modelData_->meshes_.at(i).vertices.size()), 1, 0, 0, 0);
 		}
 
+	}
+}
+
+void Object3D::DrawSkeletonDebug()
+{
+	if (skeleton_.joints.empty()) {
+		return;
+	}
+
+	CreateSkeletonDebugResources();
+
+	const float jointRadius = 0.05f;
+	Matrix4x4 objectWorldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 viewProjectionMatrix = Matrix4x4::MakeIdentity4x4();
+
+	if (camera_) {
+		viewProjectionMatrix = camera_->GetViewProjectionMatrix();
+	}
+
+	for (int32_t jointIndex = 0; jointIndex < skeleton_.joints.size(); jointIndex++) {
+		const Joint& joint = skeleton_.joints[jointIndex];
+		Vector3 jointPosition = {
+			joint.skeletonSpaceMatrix.m[3][0],
+			joint.skeletonSpaceMatrix.m[3][1],
+			joint.skeletonSpaceMatrix.m[3][2],
+		};
+
+		Matrix4x4 jointSphereMatrix = MakeAffineMatrix(
+			{ jointRadius, jointRadius, jointRadius },
+			Vector3{ 0.0f, 0.0f, 0.0f },
+			jointPosition
+		);
+		Matrix4x4 worldMatrix = jointSphereMatrix * objectWorldMatrix;
+
+		skeletonDebugTransformationMatrixDatas_[jointIndex]->WVP = worldMatrix * viewProjectionMatrix;
+		skeletonDebugTransformationMatrixDatas_[jointIndex]->World = worldMatrix;
+		skeletonDebugTransformationMatrixDatas_[jointIndex]->WorldInverseTranspose = worldMatrix.Inverse().Transpose();
+
+		for (int32_t i = 0; i < skeletonDebugSphereModelData_->meshes_.size(); i++) {
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetSrvHandleGPU(skeletonDebugTextureFilePaths_.at(i)));
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(5, modelManager_->GetTextureManager()->GetSrvHandleGPU(cubeTextureFilePaths_));
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &skeletonDebugSphereModelData_->meshes_.at(i).vertexBufferView);
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(1, skeletonDebugTransformationMatrixResources_[jointIndex]->GetGPUVirtualAddress());
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(0, skeletonDebugMaterialResources_.at(i)->GetGPUVirtualAddress());
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&skeletonDebugSphereModelData_->meshes_.at(i).indexBufferView);
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(UINT(skeletonDebugSphereModelData_->meshes_.at(i).vertices.size()), 1, 0, 0, 0);
+		}
 	}
 }
 
@@ -141,6 +190,43 @@ void Object3D::CreateWVPResource()
 	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity4x4();
 	transformationMatrixData_->World = Matrix4x4::MakeIdentity4x4();
 	transformationMatrixData_->WorldInverseTranspose = Matrix4x4::MakeIdentity4x4();
+}
+
+void Object3D::CreateSkeletonDebugResources()
+{
+	if (skeletonDebugSphereModelData_ != nullptr) {
+		return;
+	}
+
+	skeletonDebugSphereModelData_ = modelManager_->GetModelPointer(modelManager_->GetModelIndexByFilePath("debug_sphere"));
+
+	skeletonDebugTransformationMatrixResources_.resize(skeleton_.joints.size());
+	skeletonDebugTransformationMatrixDatas_.resize(skeleton_.joints.size());
+	for (int32_t i = 0; i < skeleton_.joints.size(); i++) {
+		skeletonDebugTransformationMatrixResources_[i] = object3DBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(TransformationMatrix));
+		skeletonDebugTransformationMatrixResources_[i]->Map(0, nullptr, reinterpret_cast<void**>(&skeletonDebugTransformationMatrixDatas_[i]));
+		skeletonDebugTransformationMatrixDatas_[i]->WVP = Matrix4x4::MakeIdentity4x4();
+		skeletonDebugTransformationMatrixDatas_[i]->World = Matrix4x4::MakeIdentity4x4();
+		skeletonDebugTransformationMatrixDatas_[i]->WorldInverseTranspose = Matrix4x4::MakeIdentity4x4();
+	}
+
+	modelManager_->GetTextureManager()->LoadTexture("resources/white2x2.png");
+
+	for (int32_t i = 0; i < skeletonDebugSphereModelData_->meshes_.size(); i++) {
+		Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = object3DBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(Material));
+
+		Material* materialData = nullptr;
+		materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+		materialData->color = Vector4(1.0f, 0.15f, 0.1f, 1.0f);
+		materialData->enableLighting = None;
+		materialData->enableReflection = NoneReflection;
+		materialData->shininess = 1.0f;
+		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
+
+		skeletonDebugMaterialResources_.push_back(materialResource);
+		skeletonDebugMaterialDatas_.push_back(materialData);
+		skeletonDebugTextureFilePaths_.push_back("resources/white2x2.png");
+	}
 }
 
 void Object3D::CreateMTUV()

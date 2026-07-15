@@ -224,6 +224,7 @@ void SampleScene::ModelDraw()
 	object3dAnimCube->Draw();
 	object3dPlayer->Draw();
 	object3dWalk->Draw();
+	object3dWalk->DrawSkeletonDebug();
 
 	for (auto& object : levelObjects_) {
 		object->Draw();

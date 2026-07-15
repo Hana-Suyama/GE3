@@ -36,6 +36,7 @@ public:
 	///	描画
 	/// </summary>
 	void Draw();
+	void DrawSkeletonDebug();
 
 	/// <summary>
 	///	デバッグ描画
@@ -116,6 +117,7 @@ private:
 	///	現在のモデルデータに基づいてマテリアル、テクスチャ、UVトランスフォームを生成
 	/// </summary>
 	void CreateMTUV();
+	void CreateSkeletonDebugResources();
 
 private:
 
@@ -130,18 +132,24 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	// WVPデータ書き込み用
 	TransformationMatrix* transformationMatrixData_ = nullptr;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> skeletonDebugTransformationMatrixResources_;
+	std::vector<TransformationMatrix*> skeletonDebugTransformationMatrixDatas_;
 
 	// 描画するモデルのポインタ
 	Model* modelData_ = nullptr;
+	Model* skeletonDebugSphereModelData_ = nullptr;
 	// マテリアルのリソース。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> materialResources_;
 	// マテリアルのデータ。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<Material*> materialDatas_;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> skeletonDebugMaterialResources_;
+	std::vector<Material*> skeletonDebugMaterialDatas_;
 
 	// 使用するテクスチャ。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<std::string> textureFilePaths_;
 	// 映り込み用のテクスチャ
 	std::string cubeTextureFilePaths_;
+	std::vector<std::string> skeletonDebugTextureFilePaths_;
 
 	// トランスフォーム
 	struct EulerTransform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
