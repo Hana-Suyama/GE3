@@ -32,7 +32,7 @@ public:
 
 	void Update(std::mt19937& randomEngine);
 
-	const struct Transform& GetTransform() const { return transform_; }
+	const struct EulerTransform& GetTransform() const { return transform_; }
 
 	uint32_t GetCount() const { return count_; }
 
@@ -40,7 +40,7 @@ public:
 
 private:
 
-	struct Transform transform_;
+	struct EulerTransform transform_;
 	uint32_t count_;
 	float frequency_;
 	float frequencyTime_;

@@ -52,7 +52,7 @@ public:
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
-	const struct Transform& GetTransform() const { return transform_; }
+	const struct EulerTransform& GetTransform() const { return transform_; }
 
 	/// <summary>
 	///	座標のゲッター
@@ -259,10 +259,10 @@ private:
 	Vector2 uvSize_{1.0f, 1.0f};
 
 	// Transform
-	struct Transform transform_{};
+	struct EulerTransform transform_{};
 
 	// UVTransform
-	struct Transform uvTransform_{};
+	struct EulerTransform uvTransform_{};
 
 	// アンカーポイント(0.0f~1.0f)
 	Vector2 anchorPoint_ = { 0.0f, 0.0f };

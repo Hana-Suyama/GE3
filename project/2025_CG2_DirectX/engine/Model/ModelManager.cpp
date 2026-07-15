@@ -1,6 +1,7 @@
 #include "ModelManager.h"
 #include "Material.h"
 #include <numbers>
+#include <Transform.h>
 
 void ModelManager::Initialize(DirectXBasic* directXBasic, TextureManager* textureManager)
 {
@@ -503,13 +504,16 @@ uint32_t ModelManager::GetModelIndexByFilePath(const std::string& filePath)
 Model::Node ModelManager::ReadNode(aiNode* node)
 {
 	Model::Node result;
-	aiMatrix4x4 aiLocalMatrix = node->mTransformation;	// nodeのlocalMatrixを取得
-	aiLocalMatrix.Transpose();	// 列ベクトル形式を行ベクトル形式に転置
-	for (int32_t i = 0; i < 4; i++) {
-		for (int32_t j = 0; j < 4; j++) {
-			result.localMatrix.m[i][j] = aiLocalMatrix[i][j];
-		}
-	}
+
+	aiVector3D scale, translate;
+	aiQuaternion rotate;
+	node->mTransformation.Decompose(scale, rotate, translate); // assimpの行列からSRTを抽出する関数を利用
+	QuaternionTransform transform;
+	transform.scale = { scale.x, scale.y, scale.z }; // Scaleはそのまま
+	transform.rotate = { rotate.x, -rotate.y, -rotate.z, rotate.w }; // x軸を反転、さらに回転方向が逆なので軸を反転させる
+	transform.translate = { -translate.x, translate.y, translate.z }; // x軸を反転
+	result.transform = transform;
+	result.localMatrix = MyMath::MakeAffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 	result.name = node->mName.C_Str();	// Node名を格納
 	result.children.resize(node->mNumChildren);	// 子供の数だけ確保

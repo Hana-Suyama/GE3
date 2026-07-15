@@ -36,6 +36,7 @@ public:
 	///	描画
 	/// </summary>
 	void Draw();
+	void DrawSkeletonDebug();
 
 	/// <summary>
 	///	デバッグ描画
@@ -64,7 +65,7 @@ public:
 	/// <summary>
 	///	トランスフォームのゲッター
 	/// </summary>
-	const struct Transform& GetTransform() const { return transform_; }
+	const struct EulerTransform& GetTransform() const { return transform_; }
 
 	/// <summary>
 	///	マテリアルデータのゲッター
@@ -116,6 +117,7 @@ private:
 	///	現在のモデルデータに基づいてマテリアル、テクスチャ、UVトランスフォームを生成
 	/// </summary>
 	void CreateMTUV();
+	void CreateSkeletonDebugResources();
 
 private:
 
@@ -130,23 +132,29 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource_;
 	// WVPデータ書き込み用
 	TransformationMatrix* transformationMatrixData_ = nullptr;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> skeletonDebugTransformationMatrixResources_;
+	std::vector<TransformationMatrix*> skeletonDebugTransformationMatrixDatas_;
 
 	// 描画するモデルのポインタ
 	Model* modelData_ = nullptr;
+	Model* skeletonDebugSphereModelData_ = nullptr;
 	// マテリアルのリソース。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> materialResources_;
 	// マテリアルのデータ。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<Material*> materialDatas_;
+	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> skeletonDebugMaterialResources_;
+	std::vector<Material*> skeletonDebugMaterialDatas_;
 
 	// 使用するテクスチャ。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<std::string> textureFilePaths_;
 	// 映り込み用のテクスチャ
 	std::string cubeTextureFilePaths_;
+	std::vector<std::string> skeletonDebugTextureFilePaths_;
 
 	// トランスフォーム
-	struct Transform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
+	struct EulerTransform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	// UVトランスフォーム。使用するモデルのメッシュ数と同じだけ要素を持つ
-	std::vector<struct Transform> uvTransforms_;
+	std::vector<struct EulerTransform> uvTransforms_;
 	
 	// 表示フラグ
 	bool isDraw_ = true;
@@ -158,6 +166,8 @@ private:
 	Animation* animation_ = nullptr;
 	// アニメーションの再生時間
 	float animationTime = 0.0f;
+	// スケルトン
+	Skeleton skeleton_;
 	
 };
 
