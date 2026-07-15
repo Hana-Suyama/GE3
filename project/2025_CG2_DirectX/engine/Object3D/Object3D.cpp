@@ -90,7 +90,13 @@ void Object3D::Draw()
 			// IBVを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&modelData_->meshes_.at(i).indexBufferView);
 			// 描画！ (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
-			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(UINT(modelData_->meshes_.at(i).vertices.size()), 1, 0, 0, 0);
+			// assimpと通常でインデックスの数が変わるので、インデックスがあればそれを使う。なければ頂点数を使う
+			const auto& mesh = modelData_->meshes_.at(i);
+			UINT indexCount = mesh.indices_.empty()
+				? UINT(mesh.vertices.size())
+				: UINT(mesh.indices_.size());
+
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
 		}
 
 	}

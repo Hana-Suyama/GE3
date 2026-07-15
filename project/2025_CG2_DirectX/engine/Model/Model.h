@@ -29,6 +29,7 @@ public:
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 		// デフォルトのマテリアル。モデル生成時にオブジェクト側にコピーする
 		Microsoft::WRL::ComPtr<ID3D12Resource> defaultMaterialResource;
+		std::vector<uint32_t> indices_;
 	};
 	
 	// メッシュのベクター

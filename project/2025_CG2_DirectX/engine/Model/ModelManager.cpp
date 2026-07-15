@@ -157,20 +157,18 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 
 	// メッシュごとにindexリソースを作る
 	for (auto& mesh : newModel.meshes_) {
-		mesh.indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * mesh.vertices.size());
+		mesh.indexResource = directXBasic_->CreateBufferResource(sizeof(uint32_t) * mesh.indices_.size());
 		//indexバッファビューを作る
 		//リソースの先頭のアドレスから使う
 		mesh.indexBufferView.BufferLocation = mesh.indexResource->GetGPUVirtualAddress();
 		//使用するリソースのサイズはインデックス*vertexTotalNumberのサイズ
-		mesh.indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * mesh.vertices.size());
+		mesh.indexBufferView.SizeInBytes = UINT(sizeof(uint32_t) * mesh.indices_.size());
 		//インデックスはuint32_tとする
 		mesh.indexBufferView.Format = DXGI_FORMAT_R32_UINT;
-		//plane用インデックスリソースにデータを書き込む
+		//インデックスリソースにデータを書き込む
 		uint32_t* indexData = nullptr;
 		mesh.indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
-		for (uint32_t j = 0; j < mesh.vertices.size(); j++) {
-			indexData[j] = j;
-		}
+		std::memcpy(indexData, mesh.indices_.data(), sizeof(uint32_t) * mesh.indices_.size());
 	}
 
 	// メッシュごとに使うテクスチャ番号を記録
@@ -627,9 +625,6 @@ Model ModelManager::LoadObjFileAssimp(const std::string& directoryPath, const st
 {
 
 	Model modelData;	//構築するModelData
-	//0番目のメッシュデータを追加
-	modelData.meshes_.push_back(Model::Mesh{});
-	int32_t meshCount = 0;
 
 	Assimp::Importer importer;
 	std::string filePath = directoryPath + "/" + filename;
@@ -641,34 +636,39 @@ Model ModelManager::LoadObjFileAssimp(const std::string& directoryPath, const st
 		assert(mesh->HasNormals());	// 法線がないMeshは今回は非対応
 		assert(mesh->HasTextureCoords(0));	//TexcoordがないMeshは今回は非対応
 
+		//0番目のメッシュデータを追加
+		modelData.meshes_.push_back(Model::Mesh{});
+		Model::Mesh& dstMesh = modelData.meshes_.back();
+
+		dstMesh.vertices.resize(mesh->mNumVertices);// 最初に頂点数分のメモリを確保しておく
+
+		for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; ++vertexIndex) {
+			aiVector3D& position = mesh->mVertices[vertexIndex];
+			aiVector3D& normal = mesh->mNormals[vertexIndex];
+			aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
+			// 右手系->左手系
+			dstMesh.vertices[vertexIndex].position = { -position.x, position.y, position.z, 1.0f };
+			dstMesh.vertices[vertexIndex].normal = { -normal.x, normal.y, normal.z };
+			dstMesh.vertices[vertexIndex].texcoord = { texcoord.x, texcoord.y };
+			dstMesh.vertices[vertexIndex].falseUV = false;
+		}
+
 		for (uint32_t faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex) {
 			aiFace& face = mesh->mFaces[faceIndex];
-			assert(face.mNumIndices == 3);	// 三角形のみサポート
+			assert(face.mNumIndices == 3);
 
 			for (uint32_t element = 0; element < face.mNumIndices; ++element) {
 				uint32_t vertexIndex = face.mIndices[element];
-				aiVector3D& position = mesh->mVertices[vertexIndex];
-				aiVector3D& normal = mesh->mNormals[vertexIndex];
-				aiVector3D& texcoord = mesh->mTextureCoords[0][vertexIndex];
-				VertexData vertex;
-				vertex.position = { position.x, position.y, position.z, 1.0f };
-				vertex.normal = { normal.x, normal.y, normal.z };
-				vertex.texcoord = { texcoord.x, texcoord.y };
-				vertex.falseUV = false;
-				// aiProcess_MakeLeftHandedはz*=-1で、右手->左手に変換するので手動で対処
-				vertex.position.x *= -1.0f;
-				vertex.normal.x *= -1.0f;
-				modelData.meshes_[meshCount].vertices.push_back(vertex);
+				dstMesh.indices_.push_back(vertexIndex);
 			}
 		}
-	}
 
-	for (uint32_t materialIndex = 0; materialIndex < scene->mNumMaterials; ++materialIndex) {
+		uint32_t materialIndex = mesh->mMaterialIndex;
 		aiMaterial* material = scene->mMaterials[materialIndex];
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) != 0) {
 			aiString textureFilePath;
 			material->GetTexture(aiTextureType_DIFFUSE, 0, &textureFilePath);
-			modelData.meshes_[meshCount].defaultTextureFilePath = directoryPath + "/" + textureFilePath.C_Str();
+			dstMesh.defaultTextureFilePath = directoryPath + "/" + textureFilePath.C_Str();
 		}
 	}
 
