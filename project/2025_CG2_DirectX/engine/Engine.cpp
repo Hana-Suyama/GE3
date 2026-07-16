@@ -53,7 +53,7 @@ void Engine::Initialize()
 
 	//モデルマネージャの初期化
 	modelManager_ = std::make_unique<ModelManager>();
-	modelManager_->Initialize(directXBasic_.get(), textureManager_.get());
+	modelManager_->Initialize(directXBasic_.get(), textureManager_.get(), srvManager_.get());
 
 	xaudio2Basic_ = std::make_unique<XAudio2Basic>();
 	xaudio2Basic_->Initialize();

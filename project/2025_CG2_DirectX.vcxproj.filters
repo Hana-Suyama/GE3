@@ -301,6 +301,7 @@
     <FxCompile Include="resources\shaders\Dissolve.VS.hlsl" />
     <FxCompile Include="resources\shaders\Random.PS.hlsl" />
     <FxCompile Include="resources\shaders\Random.VS.hlsl" />
+    <FxCompile Include="resources\shaders\SkinningObject3d.VS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">

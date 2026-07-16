@@ -26,6 +26,14 @@ void Object3D::Initialize(Object3DBasic* object3DBasic, ModelManager* modelManag
 	// スケルトンを作成する
 	skeleton_ = AnimationManager::CreateSkeleton(modelData_->rootNode_);
 
+	// SkinClusterを作成する
+	skinClusters_.resize(modelData_->meshes_.size());
+	for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
+		skinClusters_[i] = modelManager_->CreateSkinCluster(
+			skeleton_,
+			modelData_->meshes_.at(i)
+		);
+	}
 }
 
 void Object3D::Update()
@@ -60,6 +68,9 @@ void Object3D::Update()
 
 		AnimationManager::ApplyAnimation(skeleton_, *animation_, animationTime);
 		AnimationManager::Update(skeleton_);
+		for (auto& skinCluster : skinClusters_) {
+			AnimationManager::UpdateSkinCluster(skinCluster, skeleton_);
+		}
 	}
 
 	for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
@@ -81,6 +92,7 @@ void Object3D::Draw()
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetSrvHandleGPU(textureFilePaths_.at(i)));
 			// 映り込み用のテクスチャを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(5, modelManager_->GetTextureManager()->GetSrvHandleGPU(cubeTextureFilePaths_));
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(6, skinClusters_.at(i).paletteSrvHandle.second);
 			// VBVを設定
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &modelData_->meshes_.at(i).vertexBufferView);
 			// wvp用のCBufferの場所を設定
@@ -95,6 +107,13 @@ void Object3D::Draw()
 			UINT indexCount = mesh.indices_.empty()
 				? UINT(mesh.vertices.size())
 				: UINT(mesh.indices_.size());
+
+			D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
+				modelData_->meshes_.at(i).vertexBufferView,	// VertexDataのVBV
+				skinClusters_.at(i).influenceBufferView	//InfluenceのVBV
+			};
+			// 配列を渡す
+			object3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
 
 			object3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
 		}

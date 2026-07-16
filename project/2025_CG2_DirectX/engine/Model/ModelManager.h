@@ -7,14 +7,10 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-
+#include "../../../AnimationManager.h"
 
 class ModelManager
 {
-public:
-	
-
 public:
 
 	/* --------- namespace省略 --------- */
@@ -29,7 +25,7 @@ public:
 	///	初期化
 	/// </summary>
 	/// <param name="directXBasic">DirectXの基盤</param>
-	void Initialize(DirectXBasic* directXBasic, TextureManager* textureManager);
+	void Initialize(DirectXBasic* directXBasic, TextureManager* textureManager, SRVManager* srvManager);
 
 	/// <summary>
 	///	モデルを読み込んで使用可能な状態にする
@@ -67,6 +63,8 @@ public:
 
 	Model::Node ReadNode(aiNode* node);
 
+	Model::SkinCluster CreateSkinCluster(const Skeleton& skeleton, const Model::Mesh& modelData);
+
 private:
 
 	/* --------- private変数 --------- */
@@ -83,6 +81,9 @@ private:
 
 	// テクスチャマネージャのポインタ
 	TextureManager* textureManager_ = nullptr;
+
+	// SRVマネージャのポインタ
+	SRVManager* srvManager_ = nullptr;
 
 	std::vector<Model> modelDatas_;
 

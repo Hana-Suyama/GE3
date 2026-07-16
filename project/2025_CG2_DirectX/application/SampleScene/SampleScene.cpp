@@ -202,17 +202,18 @@ void SampleScene::SpriteDraw()
 	lightsBufferData_->lightCount = static_cast<uint32_t>(lights_.size());
 	memcpy(lightsBufferData_->lights, lightDataVector.data(), sizeof(LightData) * lightsBufferData_->lightCount);
 
-	//directionalLight用のCBufferの場所を設定
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightsBufferResource_->GetGPUVirtualAddress());
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-
+	
 	sprite->Draw();
 	sprite2->Draw();
 }
 
 void SampleScene::ModelDraw()
 {
-	object3d->Draw();
+	//directionalLight用のCBufferの場所を設定
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightsBufferResource_->GetGPUVirtualAddress());
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
+
+	/*object3d->Draw();
 	object3dTeapot->Draw();
 	object3dMultiMesh->Draw();
 	object3dMultiMaterial->Draw();
@@ -222,16 +223,16 @@ void SampleScene::ModelDraw()
 	object3dPlanegLTF->Draw();
 	object3dSphere->Draw();
 	object3dAnimCube->Draw();
-	object3dPlayer->Draw();
+	object3dPlayer->Draw();*/
 	object3dWalk->Draw();
-	object3dWalk->DrawSkeletonDebug();
+	//object3dWalk->DrawSkeletonDebug();
 
 	for (auto& object : levelObjects_) {
-		object->Draw();
+		//object->Draw();
 	}
 
 	for (auto& enemy : enemyObjects_) {
-		enemy->Draw();
+		//enemy->Draw();
 	}
 
 	particleManager->Draw();

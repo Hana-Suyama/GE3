@@ -168,6 +168,7 @@ private:
 	float animationTime = 0.0f;
 	// スケルトン
 	Skeleton skeleton_;
-	
+	// SkinCluster
+	std::vector<Model::SkinCluster> skinClusters_;
 };
 

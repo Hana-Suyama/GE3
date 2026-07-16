@@ -896,23 +896,30 @@ namespace MyMath {
 	/// <returns></returns>
 	Quaternion Slerp(const Quaternion& q0, const Quaternion& q1, float t) {
 
-		Quaternion q00 = q0;
-		Quaternion q01 = q1;
+		Quaternion q00 = q0.Normalize();
+		Quaternion q01 = q1.Normalize();
 
 		float dot = q00.Dot(q01);
 
-		if (dot < 0) {
-			q00.x = -q00.x;
-			q00.y = -q00.y;
-			q00.z = -q00.z;
-			q00.w = -q00.w;
+		if (dot < 0.0f) {
+			q01 = -q01;
 			dot = -dot;
 		}
 
-		float theta = std::acos(dot);
+		// 浮動小数点誤差でacosの定義域を外れないようにする。
+		dot = std::clamp(dot, -1.0f, 1.0f);
 
-		float scale0 = std::sin((1.0f - t) * theta) / std::sin(theta);
-		float scale1 = std::sin(t * theta) / std::sin(theta);
+		// ほぼ同じ回転ではsin(theta)が0に近づくため、線形補間を使用する。
+		constexpr float kLinearThreshold = 0.9995f;
+		if (dot > kLinearThreshold) {
+			Quaternion result = q00 * (1.0f - t) + q01 * t;
+			return result.Normalize();
+		}
+
+		float theta = std::acos(dot);
+		float sinTheta = std::sin(theta);
+		float scale0 = std::sin((1.0f - t) * theta) / sinTheta;
+		float scale1 = std::sin(t * theta) / sinTheta;
 
 		Quaternion result{};
 
@@ -921,7 +928,7 @@ namespace MyMath {
 		result.z = scale0 * q00.z + scale1 * q01.z;
 		result.w = scale0 * q00.w + scale1 * q01.w;
 
-		return result;
+		return result.Normalize();
 	}
 
 	Matrix4x4 MakeAffineMatrix(const Vector3& scale, const Quaternion& rotate, const Vector3& translate) {

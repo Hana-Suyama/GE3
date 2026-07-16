@@ -139,3 +139,14 @@ void AnimationManager::ApplyAnimation(Skeleton& skeleton, const Animation& anima
 		}
 	}
 }
+
+void AnimationManager::UpdateSkinCluster(Model::SkinCluster& skinCluster, const Skeleton& skeleton)
+{
+	for (size_t jointIndex = 0; jointIndex < skeleton.joints.size(); ++jointIndex) {
+		assert(jointIndex < skinCluster.inverseBindPoseMatrices.size());
+		skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix =
+			skinCluster.inverseBindPoseMatrices[jointIndex] * skeleton.joints[jointIndex].skeletonSpaceMatrix;
+		skinCluster.mappedPalette[jointIndex].skeletonSpaceInverseTransposeMatrix =
+			skinCluster.mappedPalette[jointIndex].skeletonSpaceMatrix.Inverse().Transpose();
+	}
+}

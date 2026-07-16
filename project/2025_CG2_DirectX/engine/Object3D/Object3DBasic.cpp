@@ -28,7 +28,7 @@ void Object3DBasic::CreatePSO()
 	descriptionRootSignature.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 
-	D3D12_DESCRIPTOR_RANGE descriptorRange[2] = {};
+	D3D12_DESCRIPTOR_RANGE descriptorRange[3] = {};
 	descriptorRange[0].BaseShaderRegister = 0;	//0から始まる
 	descriptorRange[0].NumDescriptors = 1;	//数は1つ
 	descriptorRange[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	//SRVを使う
@@ -37,9 +37,13 @@ void Object3DBasic::CreatePSO()
 	descriptorRange[1].NumDescriptors = 1;	//数は1つ
 	descriptorRange[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;	//SRVを使う
 	descriptorRange[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;//Offsetを自動計算
-	
+	descriptorRange[2].BaseShaderRegister = 0;
+	descriptorRange[2].NumDescriptors = 1;
+	descriptorRange[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
 	// RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
-	D3D12_ROOT_PARAMETER rootParameters[6] = {};
+	D3D12_ROOT_PARAMETER rootParameters[7] = {};
 	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;	//CBVを使う
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0;	//レジスタ番号0とバインド
@@ -60,6 +64,10 @@ void Object3DBasic::CreatePSO()
 	rootParameters[5].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;	//PixelShaderで使う
 	rootParameters[5].DescriptorTable.pDescriptorRanges = &descriptorRange[1];	//Tableの中身の配列を指定
 	rootParameters[5].DescriptorTable.NumDescriptorRanges = 1;	//Tableで利用する数
+	rootParameters[6].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;	//DescriptorTableを使う
+	rootParameters[6].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;	//VertexShaderで使う
+	rootParameters[6].DescriptorTable.pDescriptorRanges = &descriptorRange[2];
+	rootParameters[6].DescriptorTable.NumDescriptorRanges = 1;
 	descriptionRootSignature.pParameters = rootParameters;	//ルートパラメータ配列へのポインタ
 	descriptionRootSignature.NumParameters = _countof(rootParameters);	//配列の長さ
 
@@ -91,7 +99,7 @@ void Object3DBasic::CreatePSO()
 	assert(SUCCEEDED(hr));
 
 	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[4] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[6] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -108,6 +116,16 @@ void Object3DBasic::CreatePSO()
 	inputElementDescs[3].SemanticIndex = 0;
 	inputElementDescs[3].Format = DXGI_FORMAT_R32_SINT;
 	inputElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[4].SemanticName = "WEIGHT";
+	inputElementDescs[4].SemanticIndex = 0;
+	inputElementDescs[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;// float32_t4
+	inputElementDescs[4].InputSlot = 1;// 1番目のslotのVBVの事だと伝える
+	inputElementDescs[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+	inputElementDescs[5].SemanticName = "INDEX";
+	inputElementDescs[5].SemanticIndex = 0;
+	inputElementDescs[5].Format = DXGI_FORMAT_R32G32B32A32_SINT;// int32_t4
+	inputElementDescs[5].InputSlot = 1;	// 1番目のslotのVBVの事だと伝える
+	inputElementDescs[5].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -126,7 +144,7 @@ void Object3DBasic::CreatePSO()
 	//RasterizerStateの設定
 	D3D12_RASTERIZER_DESC rasterizerDesc{};
 	//裏面(時計回り)を表示しない
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 	//三角形の中を塗りつぶす
 	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
 
@@ -140,7 +158,7 @@ void Object3DBasic::CreatePSO()
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Object3D.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/SkinningObject3D.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 

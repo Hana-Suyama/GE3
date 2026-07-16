@@ -64,4 +64,6 @@ public:
 
 	static void Update(Skeleton& skeleton);
 	static void ApplyAnimation(Skeleton& skeleton, const Animation& animation, float animationTime);
+
+	static void UpdateSkinCluster(Model::SkinCluster& skinCluster, const Skeleton& skeleton);
 };
