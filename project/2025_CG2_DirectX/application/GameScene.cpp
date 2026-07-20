@@ -32,13 +32,13 @@ void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBa
 	camera->SetTranslate({ 0.0f, 0.0f, -10.0f });
 	object3dBasic_->SetDefaultCamera(camera.get());
 
+	mapChipField_ = std::make_unique<MapChipField>();
+	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
+
 	flag_ = std::make_unique<Object3D>();
 	flag_->Initialize(object3dBasic_, modelManager_, "resources/flag.obj");
 	flag_->SetTranslate(mapChipField_->GetMapChipPositionByIndex(196, 18));
 	flag_->SetRotate({ 0.0f, DEGtoRAD(90.0f), 0.0f });
-
-	mapChipField_ = std::make_unique<MapChipField>();
-	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 
 	GenerateBlocks();
 
