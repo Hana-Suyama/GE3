@@ -65,7 +65,7 @@ void LevelLoader::LoadObjectRecursive(const nlohmann::json& object, LevelData* l
 		assert(object.contains("transform"));
 		const nlohmann::json& transform = object["transform"];
 
-		objectData.transform.translate.x = (float)transform["translation"][0];
+		objectData.transform.translate.x = -(float)transform["translation"][0];
 		objectData.transform.translate.y = (float)transform["translation"][2];
 		objectData.transform.translate.z = (float)transform["translation"][1];
 

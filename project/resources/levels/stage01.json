@@ -44,13 +44,57 @@
             }
         },
         {
-            "type": "PlayerSpawn",
-            "name": "PlayerSpawn",
+            "type": "MESH",
+            "name": "teapot",
+            "transform": {
+                "translation": [
+                    -2.799617052078247,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    -0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "teapot"
+        },
+        {
+            "type": "MESH",
+            "name": "teapot.001",
+            "transform": {
+                "translation": [
+                    3.1055331230163574,
+                    0.0,
+                    5.551498889923096
+                ],
+                "rotation": [
+                    12.571961402893066,
+                    -22.698476791381836,
+                    149.97506713867188
+                ],
+                "scaling": [
+                    2.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "file_name": "teapot"
+        },
+        {
+            "type": "MESH",
+            "name": "Suzanne",
             "transform": {
                 "translation": [
                     0.0,
-                    -2.5289063453674316,
-                    0.0
+                    0.0,
+                    2.9974441528320312
                 ],
                 "rotation": [
                     0.0,
@@ -62,70 +106,9 @@
                     1.0,
                     1.0
                 ]
-            }
-        },
-        {
-            "type": "EnemySpawn",
-            "name": "EnemySpawn",
-            "transform": {
-                "translation": [
-                    -2.7294321060180664,
-                    0.0,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    -148.03802490234375
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            }
-        },
-        {
-            "type": "EnemySpawn",
-            "name": "EnemySpawn.001",
-            "transform": {
-                "translation": [
-                    0.0,
-                    0.0,
-                    2.7630434036254883
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    148.0634002685547
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            }
-        },
-        {
-            "type": "EnemySpawn",
-            "name": "EnemySpawn.002",
-            "transform": {
-                "translation": [
-                    2.332143545150757,
-                    -3.3767189979553223,
-                    0.0
-                ],
-                "rotation": [
-                    0.0,
-                    -0.0,
-                    84.02693176269531
-                ],
-                "scaling": [
-                    1.0,
-                    1.0,
-                    1.0
-                ]
-            }
+            },
+            "false": true,
+            "file_name": "suzanne"
         }
     ]
 }
