@@ -79,14 +79,18 @@ void Engine::Initialize()
 	//3Dオブジェクト基盤
 	object3DBasic_ = std::make_unique<Object3DBasic>();
 	object3DBasic_->Initialize(directXBasic_.get(), logger_.get());
-
 	object3DBasic_->SetDefaultCamera(defaultCamera_.get());
+
+	// スキニング3Dオブジェクト基盤
+	skinnedObject3DBasic_ = std::make_unique<SkinnedObject3DBasic>();
+	skinnedObject3DBasic_->Initialize(directXBasic_.get(), logger_.get());
+	skinnedObject3DBasic_->SetDefaultCamera(defaultCamera_.get());
 
 	debugcamera_ = std::make_unique<DebugCamera>();
 	debugcamera_->Initialize(WindowsApi::kClientWidth, WindowsApi::kClientHeight);
 
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(directXBasic_.get(), object3DBasic_.get(), modelManager_.get(), logger_.get(), srvManager_.get(), textureManager_.get(), spriteBasic_.get(), xaudio2Basic_.get(), &randomEngine_);
+	sceneManager_->Initialize(directXBasic_.get(), object3DBasic_.get(), skinnedObject3DBasic_.get(), modelManager_.get(), logger_.get(), srvManager_.get(), textureManager_.get(), spriteBasic_.get(), xaudio2Basic_.get(), &randomEngine_);
 
 	TimeManager::GetInstance()->Initialize();
 
@@ -128,6 +132,10 @@ void Engine::ModelPreDraw()
 	object3DBasic_->Object3DPreDraw();
 
 	sceneManager_->ModelDraw();
+
+	skinnedObject3DBasic_->SkinnedObject3DPreDraw();
+
+	sceneManager_->SkinnedModelDraw();
 }
 
 void Engine::DrawRenderTexture()
@@ -139,14 +147,14 @@ void Engine::DrawRenderTexture()
 	postEffectTime_ += TimeManager::GetInstance()->GetDeltaTime();
 	outlineMaterialData_->time = postEffectTime_;
 
-	outlineMaterialData_->threshold = threshold_;
+	outlineMaterialData_->threshold = postEffectSettings_.threshold;
 
 	ID3D12DescriptorHeap* heaps[] = { srvManager_->GetDescriptorHeap() };
 	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(directXBasic_->GetRootSignatureRenderTexture());
-	directXBasic_->GetCommandList()->SetPipelineState(directXBasic_->GetGraphicsPipelineStateRenderTexture());	//PSOを設定
+	directXBasic_->GetCommandList()->SetPipelineState(directXBasic_->GetPostEffectPSO(postEffectSettings_.type));	//PSOを設定
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, outlineMaterialResource_->GetGPUVirtualAddress());
 
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -170,16 +178,50 @@ void Engine::PostDraw()
 	directXBasic_->PostDraw();
 }
 
+#ifdef USE_IMGUI
 void Engine::PostEffectImGuiDraw()
 {
-#ifdef _DEBUG
+	static constexpr const char* effectNames[] = {
+		"None",
+		"Grayscale",
+		"Sepia",
+		"Vignette",
+		"BoxFilter3x3" ,
+		"BoxFilter5x5" ,
+		"GaussianBlur",
+		"RadialBlur",
+		"LuminanceOutline",
+		"DepthOutline",
+		"Random",
+		"Dissolve"
+	};
+
+	int type = static_cast<int>(postEffectSettings_.type);
+
 	ImGui::Begin("PostEffect");
 
-	ImGui::SliderFloat("Threshold", &threshold_, 0.0f, 1.0f);
+	if (ImGui::Combo(
+		"Effect",
+		&type,
+		effectNames,
+		static_cast<int>(std::size(effectNames))))
+	{
+		postEffectSettings_.type =
+			static_cast<PostEffectType>(type);
+	}
+
+	if (postEffectSettings_.type == PostEffectType::Dissolve) {
+		ImGui::SliderFloat(
+			"Threshold",
+			&postEffectSettings_.threshold,
+			0.0f,
+			1.0f
+		);
+	}
 
 	ImGui::End();
-#endif
 }
+#endif
 
 void Engine::Finalize()
 {

@@ -63,7 +63,18 @@ void DirectXBasic::Initialize(Logger* logger, WindowsApi* winApi)
 	CreateDSV();
 
 	// レンダーテクスチャ用のPSOの生成
-	CreateRenderTexturePSO();
+	CreateRenderTexturePSO(PostEffectType::None, L"resources/shaders/Fullscreen.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Grayscale, L"resources/shaders/Grayscale.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Sepia, L"resources/shaders/Sepia.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Vignette, L"resources/shaders/Vignette.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::BoxFilter3x3, L"resources/shaders/BoxFilter3x3.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::BoxFilter5x5, L"resources/shaders/BoxFilter5x5.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::GaussianBlur, L"resources/shaders/GaussianFilter.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::RadialBlur, L"resources/shaders/RadialBlur.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::LuminanceOutline, L"resources/shaders/LuminanceBasedOutline.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::DepthOutline, L"resources/shaders/DepthBasedOutline.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Random, L"resources/shaders/Random.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Dissolve, L"resources/shaders/Dissolve.PS.hlsl");
 
 }
 
@@ -253,7 +264,7 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXBasic::CreateRenderTextureResource
 	return resource;
 }
 
-void DirectXBasic::CreateRenderTexturePSO()
+void DirectXBasic::CreateRenderTexturePSO(PostEffectType postEffectType, std::wstring shaderFile)
 {
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -363,7 +374,7 @@ void DirectXBasic::CreateRenderTexturePSO()
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 
-	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(L"resources/shaders/Fullscreen.PS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> pixelShaderBlob = CompileShader(shaderFile,
 		L"ps_6_0", logger_);
 	assert(pixelShaderBlob != nullptr);
 
@@ -391,7 +402,8 @@ void DirectXBasic::CreateRenderTexturePSO()
 	graphicsPipelineStateDesc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	//実際に生成
 	hr = device_->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
-		IID_PPV_ARGS(&graphicsPipelineStateRenderTexture_));
+		IID_PPV_ARGS(postEffectPipelineStates_[static_cast<size_t>(postEffectType)]
+		.ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(hr));
 }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Object3DBasic.h"
+#include "SkinnedObject3DBasic.h"
 #include "ModelManager.h"
 #include "TransformationMatrix.h"
 #include "Transform.h"
@@ -7,7 +7,7 @@
 #include "Material.h"
 #include "../../../AnimationManager.h"
 
-class Object3D
+class SkinnedObject3D
 {
 public:
 
@@ -25,7 +25,7 @@ public:
 	/// <param name="object3DBasic">3Dオブジェクトの基盤</param>
 	/// <param name="modelManager">モデルマネージャー</param>
 	/// <param name="modelFilePath">モデルのファイルパス</param>
-	void Initialize(Object3DBasic* object3DBasic, ModelManager* modelManager, std::string modelFilePath);
+	void Initialize(SkinnedObject3DBasic* skinnedobject3DBasic, ModelManager* modelManager, std::string modelFilePath);
 
 	/// <summary>
 	///	更新
@@ -36,6 +36,7 @@ public:
 	///	描画
 	/// </summary>
 	void Draw();
+	void DrawSkeletonDebug();
 
 	/// <summary>
 	///	デバッグ描画
@@ -47,6 +48,12 @@ public:
 	///	モデルデータのセット
 	/// </summary>
 	void SetModelData(std::string modelFilePath);
+
+	/// <summary>
+	/// アニメーションデータのセット
+	/// </summary>
+	/// <param name="animation">アニメーションデータ</param>
+	void SetAnimation(Animation& animation) { animation_ = &animation; }
 
 	/* --------- ゲッター --------- */
 
@@ -110,13 +117,14 @@ private:
 	///	現在のモデルデータに基づいてマテリアル、テクスチャ、UVトランスフォームを生成
 	/// </summary>
 	void CreateMTUV();
+	void CreateSkeletonDebugResources();
 
 private:
 
 	/* --------- private変数 --------- */
 
 	// 3Dオブジェクト基盤のポインタ
-	Object3DBasic* object3DBasic_ = nullptr;
+	SkinnedObject3DBasic* skinnedObject3DBasic_ = nullptr;
 	// モデルマネージャのポインタ
 	ModelManager* modelManager_ = nullptr;
 
@@ -147,12 +155,20 @@ private:
 	struct EulerTransform transform_ { { 1.0f, 1.0f, 1.0f }, { 0.0f, -3.14f, 0.0f }, { 0.0f, 0.0f, 0.0f } };
 	// UVトランスフォーム。使用するモデルのメッシュ数と同じだけ要素を持つ
 	std::vector<struct EulerTransform> uvTransforms_;
-	
+
 	// 表示フラグ
 	bool isDraw_ = true;
 
 	// カメラ
 	Camera* camera_ = nullptr;
 
+	// アニメーション
+	Animation* animation_ = nullptr;
+	// アニメーションの再生時間
+	float animationTime = 0.0f;
+	// スケルトン
+	Skeleton skeleton_;
+	// SkinCluster
+	std::vector<Model::SkinCluster> skinClusters_;
 };
 

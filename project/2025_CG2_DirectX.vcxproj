@@ -211,6 +211,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Time\TimeManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Primitive\Primitive.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
@@ -474,6 +476,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\LevelLoader\LevelLoader.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Primitive\Primitive.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

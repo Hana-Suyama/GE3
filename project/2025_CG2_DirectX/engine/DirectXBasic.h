@@ -9,6 +9,32 @@
 #include "d3dx12.h"
 #include "FixFPS.h"
 #include <Vector4.h>
+#include <array>
+
+enum class PostEffectType : uint32_t
+{
+	None,
+	Grayscale,
+	Sepia,
+	Vignette,
+	BoxFilter3x3,
+	BoxFilter5x5,
+	GaussianBlur,
+	RadialBlur,
+	LuminanceOutline,
+	DepthOutline,
+	Random,
+	Dissolve,
+	Count
+};
+
+struct PostEffectSettings
+{
+	PostEffectType type = PostEffectType::None;
+	float threshold = 1.0f;
+	float noiseStrength = 0.8f;
+	float vignettePower = 0.8f;
+};
 
 class DirectXBasic
 {
@@ -118,7 +144,7 @@ public:
 
 	Comptr<ID3D12Resource> CreateRenderTextureResource(Comptr<ID3D12Device> device, uint32_t width, uint32_t height, DXGI_FORMAT format, const Vector4& clearColor);
 
-	void CreateRenderTexturePSO();
+	void CreateRenderTexturePSO(PostEffectType postEffectType, std::wstring shaderFile);
 
 	/* --------- ゲッター --------- */
 
@@ -198,16 +224,19 @@ public:
 	/// レンダーテクスチャルートシグネチャのゲッター
 	/// </summary>
 	ID3D12RootSignature* GetRootSignatureRenderTexture() const { return rootSignatureRenderTexture_.Get(); }
-	/// <summary>
-	/// レンダーテクスチャグラフィックスパイプラインステートのゲッター
-	/// </summary>
-	ID3D12PipelineState* GetGraphicsPipelineStateRenderTexture() const { return graphicsPipelineStateRenderTexture_.Get(); }
-
+	
 	/// <summary>
 	/// GetDepthStencilResourceのゲッター
 	/// </summary>
 	/// <returns></returns>
 	ID3D12Resource* GetDepthStencilResource() const { return depthStencilResource_.Get(); }
+
+	/// <summary>
+	/// PSOのゲッター
+	/// </summary>
+	/// <param name="type"></param>
+	/// <returns></returns>
+	ID3D12PipelineState* GetPostEffectPSO(PostEffectType type) const { return postEffectPipelineStates_[static_cast<size_t>(type)].Get(); }
 
 private:
 
@@ -341,10 +370,11 @@ private:
 
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignatureRenderTexture_ = nullptr;
-	// グラフィックスパイプラインステート
-	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineStateRenderTexture_ = nullptr;
-
+	
 	bool isBarrierSkipped_ = false;
+
+	// PostEffect切り替えのためにPSOをarray配列で持つ
+	std::array<Microsoft::WRL::ComPtr<ID3D12PipelineState>,static_cast<size_t>(PostEffectType::Count)> postEffectPipelineStates_;
 
 };
 

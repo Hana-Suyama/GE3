@@ -7,13 +7,15 @@ public:
 
 	~SceneManager();
 
-	void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
+	void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
 
 	void Update();
 
 	void SpriteDraw();
 
 	void ModelDraw();
+
+	void SkinnedModelDraw();
 
 	void ImGuiDraw();
 
@@ -23,6 +25,7 @@ private:
 
 	DirectXBasic* directXBasic_ = nullptr;
 	Object3DBasic* object3dBasic_ = nullptr;
+	SkinnedObject3DBasic* skinnedObject3dBasic_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
 	Logger* logger_ = nullptr;
 	SRVManager* srvManager_ = nullptr;

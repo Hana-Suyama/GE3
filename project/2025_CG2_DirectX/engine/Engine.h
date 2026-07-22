@@ -16,6 +16,7 @@
 #include "Object3DBasic.h"
 #include "ModelManager.h"
 #include "Object3D.h"
+#include "Object3D/SkinnedObject3DBasic.h"
 #include "SRVManager.h"
 #include "ParticleManager.h"
 #include "ImGuiManager.h"
@@ -86,6 +87,7 @@ protected:
 	std::unique_ptr<SpriteBasic> spriteBasic_ = nullptr;
 	std::unique_ptr<Camera> defaultCamera_ = nullptr;
 	std::unique_ptr<Object3DBasic> object3DBasic_ = nullptr;
+	std::unique_ptr<SkinnedObject3DBasic> skinnedObject3DBasic_ = nullptr;
 
 	BYTE beforeKey_[256] = {};
 	std::unique_ptr<DebugCamera> debugcamera_ = nullptr;
@@ -104,7 +106,8 @@ protected:
 
 	float postEffectTime_ = 0.0f;
 
-	float threshold_ = 1.0f;
+	// ポストエフェクト用の設定群
+	PostEffectSettings postEffectSettings_;
 };
 
 

@@ -33,7 +33,7 @@ void WindowsApi::Initialize(){
 	// ウィンドウの生成
 	hwnd_ = CreateWindow(
 		wndClass_.lpszClassName,		// 利用するクラス名
-		L"LE2A_10_スヤマ_ハナ_FlagRun",			// タイトルバーの文字(何でも良い)
+		L"LE3C_11_スヤマ_ハナ",			// タイトルバーの文字(何でも良い)
 		WS_OVERLAPPEDWINDOW,	// よく見るウィンドウスタイル
 		CW_USEDEFAULT,			// 表示X座標(Windowsに任せる)
 		CW_USEDEFAULT,			// 表示Y座標(WindowsOSに任せる)

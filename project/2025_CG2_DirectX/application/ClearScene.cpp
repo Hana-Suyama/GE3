@@ -9,10 +9,11 @@
 
 using namespace MyMath;
 
-void ClearScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void ClearScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
+	skinnedObject3dBasic_ = skinnedObject3dBasic;
 	modelManager_ = modelManager;
 	logger_ = logger;
 	srvManager_ = srvManager;
@@ -95,6 +96,11 @@ void ClearScene::SpriteDraw()
 void ClearScene::ModelDraw()
 {
 	object_->Draw();
+}
+
+void ClearScene::SkinnedModelDraw()
+{
+
 }
 
 void ClearScene::ImGuiDraw()

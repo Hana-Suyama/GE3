@@ -1,6 +1,6 @@
-#include "Object3DBasic.h"
+#include "SkinnedObject3DBasic.h"
 
-void Object3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
+void SkinnedObject3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
 {
 	// 引数のDirectX基盤ポインタを記録
 	directXBasic_ = directXBasic;
@@ -12,7 +12,7 @@ void Object3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
 	CreatePSO();
 }
 
-void Object3DBasic::Object3DPreDraw()
+void SkinnedObject3DBasic::SkinnedObject3DPreDraw()
 {
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(rootSignature_.Get());
@@ -21,7 +21,7 @@ void Object3DBasic::Object3DPreDraw()
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
-void Object3DBasic::CreatePSO()
+void SkinnedObject3DBasic::CreatePSO()
 {
 	//RootSignature作成
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature{};
@@ -158,7 +158,7 @@ void Object3DBasic::CreatePSO()
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Object3D.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/SkinningObject3D.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 

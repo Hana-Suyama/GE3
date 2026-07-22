@@ -6,10 +6,11 @@
 #include "../../../AnimationManager.h"
 using namespace MyMath;
 
-void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
+	skinnedObject3dBasic_ = skinnedObject3dBasic;
 	modelManager_ = modelManager;
 	logger_ = logger;
 	srvManager_ = srvManager;
@@ -46,6 +47,7 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
 	camera->SetTranslate({ 0.0f, 0.0f, -10.0f });
 	object3dBasic_->SetDefaultCamera(camera.get());
+	skinnedObject3dBasic_->SetDefaultCamera(camera.get());
 
 	particleManager = std::make_unique<ParticleManager>();
 	particleManager->Initialize(directXBasic, srvManager, logger, textureManager, "resources/gradationLine.png", camera.get());
@@ -96,10 +98,9 @@ void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3d
 
 	object3dAnimCube = std::make_unique<Object3D>();
 	object3dAnimCube->Initialize(object3dBasic_, modelManager, "resources/AnimatedCube.gltf");
-	object3dAnimCube->SetAnimation(animation);
 
-	object3dWalk = std::make_unique<Object3D>();
-	object3dWalk->Initialize(object3dBasic_, modelManager, "resources/human/walk.gltf");
+	object3dWalk = std::make_unique<SkinnedObject3D>();
+	object3dWalk->Initialize(skinnedObject3dBasic_, modelManager, "resources/human/walk.gltf");
 	object3dWalk->SetAnimation(walkAnimation);
 
 	// カメラ位置転送用のリソースを作る
@@ -213,7 +214,7 @@ void SampleScene::ModelDraw()
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightsBufferResource_->GetGPUVirtualAddress());
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
 
-	/*object3d->Draw();
+	object3d->Draw();
 	object3dTeapot->Draw();
 	object3dMultiMesh->Draw();
 	object3dMultiMaterial->Draw();
@@ -223,8 +224,8 @@ void SampleScene::ModelDraw()
 	object3dPlanegLTF->Draw();
 	object3dSphere->Draw();
 	object3dAnimCube->Draw();
-	object3dPlayer->Draw();*/
-	object3dWalk->Draw();
+	object3dPlayer->Draw();
+	
 	//object3dWalk->DrawSkeletonDebug();
 
 	for (auto& object : levelObjects_) {
@@ -240,6 +241,14 @@ void SampleScene::ModelDraw()
 	skyBoxBasic_->SkyBoxPreDraw();
 	skyBox_->Draw();
 
+}
+
+void SampleScene::SkinnedModelDraw()
+{
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightsBufferResource_->GetGPUVirtualAddress());
+	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
+
+	object3dWalk->Draw();
 }
 
 void SampleScene::ImGuiDraw()

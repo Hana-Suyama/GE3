@@ -7,13 +7,15 @@ class TitleScene : public BaseScene
 {
 public:
 
-	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
+	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3DBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
 
 	virtual void Update();
 
 	virtual void SpriteDraw();
 
 	virtual void ModelDraw();
+
+	virtual void SkinnedModelDraw();
 
 	virtual void ImGuiDraw();
 
@@ -23,6 +25,7 @@ private:
 
 	DirectXBasic* directXBasic_ = nullptr;
 	Object3DBasic* object3dBasic_ = nullptr;
+	SkinnedObject3DBasic* skinnedObject3dBasic_ = nullptr;
 	ModelManager* modelManager_ = nullptr;
 	Logger* logger_ = nullptr;
 	SRVManager* srvManager_ = nullptr;

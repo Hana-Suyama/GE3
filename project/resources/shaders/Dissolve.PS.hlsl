@@ -1,4 +1,4 @@
-#include "Dissolve.hlsli"
+#include "Fullscreen.hlsli"
 
 Texture2D<float32_t4> gTexture : register(t0);
 SamplerState gSampler : register(s0);
@@ -31,7 +31,9 @@ PixelShaderOutput main(VertexShaderOutput input)
         discard;
     }
     
-    float32_t edge = 1.0f - smoothstep(0.5f, 0.53f, mask);
+    const float32_t edgeWidth = 0.03f;
+    
+    float32_t edge = 1.0f - smoothstep(gMaterial.threshold, gMaterial.threshold + edgeWidth, mask);
     output.color = gTexture.Sample(gSampler, input.texcoord);
     output.color.rgb += edge * float32_t3(1.0f, 0.4f, 0.3f);
     
