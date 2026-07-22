@@ -178,9 +178,10 @@ void Engine::PostDraw()
 	directXBasic_->PostDraw();
 }
 
-#ifdef USE_IMGUI
+
 void Engine::PostEffectImGuiDraw()
 {
+#ifdef USE_IMGUI
 	static constexpr const char* effectNames[] = {
 		"None",
 		"Grayscale",
@@ -220,8 +221,9 @@ void Engine::PostEffectImGuiDraw()
 	}
 
 	ImGui::End();
-}
 #endif
+}
+
 
 void Engine::Finalize()
 {
