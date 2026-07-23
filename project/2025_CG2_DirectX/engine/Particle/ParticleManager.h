@@ -25,9 +25,23 @@ struct ParticleForGPU {
 	float padding;
 };
 
+struct ParticleCS {
+	Vector3 translate;
+	Vector3 scale;
+	float lifeTime;
+	Vector3 velocity;
+	float currentTime;
+	Vector4 color;
+};
+
 struct AccelerationField {
 	Vector3 acceleration;
 	MyMath::AABB area;
+};
+
+struct PerView {
+	Matrix4x4 viewProjection;
+	Matrix4x4 billboardMatrix;
 };
 
 class ParticleManager
@@ -59,6 +73,11 @@ public:
 	/// </summary>
 	void CreatePSO();
 
+	/// <summary>
+	/// CS用PSOの作成
+	/// </summary>
+	void CreateComputeState();
+
 	void CreateVertexResource(uint32_t vertexCount);
 
 	std::list<Particle> Emit(const ParticleEmitter& emitter, std::mt19937& randomEngine);
@@ -66,6 +85,8 @@ public:
 	Particle MakeNewParticle(std::mt19937& randomEngine, const Vector3& translate, ParticleEffectType effectType);
 
 	bool IsCollision(const MyMath::AABB& aabb, const Vector3& point);
+
+	void DispatchInitializeParticle();
 
 private:
 	DirectXBasic* directXBasic_ = nullptr;
@@ -132,6 +153,22 @@ private:
 	const float kInnerRadius = 0.2f;
 
 	uint32_t vertexCount_ = 0;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> UAVResource_;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE CSVertexUavHandleCPU_;
+	D3D12_GPU_DESCRIPTOR_HANDLE CSVertexUavHandleGPU_;
+
+	uint32_t particleUavIndex_ = 0;
+	uint32_t particleSrvIndex_ = 0;
+	D3D12_RESOURCE_STATES particleResourceState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	// Computeパイプラインステート
+	Comptr<ID3D12PipelineState> computePipelineState_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_;
+
+	Comptr<ID3D12Resource> perViewResource_ = nullptr;
+	PerView* perViewData_ = nullptr;
 
 };
 
