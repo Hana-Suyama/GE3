@@ -15,6 +15,7 @@
 #include "XAudio2Basic.h"
 
 class SceneManager;
+class PostEffectController;
 
 class BaseScene
 {
@@ -37,10 +38,12 @@ public:
 	virtual void Finalize() = 0;
 
 	virtual void SetSceneManager(SceneManager* sceneManager) { sceneManager_ = sceneManager; }
+	virtual void SetPostEffectController(PostEffectController* postEffectController) { postEffectController_ = postEffectController; }
 
 protected:
 
 	SceneManager* sceneManager_ = nullptr;
+	PostEffectController* postEffectController_ = nullptr;
 
 };
 

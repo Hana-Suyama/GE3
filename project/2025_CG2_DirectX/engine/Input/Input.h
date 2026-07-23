@@ -6,6 +6,7 @@
 #include "WindowsApi.h"
 #include "Vector2.h"
 #include <memory>
+#include <vector>
 #include <Xinput.h>
 
 #pragma comment(lib, "xinput.lib")
@@ -57,6 +58,18 @@ public:
 
 	// キーを離した瞬間かをチェック
 	bool IsTriggerReleaseKey(BYTE keyNumber);
+
+	// 現在押されているすべてのキーを取得
+	std::vector<BYTE> GetPushKeys() const;
+
+	// 今フレームで状態が変化したすべてのキーを取得
+	std::vector<BYTE> GetTriggerKeys() const;
+
+	// 今フレームで押されたすべてのキーを取得
+	std::vector<BYTE> GetTriggerPushKeys() const;
+
+	// 今フレームで離されたすべてのキーを取得
+	std::vector<BYTE> GetTriggerReleaseKeys() const;
 
 	/* --- ゲームパッド --- */
 

@@ -7,7 +7,7 @@ public:
 
 	~SceneManager();
 
-	void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
+	void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine, PostEffectController* postEffectController);
 
 	void Update();
 
@@ -33,6 +33,7 @@ private:
 	SpriteBasic* spriteBasic_ = nullptr;
 	std::mt19937* randomEngine_ = nullptr;
 	XAudio2Basic* xaudio2Basic_ = nullptr;
+	PostEffectController* postEffectController_ = nullptr;
 
 	std::unique_ptr<BaseScene> scene_ = nullptr;
 

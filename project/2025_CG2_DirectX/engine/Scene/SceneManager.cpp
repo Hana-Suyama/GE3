@@ -7,7 +7,7 @@ SceneManager::~SceneManager()
 	scene_ = nullptr;
 }
 
-void SceneManager::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void SceneManager::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine, PostEffectController* postEffectController)
 {
 	directXBasic_ = directXBasic;
 	object3dBasic_ = object3dBasic;
@@ -19,6 +19,7 @@ void SceneManager::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3
 	spriteBasic_ = spriteBasic;
 	xaudio2Basic_ = xaudio2Basic;
 	randomEngine_ = randomEngine;
+	postEffectController_ = postEffectController;
 }
 
 void SceneManager::Update()
@@ -35,6 +36,7 @@ void SceneManager::Update()
 		nextScene_ = nullptr;
 
 		scene_->SetSceneManager(this);
+		scene_->SetPostEffectController(postEffectController_);
 
 		scene_->Initialize(directXBasic_, object3dBasic_, skinnedObject3dBasic_, modelManager_, logger_, srvManager_, textureManager_, spriteBasic_, xaudio2Basic_, randomEngine_);
 	}

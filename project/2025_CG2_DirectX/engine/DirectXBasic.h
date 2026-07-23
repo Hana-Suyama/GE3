@@ -8,33 +8,9 @@
 #include "DirectXTex.h"
 #include "d3dx12.h"
 #include "FixFPS.h"
+#include "PostEffectController.h"
 #include <Vector4.h>
 #include <array>
-
-enum class PostEffectType : uint32_t
-{
-	None,
-	Grayscale,
-	Sepia,
-	Vignette,
-	BoxFilter3x3,
-	BoxFilter5x5,
-	GaussianBlur,
-	RadialBlur,
-	LuminanceOutline,
-	DepthOutline,
-	Random,
-	Dissolve,
-	Count
-};
-
-struct PostEffectSettings
-{
-	PostEffectType type = PostEffectType::None;
-	float threshold = 1.0f;
-	float noiseStrength = 0.8f;
-	float vignettePower = 0.8f;
-};
 
 class DirectXBasic
 {

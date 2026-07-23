@@ -435,6 +435,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\SpotLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\PostEffectMaterial.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffectController.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Skybox\SkyBox.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Skybox\SkyBoxBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Geometry.h" />

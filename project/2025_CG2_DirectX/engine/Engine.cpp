@@ -90,7 +90,7 @@ void Engine::Initialize()
 	debugcamera_->Initialize(WindowsApi::kClientWidth, WindowsApi::kClientHeight);
 
 	sceneManager_ = std::make_unique<SceneManager>();
-	sceneManager_->Initialize(directXBasic_.get(), object3DBasic_.get(), skinnedObject3DBasic_.get(), modelManager_.get(), logger_.get(), srvManager_.get(), textureManager_.get(), spriteBasic_.get(), xaudio2Basic_.get(), &randomEngine_);
+	sceneManager_->Initialize(directXBasic_.get(), object3DBasic_.get(), skinnedObject3DBasic_.get(), modelManager_.get(), logger_.get(), srvManager_.get(), textureManager_.get(), spriteBasic_.get(), xaudio2Basic_.get(), &randomEngine_, &postEffectController_);
 
 	TimeManager::GetInstance()->Initialize();
 
@@ -140,6 +140,8 @@ void Engine::ModelPreDraw()
 
 void Engine::DrawRenderTexture()
 {
+	const PostEffectSettings& postEffectSettings = postEffectController_.GetSettings();
+
 	Camera* camera = object3DBasic_->GetDefaultCamera();
 	outlineMaterialData_->projectionInverse =
 		camera->GetProjectionMatrix().Inverse();
@@ -147,14 +149,14 @@ void Engine::DrawRenderTexture()
 	postEffectTime_ += TimeManager::GetInstance()->GetDeltaTime();
 	outlineMaterialData_->time = postEffectTime_;
 
-	outlineMaterialData_->threshold = postEffectSettings_.threshold;
+	outlineMaterialData_->threshold = postEffectSettings.threshold;
 
 	ID3D12DescriptorHeap* heaps[] = { srvManager_->GetDescriptorHeap() };
 	directXBasic_->GetCommandList()->SetDescriptorHeaps(1, heaps);
 
 	// RootSignatureを設定。PSOに設定しているけど別途設定が必要
 	directXBasic_->GetCommandList()->SetGraphicsRootSignature(directXBasic_->GetRootSignatureRenderTexture());
-	directXBasic_->GetCommandList()->SetPipelineState(directXBasic_->GetPostEffectPSO(postEffectSettings_.type));	//PSOを設定
+	directXBasic_->GetCommandList()->SetPipelineState(directXBasic_->GetPostEffectPSO(postEffectSettings.type));	//PSOを設定
 	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(0, outlineMaterialResource_->GetGPUVirtualAddress());
 
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -182,6 +184,8 @@ void Engine::PostDraw()
 void Engine::PostEffectImGuiDraw()
 {
 #ifdef USE_IMGUI
+	PostEffectSettings& postEffectSettings = postEffectController_.GetSettings();
+
 	static constexpr const char* effectNames[] = {
 		"None",
 		"Grayscale",
@@ -197,7 +201,7 @@ void Engine::PostEffectImGuiDraw()
 		"Dissolve"
 	};
 
-	int type = static_cast<int>(postEffectSettings_.type);
+	int type = static_cast<int>(postEffectSettings.type);
 
 	ImGui::Begin("PostEffect");
 
@@ -207,14 +211,14 @@ void Engine::PostEffectImGuiDraw()
 		effectNames,
 		static_cast<int>(std::size(effectNames))))
 	{
-		postEffectSettings_.type =
+		postEffectSettings.type =
 			static_cast<PostEffectType>(type);
 	}
 
-	if (postEffectSettings_.type == PostEffectType::Dissolve) {
+	if (postEffectSettings.type == PostEffectType::Dissolve) {
 		ImGui::SliderFloat(
 			"Threshold",
-			&postEffectSettings_.threshold,
+			&postEffectSettings.threshold,
 			0.0f,
 			1.0f
 		);

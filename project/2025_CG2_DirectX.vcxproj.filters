@@ -520,6 +520,9 @@
     <ClInclude Include="2025_CG2_DirectX\engine\PostEffectMaterial.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffectController.h">
+      <Filter>ヘッダー ファイル\engine</Filter>
+    </ClInclude>
     <ClInclude Include="AnimationManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

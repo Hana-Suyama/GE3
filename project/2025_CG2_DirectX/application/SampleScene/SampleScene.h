@@ -88,5 +88,6 @@ private:
 	std::vector<std::unique_ptr<Object3D>> enemyObjects_;
 	Animation walkAnimation;
 
+	float DissolveThreshold = 0.5f;
 };
 

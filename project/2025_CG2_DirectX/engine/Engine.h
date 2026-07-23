@@ -41,6 +41,7 @@
 #include <dxcapi.h>
 #include "SceneManager.h"
 #include <PostEffectMaterial.h>
+#include "PostEffectController.h"
 
 using namespace MyMath;
 
@@ -69,6 +70,8 @@ public:
 	virtual void Finalize();
 
 	void Run();
+
+	void SetPostEffectType(PostEffectType type){ postEffectController_.SetType(type); }
 
 private:
 
@@ -107,7 +110,7 @@ protected:
 	float postEffectTime_ = 0.0f;
 
 	// ポストエフェクト用の設定群
-	PostEffectSettings postEffectSettings_;
+	PostEffectController postEffectController_;
 };
 
 

@@ -115,6 +115,58 @@ bool Input::IsTriggerReleaseKey(BYTE keyNumber)
 	return false;
 }
 
+std::vector<BYTE> Input::GetPushKeys() const
+{
+	std::vector<BYTE> keys;
+
+	for (uint16_t keyNumber = 0; keyNumber < 256; ++keyNumber) {
+		if (key_[keyNumber]) {
+			keys.push_back(static_cast<BYTE>(keyNumber));
+		}
+	}
+
+	return keys;
+}
+
+std::vector<BYTE> Input::GetTriggerKeys() const
+{
+	std::vector<BYTE> keys;
+
+	for (uint16_t keyNumber = 0; keyNumber < 256; ++keyNumber) {
+		if (key_[keyNumber] != keyPre_[keyNumber]) {
+			keys.push_back(static_cast<BYTE>(keyNumber));
+		}
+	}
+
+	return keys;
+}
+
+std::vector<BYTE> Input::GetTriggerPushKeys() const
+{
+	std::vector<BYTE> keys;
+
+	for (uint16_t keyNumber = 0; keyNumber < 256; ++keyNumber) {
+		if (key_[keyNumber] && !keyPre_[keyNumber]) {
+			keys.push_back(static_cast<BYTE>(keyNumber));
+		}
+	}
+
+	return keys;
+}
+
+std::vector<BYTE> Input::GetTriggerReleaseKeys() const
+{
+	std::vector<BYTE> keys;
+
+	for (uint16_t keyNumber = 0; keyNumber < 256; ++keyNumber) {
+		if (!key_[keyNumber] && keyPre_[keyNumber]) {
+			keys.push_back(static_cast<BYTE>(keyNumber));
+		}
+	}
+
+	return keys;
+}
+
 bool Input::IsPadButton(WORD button)
 {
 	return (padState_.Gamepad.wButtons & button) != 0;

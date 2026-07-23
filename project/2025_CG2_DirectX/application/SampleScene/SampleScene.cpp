@@ -3,6 +3,7 @@
 #include "../../engine/Utility/Math/Lerp.h"
 #include <TimeManager.h>
 #include <AreaLight.h>
+#include <PostEffectController.h>
 #include "../../../AnimationManager.h"
 using namespace MyMath;
 
@@ -180,6 +181,64 @@ void SampleScene::Update()
 	if (Input::GetInstance()->IsPadButtonDown(XINPUT_GAMEPAD_A))
 	{
 		Input::GetInstance()->PlayVibration(1.0f, 0.3f, 0.2f);
+	}
+
+	for (BYTE key : Input::GetInstance()->GetTriggerPushKeys()) {
+		if (!postEffectController_) {
+			break;
+		}
+
+		switch (key) {
+		case DIK_1:
+			postEffectController_->SetType(PostEffectType::None);
+			break;
+		case DIK_2:
+			postEffectController_->SetType(PostEffectType::Grayscale);
+			break;
+		case DIK_3:
+			postEffectController_->SetType(PostEffectType::Sepia);
+			break;
+		case DIK_4:
+			postEffectController_->SetType(PostEffectType::Vignette);
+			break;
+		case DIK_5:
+			postEffectController_->SetType(PostEffectType::BoxFilter3x3);
+			break;
+		case DIK_6:
+			postEffectController_->SetType(PostEffectType::BoxFilter5x5);
+			break;
+		case DIK_7:
+			postEffectController_->SetType(PostEffectType::GaussianBlur);
+			break;
+		case DIK_8:
+			postEffectController_->SetType(PostEffectType::RadialBlur);
+			break;
+		case DIK_9:
+			postEffectController_->SetType(PostEffectType::LuminanceOutline);
+			break;
+		case DIK_Q:
+			postEffectController_->SetType(PostEffectType::DepthOutline);
+			break;
+		case DIK_W:
+			postEffectController_->SetType(PostEffectType::Random);
+			break;
+		case DIK_E:
+			postEffectController_->SetType(PostEffectType::Dissolve);
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (postEffectController_->GetType() == PostEffectType::Dissolve) {
+		if (Input::GetInstance()->IsPushKey(DIK_LEFTARROW)) {
+			DissolveThreshold -= 0.01f;
+		}
+		if (Input::GetInstance()->IsPushKey(DIK_RIGHTARROW)) {
+			DissolveThreshold += 0.01f;
+		}
+		DissolveThreshold = std::clamp(DissolveThreshold, 0.0f, 1.0f);
+		postEffectController_->SetThreshold(DissolveThreshold);
 	}
 
 	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
