@@ -831,6 +831,33 @@ Microsoft::WRL::ComPtr<ID3D12Resource> DirectXBasic::CreateBufferResource(size_t
 	return vertexResource;
 }
 
+Microsoft::WRL::ComPtr<ID3D12Resource> DirectXBasic::CreateBufferResourceUAV(size_t sizeInBytes)
+{
+	//頂点リソース用のヒープの設定
+	D3D12_HEAP_PROPERTIES defaultHeapProperties{};
+	defaultHeapProperties.Type = D3D12_HEAP_TYPE_DEFAULT;//defaultHeapを使う
+	//頂点リソースの設定
+	D3D12_RESOURCE_DESC resourceDesc{};
+	//バッファリソース。テクスチャの場合はまた別の設定をする
+	resourceDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width = sizeInBytes;//リソースのサイズ。今回はVector4を3頂点分
+	//バッファの場合はこれらは1にする決まり
+	resourceDesc.Height = 1;
+	resourceDesc.DepthOrArraySize = 1;
+	resourceDesc.MipLevels = 1;
+	resourceDesc.SampleDesc.Count = 1;
+	//バッファの場合はこれにする決まり
+	resourceDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+	//実際に頂点リソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	HRESULT hr = device_->CreateCommittedResource(&defaultHeapProperties, D3D12_HEAP_FLAG_NONE,
+		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, nullptr,
+		IID_PPV_ARGS(&resource));
+	assert(SUCCEEDED(hr));
+	return resource;
+}
+
 Microsoft::WRL::ComPtr<ID3D12Resource> DirectXBasic::CreateTextureResource(const DirectX::TexMetadata& metadata) {
 	//metadataを基にResourceの設定
 	D3D12_RESOURCE_DESC resourceDesc{};

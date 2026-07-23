@@ -10,6 +10,9 @@ void SkinnedObject3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger
 
 	// PSOを作成
 	CreatePSO();
+
+	// CS用PSOを作成
+	CreateComputeState();
 }
 
 void SkinnedObject3DBasic::SkinnedObject3DPreDraw()
@@ -19,6 +22,21 @@ void SkinnedObject3DBasic::SkinnedObject3DPreDraw()
 	directXBasic_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());	//PSOを設定
 	// 形状を設定。PSOに設定しているものとはまた別。同じものを設定すると考えておけば良い
 	directXBasic_->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+}
+
+void SkinnedObject3DBasic::SetComputeResources(D3D12_GPU_DESCRIPTOR_HANDLE palette, D3D12_GPU_DESCRIPTOR_HANDLE inputVertex, D3D12_GPU_DESCRIPTOR_HANDLE influence, D3D12_GPU_DESCRIPTOR_HANDLE outputVertex, D3D12_GPU_VIRTUAL_ADDRESS skinningInformation)
+{
+	directXBasic_->GetCommandList()->SetComputeRootDescriptorTable(0, palette);
+	directXBasic_->GetCommandList()->SetComputeRootDescriptorTable(1, inputVertex);
+	directXBasic_->GetCommandList()->SetComputeRootDescriptorTable(2, influence);
+	directXBasic_->GetCommandList()->SetComputeRootDescriptorTable(3, outputVertex);
+	directXBasic_->GetCommandList()->SetComputeRootConstantBufferView(4, skinningInformation);
+}
+
+void SkinnedObject3DBasic::SkinningPreDispatch()
+{
+	directXBasic_->GetCommandList()->SetComputeRootSignature(computeRootSignature_.Get());
+	directXBasic_->GetCommandList()->SetPipelineState(computePipelineState.Get());
 }
 
 void SkinnedObject3DBasic::CreatePSO()
@@ -99,7 +117,7 @@ void SkinnedObject3DBasic::CreatePSO()
 	assert(SUCCEEDED(hr));
 
 	//InputLayout
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs[6] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs[4] = {};
 	inputElementDescs[0].SemanticName = "POSITION";
 	inputElementDescs[0].SemanticIndex = 0;
 	inputElementDescs[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -116,16 +134,6 @@ void SkinnedObject3DBasic::CreatePSO()
 	inputElementDescs[3].SemanticIndex = 0;
 	inputElementDescs[3].Format = DXGI_FORMAT_R32_SINT;
 	inputElementDescs[3].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[4].SemanticName = "WEIGHT";
-	inputElementDescs[4].SemanticIndex = 0;
-	inputElementDescs[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;// float32_t4
-	inputElementDescs[4].InputSlot = 1;// 1番目のslotのVBVの事だと伝える
-	inputElementDescs[4].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
-	inputElementDescs[5].SemanticName = "INDEX";
-	inputElementDescs[5].SemanticIndex = 0;
-	inputElementDescs[5].Format = DXGI_FORMAT_R32G32B32A32_SINT;// int32_t4
-	inputElementDescs[5].InputSlot = 1;	// 1番目のslotのVBVの事だと伝える
-	inputElementDescs[5].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDesc{};
 	inputLayoutDesc.pInputElementDescs = inputElementDescs;
 	inputLayoutDesc.NumElements = _countof(inputElementDescs);
@@ -158,7 +166,7 @@ void SkinnedObject3DBasic::CreatePSO()
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/SkinningObject3D.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Object3D.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 
@@ -196,5 +204,83 @@ void SkinnedObject3DBasic::CreatePSO()
 	//実際に生成
 	hr = directXBasic_->GetDevice()->CreateGraphicsPipelineState(&graphicsPipelineStateDesc,
 		IID_PPV_ARGS(&graphicsPipelineState_));
+	assert(SUCCEEDED(hr));
+}
+
+void SkinnedObject3DBasic::CreateComputeState()
+{
+	Microsoft::WRL::ComPtr<IDxcBlob> computeShaderBlob = directXBasic_->CompileShader(L"resources/shaders/Skinning.CS.hlsl",
+		L"cs_6_0", logger_);
+	assert(computeShaderBlob != nullptr);
+
+	D3D12_ROOT_SIGNATURE_DESC computeRootSignatureDesc{};
+	computeRootSignatureDesc.Flags =
+		D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+	D3D12_DESCRIPTOR_RANGE descriptorRanges[4] = {};
+	descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRanges[0].NumDescriptors = 1;
+	descriptorRanges[0].BaseShaderRegister = 0;
+	descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRanges[1].NumDescriptors = 1;
+	descriptorRanges[1].BaseShaderRegister = 1;
+	descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRanges[2].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRanges[2].NumDescriptors = 1;
+	descriptorRanges[2].BaseShaderRegister = 2;
+	descriptorRanges[2].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRanges[3].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	descriptorRanges[3].NumDescriptors = 1;
+	descriptorRanges[3].BaseShaderRegister = 0;
+	descriptorRanges[3].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	// RootParameter作成。複数設定できるので配列。今回は結果1つだけなので長さ1の配列
+	D3D12_ROOT_PARAMETER rootParameters[5] = {};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;	//CSで使う
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;	//CSで使う
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;	//CSで使う
+	rootParameters[2].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[2].DescriptorTable.pDescriptorRanges = &descriptorRanges[2];
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;	//CSで使う
+	rootParameters[3].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[3].DescriptorTable.pDescriptorRanges = &descriptorRanges[3];
+	rootParameters[4].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[4].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[4].Descriptor.ShaderRegister = 0;
+
+	computeRootSignatureDesc.pParameters = rootParameters;	//ルートパラメータ配列へのポインタ
+	computeRootSignatureDesc.NumParameters = _countof(rootParameters);	//配列の長さ
+
+	//シリアライズしてバイナリにする
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&computeRootSignatureDesc,
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		logger_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリを元に生成
+	hr = directXBasic_->GetDevice()->CreateRootSignature(0,
+		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&computeRootSignature_));
+	assert(SUCCEEDED(hr));
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc{};
+	computePipelineStateDesc.CS = {
+		.pShaderBytecode = computeShaderBlob->GetBufferPointer(),
+		.BytecodeLength = computeShaderBlob->GetBufferSize()
+	};
+	computePipelineStateDesc.pRootSignature = computeRootSignature_.Get();
+	hr = directXBasic_->GetDevice()->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&computePipelineState));
 	assert(SUCCEEDED(hr));
 }

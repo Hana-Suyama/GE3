@@ -86,15 +86,70 @@ void SkinnedObject3D::Draw()
 {
 	// 表示フラグがたっていたらもろもろの描画処理を行う
 	if (isDraw_) {
+		skinnedObject3DBasic_->SkinningPreDispatch();
 
 		for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
+			const auto& mesh = modelData_->meshes_.at(i);
+			auto& skinCluster = skinClusters_.at(i);
+
+			if (skinCluster.skinnedVertexResourceState !=
+				D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
+
+				D3D12_RESOURCE_BARRIER barrier{};
+				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+				barrier.Transition.pResource =
+					skinCluster.skinnedVertexResource.Get();
+				barrier.Transition.StateBefore =
+					skinCluster.skinnedVertexResourceState;
+				barrier.Transition.StateAfter =
+					D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+				barrier.Transition.Subresource =
+					D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+				skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->ResourceBarrier(1, &barrier);
+
+				skinCluster.skinnedVertexResourceState =
+					D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+			}
+
+			skinnedObject3DBasic_->SetComputeResources(
+				skinCluster.paletteSrvHandle.second,
+				mesh.vertexSrvHandle.second,
+				skinCluster.influenceSrvHandle.second,
+				skinCluster.skinnedVertexUavHandleGPU,
+				skinCluster.skinningInformationResource->GetGPUVirtualAddress());
+
+			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->Dispatch(UINT(modelData_->meshes_.at(i).vertices.size() + 1023) / 1024, 1, 1);
+			
+			if (skinCluster.skinnedVertexResourceState != D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER) {
+				//TransitionBarrierの設定
+				D3D12_RESOURCE_BARRIER barrier_ = {};
+				//今回のバリアはTransition
+				barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+				//Noneにしておく
+				barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+				//バリアを張る対象のリソース。現在のバックバッファに対して行う
+				barrier_.Transition.pResource = skinCluster.skinnedVertexResource.Get();
+				//遷移前(現在)のResourceState
+				barrier_.Transition.StateBefore = skinCluster.skinnedVertexResourceState;
+				barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+				//TransitionBarrierを張る
+				skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->ResourceBarrier(1, &barrier_);
+				skinCluster.skinnedVertexResourceState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
+			}
+		}
+
+		for (int32_t i = 0; i < modelData_->meshes_.size(); i++) {
+			const auto& mesh = modelData_->meshes_.at(i);
+			auto& skinCluster = skinClusters_.at(i);
+
+			skinnedObject3DBasic_->SkinnedObject3DPreDraw();
+
 			// テクスチャを設定
 			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(2, modelManager_->GetTextureManager()->GetSrvHandleGPU(textureFilePaths_.at(i)));
 			// 映り込み用のテクスチャを設定
 			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(5, modelManager_->GetTextureManager()->GetSrvHandleGPU(cubeTextureFilePaths_));
-			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootDescriptorTable(6, skinClusters_.at(i).paletteSrvHandle.second);
-			// VBVを設定
-			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &modelData_->meshes_.at(i).vertexBufferView);
 			// wvp用のCBufferの場所を設定
 			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource_->GetGPUVirtualAddress());
 			// マテリアルCBufferの場所を設定
@@ -103,21 +158,14 @@ void SkinnedObject3D::Draw()
 			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->IASetIndexBuffer(&modelData_->meshes_.at(i).indexBufferView);
 			// 描画！ (DrawCall/ドローコール)。3頂点で1つのインスタンス。インスタンスについては今後
 			// assimpと通常でインデックスの数が変わるので、インデックスがあればそれを使う。なければ頂点数を使う
-			const auto& mesh = modelData_->meshes_.at(i);
 			UINT indexCount = mesh.indices_.empty()
 				? UINT(mesh.vertices.size())
 				: UINT(mesh.indices_.size());
 
-			D3D12_VERTEX_BUFFER_VIEW vbvs[2] = {
-				modelData_->meshes_.at(i).vertexBufferView,	// VertexDataのVBV
-				skinClusters_.at(i).influenceBufferView	//InfluenceのVBV
-			};
-			// 配列を渡す
-			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 2, vbvs);
+			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->IASetVertexBuffers(0, 1, &skinCluster.skinnedVertexBufferView);
 
 			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->DrawIndexedInstanced(indexCount, 1, 0, 0, 0);
 		}
-
 	}
 }
 

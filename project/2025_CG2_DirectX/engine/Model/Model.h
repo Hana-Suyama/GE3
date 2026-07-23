@@ -20,6 +20,10 @@ struct WellForGPU {
 	Matrix4x4 skeletonSpaceInverseTransposeMatrix;	// 法線用
 };
 
+struct SkinningInformation {
+	uint32_t numVertices;
+};
+
 class Model
 {
 public:
@@ -46,9 +50,18 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource> influenceResource;
 		D3D12_VERTEX_BUFFER_VIEW influenceBufferView;
 		std::span<VertexInfluence> mappedInfluence;
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> influenceSrvHandle;
 		Microsoft::WRL::ComPtr<ID3D12Resource> paletteResource;
 		std::span<WellForGPU> mappedPalette;
 		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> paletteSrvHandle;
+		Microsoft::WRL::ComPtr<ID3D12Resource> skinningInformationResource;
+		SkinningInformation* mappedSkinningInformation = nullptr;
+		Microsoft::WRL::ComPtr<ID3D12Resource> skinnedVertexResource;
+		D3D12_VERTEX_BUFFER_VIEW skinnedVertexBufferView;
+		uint32_t skinnedVertexUavIndex;
+		D3D12_CPU_DESCRIPTOR_HANDLE skinnedVertexUavHandleCPU;
+		D3D12_GPU_DESCRIPTOR_HANDLE skinnedVertexUavHandleGPU;
+		D3D12_RESOURCE_STATES skinnedVertexResourceState = D3D12_RESOURCE_STATE_COMMON;
 	};
 
 public:
@@ -60,6 +73,7 @@ public:
 		Microsoft::WRL::ComPtr<ID3D12Resource> indexResource;
 		D3D12_INDEX_BUFFER_VIEW indexBufferView{};
 		Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource;
+		std::pair<D3D12_CPU_DESCRIPTOR_HANDLE, D3D12_GPU_DESCRIPTOR_HANDLE> vertexSrvHandle;
 		D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 		// デフォルトのマテリアル。モデル生成時にオブジェクト側にコピーする
 		Microsoft::WRL::ComPtr<ID3D12Resource> defaultMaterialResource;

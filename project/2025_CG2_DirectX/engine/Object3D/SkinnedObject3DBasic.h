@@ -27,6 +27,10 @@ public:
 	/// </summary>
 	void SkinnedObject3DPreDraw();
 
+	void SetComputeResources(D3D12_GPU_DESCRIPTOR_HANDLE palette, D3D12_GPU_DESCRIPTOR_HANDLE inputVertex, D3D12_GPU_DESCRIPTOR_HANDLE influence, D3D12_GPU_DESCRIPTOR_HANDLE outputVertex, D3D12_GPU_VIRTUAL_ADDRESS skinningInformation);
+
+	void SkinningPreDispatch();
+
 	/* --------- ゲッター --------- */
 
 	/// <summary>
@@ -57,6 +61,11 @@ private:
 	/// </summary>
 	void CreatePSO();
 
+	/// <summary>
+	/// CS用PSOの作成
+	/// </summary>
+	void CreateComputeState();
+
 private:
 
 	/* --------- private変数 --------- */
@@ -73,8 +82,14 @@ private:
 	// ルートシグネチャ
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature_ = nullptr;
 
+	// CS用ルートシグネチャ
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignature_ = nullptr;
+
 	// グラフィックスパイプラインステート
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
+
+	// Computeパイプラインステート
+	Comptr<ID3D12PipelineState> computePipelineState = nullptr;
 
 };
 

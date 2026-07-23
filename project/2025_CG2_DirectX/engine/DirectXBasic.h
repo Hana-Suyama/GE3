@@ -100,6 +100,12 @@ public:
 	Comptr<ID3D12Resource> CreateBufferResource(size_t sizeInBytes);
 
 	/// <summary>
+	/// UAV用BufferResourceの作成
+	/// </summary>
+	/// <param name="sizeInBytes">リソースのサイズ</param>
+	Comptr<ID3D12Resource> CreateBufferResourceUAV(size_t sizeInBytes);
+
+	/// <summary>
 	/// TextureResourceの作成
 	/// </summary>
 	/// <param name="metadata">メタデータ</param>

@@ -49,6 +49,15 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 		mesh.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 		//頂点データをリソースにコピー
 		std::memcpy(vertexData, mesh.vertices.data(), sizeof(VertexData) * mesh.vertices.size());
+
+		uint32_t vertexSrvIndex = srvManager_->Allocate();
+		mesh.vertexSrvHandle.first = srvManager_->GetCPUDescriptorHandle(vertexSrvIndex);
+		mesh.vertexSrvHandle.second = srvManager_->GetGPUDescriptorHandle(vertexSrvIndex);
+		srvManager_->CreateSRVforStructuredBuffer(
+			vertexSrvIndex,
+			mesh.vertexResource.Get(),
+			static_cast<UINT>(mesh.vertices.size()),
+			sizeof(VertexData));
 	}
 
 	// メッシュごとにデフォルトマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
@@ -138,6 +147,15 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 		mesh.vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 		//頂点データをリソースにコピー
 		std::memcpy(vertexData, mesh.vertices.data(), sizeof(VertexData) * mesh.vertices.size());
+
+		uint32_t vertexSrvIndex = srvManager_->Allocate();
+		mesh.vertexSrvHandle.first = srvManager_->GetCPUDescriptorHandle(vertexSrvIndex);
+		mesh.vertexSrvHandle.second = srvManager_->GetGPUDescriptorHandle(vertexSrvIndex);
+		srvManager_->CreateSRVforStructuredBuffer(
+			vertexSrvIndex,
+			mesh.vertexResource.Get(),
+			static_cast<UINT>(mesh.vertices.size()),
+			sizeof(VertexData));
 	}
 
 	// メッシュごとにデフォルトマテリアル用のリソースを作る。今回はMaterial1つ分のサイズを用意する
@@ -561,6 +579,15 @@ Model::SkinCluster ModelManager::CreateSkinCluster(const Skeleton& skeleton, con
 	skinCluster.influenceBufferView.SizeInBytes = UINT(sizeof(VertexInfluence) * modelData.vertices.size());
 	skinCluster.influenceBufferView.StrideInBytes = sizeof(VertexInfluence);
 
+	uint32_t influenceSrvIndex = srvManager_->Allocate();
+	skinCluster.influenceSrvHandle.first = srvManager_->GetCPUDescriptorHandle(influenceSrvIndex);
+	skinCluster.influenceSrvHandle.second = srvManager_->GetGPUDescriptorHandle(influenceSrvIndex);
+	srvManager_->CreateSRVforStructuredBuffer(
+		influenceSrvIndex,
+		skinCluster.influenceResource.Get(),
+		static_cast<UINT>(modelData.vertices.size()),
+		sizeof(VertexInfluence));
+
 	// InverseBindPoseMatrixを格納する場所を作成して、単位行列で埋める
 	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
 	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), Matrix4x4::MakeIdentity4x4);
@@ -584,6 +611,43 @@ Model::SkinCluster ModelManager::CreateSkinCluster(const Skeleton& skeleton, con
 		}
 	}
 
+	// UAV用のResourceを確保
+	skinCluster.skinnedVertexResource = directXBasic_->CreateBufferResourceUAV(sizeof(VertexData) * modelData.vertices.size());
+	skinCluster.skinnedVertexBufferView.BufferLocation = skinCluster.skinnedVertexResource->GetGPUVirtualAddress();
+	skinCluster.skinnedVertexBufferView.SizeInBytes = static_cast<UINT>(sizeof(VertexData) * modelData.vertices.size());
+	skinCluster.skinnedVertexBufferView.StrideInBytes = sizeof(VertexData);
+
+	skinCluster.skinnedVertexUavIndex = srvManager_->Allocate();
+	skinCluster.skinnedVertexUavHandleCPU = srvManager_->GetCPUDescriptorHandle(skinCluster.skinnedVertexUavIndex);
+	skinCluster.skinnedVertexUavHandleGPU = srvManager_->GetGPUDescriptorHandle(skinCluster.skinnedVertexUavIndex);
+
+	// UAVを生成
+	D3D12_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
+	uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	uavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	uavDesc.Buffer.FirstElement = 0;
+	uavDesc.Buffer.NumElements = static_cast<UINT>(modelData.vertices.size());
+	uavDesc.Buffer.CounterOffsetInBytes = 0;
+	uavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+	uavDesc.Buffer.StructureByteStride = sizeof(VertexData);
+
+	// 第二引数は今はnullptrにしておく
+	directXBasic_->GetDevice()->CreateUnorderedAccessView(
+		skinCluster.skinnedVertexResource.Get(), nullptr, &uavDesc, skinCluster.skinnedVertexUavHandleCPU);
+
+	// スキニング対象の頂点数をCompute Shaderに渡す
+	constexpr size_t kConstantBufferAlignment = 256;
+	const size_t skinningInformationSize =
+		(sizeof(SkinningInformation) + kConstantBufferAlignment - 1) &
+		~(kConstantBufferAlignment - 1);
+	skinCluster.skinningInformationResource =
+		directXBasic_->CreateBufferResource(skinningInformationSize);
+	skinCluster.skinningInformationResource->Map(
+		0,
+		nullptr,
+		reinterpret_cast<void**>(&skinCluster.mappedSkinningInformation));
+	skinCluster.mappedSkinningInformation->numVertices =
+		static_cast<uint32_t>(modelData.vertices.size());
 
 	return skinCluster;
 }

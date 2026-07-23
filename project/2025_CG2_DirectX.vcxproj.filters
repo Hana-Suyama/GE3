@@ -552,5 +552,6 @@
     <None Include="resources\shaders\RadialBlur.hlsli" />
     <None Include="resources\shaders\Dissolve.hlsli" />
     <None Include="resources\shaders\Random.hlsli" />
+    <None Include="resources\shaders\Skinning.CS.hlsl" />
   </ItemGroup>
 </Project>
