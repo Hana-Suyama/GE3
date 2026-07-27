@@ -10,12 +10,6 @@ struct EmitterSphere
     uint32_t emit;
 };
 
-struct PerFrame
-{
-    float32_t time;
-    float32_t deltaTime;
-};
-
 float32_t rand3dTo1d(
     float32_t3 value,
     float32_t3 dotDir = float32_t3(12.9898f, 78.233f, 37.719f))
@@ -70,6 +64,9 @@ void main(uint32_t3 DTid : SV_DispatchThreadID)
                 gParticles[particleIndex].translate = generator.Generate3d();
                 gParticles[particleIndex].color.rgb = generator.Generate3d();
                 gParticles[particleIndex].color.a = 1.0f;
+                gParticles[particleIndex].lifeTime = 2.0f;
+                gParticles[particleIndex].velocity = (generator.Generate3d() * 2.0f - 1.0f) * 0.5f;
+                gParticles[particleIndex].currentTime = 0.0f;
             }
         }
 

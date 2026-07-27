@@ -98,6 +98,11 @@ public:
 	/// </summary>
 	void CreateComputeStateEmit();
 
+	/// <summary>
+	/// CS用PSOの作成
+	/// </summary>
+	void CreateComputeStateUpdate();
+
 	void CreateVertexResource(uint32_t vertexCount);
 
 	std::list<Particle> Emit(const ParticleEmitter& emitter, std::mt19937& randomEngine);
@@ -197,6 +202,9 @@ private:
 
 	Comptr<ID3D12PipelineState> computePipelineStateEmit_ = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignatureEmit_;
+
+	Comptr<ID3D12PipelineState> computePipelineStateUpdate_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignatureUpdate_;
 
 	Comptr<ID3D12Resource> perFrameResource_ = nullptr;
 	PerFrame* perFrameData_ = nullptr;
