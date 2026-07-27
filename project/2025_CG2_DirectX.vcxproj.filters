@@ -261,6 +261,9 @@
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\Object3d.PS.hlsl">
@@ -311,6 +314,7 @@
     <FxCompile Include="resources\shaders\ParticleCS.hlsli" />
     <FxCompile Include="resources\shaders\InitializeParticle.CS.hlsl" />
     <FxCompile Include="resources\shaders\ParticleCS.VS.hlsl" />
+    <FxCompile Include="resources\shaders\EmitParticle.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -530,6 +534,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

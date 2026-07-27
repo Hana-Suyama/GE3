@@ -37,6 +37,8 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 
 	CreateComputeState();
 
+	CreateComputeStateEmit();
+
 	CreateVertexResource(4);
 
 	//スプライト用の頂点リソースにデータを書き込む
@@ -81,6 +83,12 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	perViewData_->viewProjection = Matrix4x4::MakeIdentity4x4();
 	perViewData_->billboardMatrix = Matrix4x4::MakeIdentity4x4();
 
+	perFrameResource_ = directXBasic_->CreateBufferResource(sizeof(PerFrame));
+	hr = perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&perFrameData_));
+	assert(SUCCEEDED(hr));
+	perFrameData_->deltaTime = 0.0f;
+	perFrameData_->time = 0.0f;
+
 	// UAV用のResourceを確保
 	UAVResource_ = directXBasic_->CreateBufferResourceUAV(sizeof(ParticleCS) * 1024);
 	particleUavIndex_ = srvManager_->Allocate();
@@ -109,7 +117,31 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 		1024,
 		sizeof(ParticleCS));
 
+	freeCounterResource_ = directXBasic_->CreateBufferResourceUAV(sizeof(uint32_t));
+	freeCounterUavIndex_ = srvManager_->Allocate();
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC counterUavDesc{};
+	counterUavDesc.Format = DXGI_FORMAT_UNKNOWN;
+	counterUavDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	counterUavDesc.Buffer.FirstElement = 0;
+	counterUavDesc.Buffer.NumElements = 1;
+	counterUavDesc.Buffer.StructureByteStride = sizeof(uint32_t);
+	counterUavDesc.Buffer.CounterOffsetInBytes = 0;
+	counterUavDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+
+	directXBasic_->GetDevice()->CreateUnorderedAccessView( freeCounterResource_.Get(), nullptr, &counterUavDesc, srvManager_->GetCPUDescriptorHandle(freeCounterUavIndex_));
+
 	DispatchInitializeParticle();
+
+	emitterSphereResource_ = directXBasic_->CreateBufferResource(sizeof(EmitterSphere));
+	emitterSphereResource_->Map(0, nullptr, reinterpret_cast<void**>(&emitterSphereData_));
+	
+	emitterSphereData_->count = 10;
+	emitterSphereData_->frequency = 0.5f;
+	emitterSphereData_->frequencyTime = 0.0f;
+	emitterSphereData_->translate = Vector3(0.0f, 0.0f, 0.0f);
+	emitterSphereData_->radius = 1.0f;
+	emitterSphereData_->emit = 0;
 
 	accelerationField_.acceleration = { 0.0f, 15.0f, 0.0f };
 	accelerationField_.area.min = { -1.0f, -1.0f, -1.0f };
@@ -189,7 +221,12 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 	billboardMatrix.m[3][1] = 0.0f;
 	billboardMatrix.m[3][2] = 0.0f;
 
-		perViewData_->billboardMatrix = billboardMatrix;
+	perViewData_->billboardMatrix = billboardMatrix;
+
+	const float deltaTime = TimeManager::GetInstance()->GetDeltaTime();
+
+	perFrameData_->deltaTime = deltaTime;
+	perFrameData_->time += deltaTime;
 
 	//uvTransform_.translate.x += 0.001f;
 
@@ -283,6 +320,14 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 	//	return false;
 	//	});
 	
+	emitterSphereData_->frequencyTime += TimeManager::GetInstance()->GetDeltaTime();
+	if (emitterSphereData_->frequency <= emitterSphereData_->frequencyTime) {
+		emitterSphereData_->frequencyTime -= emitterSphereData_->frequency;
+		emitterSphereData_->emit = 1;
+	} else {
+		emitterSphereData_->emit = 0;
+	}
+	DispatchEmitParticle();
 }
 
 void ParticleManager::Draw()
@@ -489,15 +534,31 @@ void ParticleManager::CreateComputeState() {
 	descriptorRange.RegisterSpace = 0;
 	descriptorRange.OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 
-	D3D12_ROOT_PARAMETER rootParameter{};
-	rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
-	rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
-	rootParameter.DescriptorTable.NumDescriptorRanges = 1;
-	rootParameter.DescriptorTable.pDescriptorRanges = &descriptorRange;
+	D3D12_DESCRIPTOR_RANGE descriptorRanges[2]{};
+	descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	descriptorRanges[0].NumDescriptors = 1;
+	descriptorRanges[0].BaseShaderRegister = 0;
+	descriptorRanges[0].RegisterSpace = 0;
+	descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	descriptorRanges[1].NumDescriptors = 1;
+	descriptorRanges[1].BaseShaderRegister = 1;
+	descriptorRanges[1].RegisterSpace = 0;
+	descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[2]{};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
 
 	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
-	rootSignatureDesc.NumParameters = 1;
-	rootSignatureDesc.pParameters = &rootParameter;
+	rootSignatureDesc.NumParameters = _countof(rootParameters);
+	rootSignatureDesc.pParameters = rootParameters;
 	rootSignatureDesc.NumStaticSamplers = 0;
 	rootSignatureDesc.pStaticSamplers = nullptr;
 	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
@@ -524,6 +585,71 @@ void ParticleManager::CreateComputeState() {
 	};
 	computePipelineStateDesc.pRootSignature = computeRootSignature_.Get();
 	hr = directXBasic_->GetDevice()->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&computePipelineState_));
+	assert(SUCCEEDED(hr));
+}
+
+void ParticleManager::CreateComputeStateEmit() {
+	Microsoft::WRL::ComPtr<IDxcBlob> computeShaderBlob = directXBasic_->CompileShader(L"resources/shaders/EmitParticle.CS.hlsl",
+		L"cs_6_0", logger_);
+	assert(computeShaderBlob != nullptr);
+
+	D3D12_DESCRIPTOR_RANGE descriptorRanges[2]{};
+	descriptorRanges[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	descriptorRanges[0].NumDescriptors = 1;
+	descriptorRanges[0].BaseShaderRegister = 0;
+	descriptorRanges[0].RegisterSpace = 0;
+	descriptorRanges[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+	descriptorRanges[1].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_UAV;
+	descriptorRanges[1].NumDescriptors = 1;
+	descriptorRanges[1].BaseShaderRegister = 1;
+	descriptorRanges[1].RegisterSpace = 0;
+	descriptorRanges[1].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+	D3D12_ROOT_PARAMETER rootParameters[4]{};
+	rootParameters[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[0].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[0].DescriptorTable.pDescriptorRanges = &descriptorRanges[0];
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = 1;
+	rootParameters[1].DescriptorTable.pDescriptorRanges = &descriptorRanges[1];
+	rootParameters[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[2].Descriptor.ShaderRegister = 0;
+	rootParameters[3].ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+	rootParameters[3].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+	rootParameters[3].Descriptor.ShaderRegister = 1;
+
+	D3D12_ROOT_SIGNATURE_DESC rootSignatureDesc{};
+	rootSignatureDesc.NumParameters = _countof(rootParameters);
+	rootSignatureDesc.pParameters = rootParameters;
+	rootSignatureDesc.NumStaticSamplers = 0;
+	rootSignatureDesc.pStaticSamplers = nullptr;
+	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_NONE;
+
+	//シリアライズしてバイナリにする
+	Microsoft::WRL::ComPtr<ID3DBlob> signatureBlob = nullptr;
+	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob = nullptr;
+	HRESULT hr = D3D12SerializeRootSignature(&rootSignatureDesc,
+		D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob, &errorBlob);
+	if (FAILED(hr)) {
+		logger_->Log(reinterpret_cast<char*>(errorBlob->GetBufferPointer()));
+		assert(false);
+	}
+	//バイナリを元に生成
+	hr = directXBasic_->GetDevice()->CreateRootSignature(0,
+		signatureBlob->GetBufferPointer(), signatureBlob->GetBufferSize(),
+		IID_PPV_ARGS(&computeRootSignatureEmit_));
+	assert(SUCCEEDED(hr));
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC computePipelineStateDesc{};
+	computePipelineStateDesc.CS = {
+		.pShaderBytecode = computeShaderBlob->GetBufferPointer(),
+		.BytecodeLength = computeShaderBlob->GetBufferSize()
+	};
+	computePipelineStateDesc.pRootSignature = computeRootSignatureEmit_.Get();
+	hr = directXBasic_->GetDevice()->CreateComputePipelineState(&computePipelineStateDesc, IID_PPV_ARGS(&computePipelineStateEmit_));
 	assert(SUCCEEDED(hr));
 }
 
@@ -663,6 +789,23 @@ void ParticleManager::DispatchInitializeParticle()
 	particleResourceState_ =
 		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
+	D3D12_RESOURCE_BARRIER counterBarrier{};
+	counterBarrier.Type =
+		D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	counterBarrier.Transition.pResource =
+		freeCounterResource_.Get();
+	counterBarrier.Transition.StateBefore =
+		D3D12_RESOURCE_STATE_COMMON;
+	counterBarrier.Transition.StateAfter =
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	counterBarrier.Transition.Subresource =
+		D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+	commandList->ResourceBarrier(1, &counterBarrier);
+
+	freeCounterResourceState_ =
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
 	// 初期化用Compute Shader
 	commandList->SetComputeRootSignature(
 		computeRootSignature_.Get());
@@ -673,6 +816,10 @@ void ParticleManager::DispatchInitializeParticle()
 	commandList->SetComputeRootDescriptorTable(
 		0,
 		srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
+
+	commandList->SetComputeRootDescriptorTable(
+		1,
+		srvManager_->GetGPUDescriptorHandle(freeCounterUavIndex_));
 
 	commandList->Dispatch(1, 1, 1);
 
@@ -685,4 +832,71 @@ void ParticleManager::DispatchInitializeParticle()
 	commandList->ResourceBarrier(1, &barrier);
 	particleResourceState_ =
 		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+
+	D3D12_RESOURCE_BARRIER counterUavBarrier{};
+	counterUavBarrier.Type =
+		D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	counterUavBarrier.UAV.pResource =
+		freeCounterResource_.Get();
+
+	commandList->ResourceBarrier(1, &counterUavBarrier);
+}
+
+void ParticleManager::DispatchEmitParticle() {
+	ID3D12GraphicsCommandList* commandList =
+		directXBasic_->GetCommandList();
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = {
+		srvManager_->GetDescriptorHeap()
+	};
+	commandList->SetDescriptorHeaps(
+		_countof(descriptorHeaps),
+		descriptorHeaps);
+
+	// COMMON → UAV
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = UAVResource_.Get();
+	barrier.Transition.StateBefore = particleResourceState_;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+	commandList->ResourceBarrier(1, &barrier);
+	particleResourceState_ =
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+
+	// 初期化用Compute Shader
+	commandList->SetComputeRootSignature(
+		computeRootSignatureEmit_.Get());
+
+	commandList->SetPipelineState(
+		computePipelineStateEmit_.Get());
+
+	commandList->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
+
+	commandList->SetComputeRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(freeCounterUavIndex_));
+
+	commandList->SetComputeRootConstantBufferView(2, emitterSphereResource_->GetGPUVirtualAddress());
+
+	commandList->SetComputeRootConstantBufferView(3, perFrameResource_->GetGPUVirtualAddress());
+
+	commandList->Dispatch(1, 1, 1);
+
+	// UAV → Vertex Shaderから読めるSRV状態
+	barrier.Transition.StateBefore =
+		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	barrier.Transition.StateAfter =
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+
+	commandList->ResourceBarrier(1, &barrier);
+	particleResourceState_ =
+		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+
+	D3D12_RESOURCE_BARRIER counterUavBarrier{};
+	counterUavBarrier.Type =
+		D3D12_RESOURCE_BARRIER_TYPE_UAV;
+	counterUavBarrier.UAV.pResource =
+		freeCounterResource_.Get();
+
+	commandList->ResourceBarrier(1, &counterUavBarrier);
 }

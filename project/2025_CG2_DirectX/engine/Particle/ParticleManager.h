@@ -44,6 +44,21 @@ struct PerView {
 	Matrix4x4 billboardMatrix;
 };
 
+struct PerFrame
+{
+	float time;
+	float deltaTime;
+};
+
+struct EmitterSphere {
+	Vector3 translate;
+	float radius;
+	uint32_t count;
+	float frequency;
+	float frequencyTime;
+	uint32_t emit;
+};
+
 class ParticleManager
 {
 public:
@@ -78,6 +93,11 @@ public:
 	/// </summary>
 	void CreateComputeState();
 
+	/// <summary>
+	/// CS用PSOの作成
+	/// </summary>
+	void CreateComputeStateEmit();
+
 	void CreateVertexResource(uint32_t vertexCount);
 
 	std::list<Particle> Emit(const ParticleEmitter& emitter, std::mt19937& randomEngine);
@@ -87,6 +107,8 @@ public:
 	bool IsCollision(const MyMath::AABB& aabb, const Vector3& point);
 
 	void DispatchInitializeParticle();
+
+	void DispatchEmitParticle();
 
 private:
 	DirectXBasic* directXBasic_ = nullptr;
@@ -170,5 +192,17 @@ private:
 	Comptr<ID3D12Resource> perViewResource_ = nullptr;
 	PerView* perViewData_ = nullptr;
 
+	Comptr<ID3D12Resource> emitterSphereResource_ = nullptr;
+	EmitterSphere* emitterSphereData_ = nullptr;
+
+	Comptr<ID3D12PipelineState> computePipelineStateEmit_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12RootSignature> computeRootSignatureEmit_;
+
+	Comptr<ID3D12Resource> perFrameResource_ = nullptr;
+	PerFrame* perFrameData_ = nullptr;
+
+	Comptr<ID3D12Resource> freeCounterResource_ = nullptr;
+	uint32_t freeCounterUavIndex_ = 0;
+	D3D12_RESOURCE_STATES freeCounterResourceState_ = D3D12_RESOURCE_STATE_COMMON;
 };
 
