@@ -156,6 +156,35 @@ void SampleScene::Update()
 	object3dSphere->Update();
 	object3dAnimCube->Update();
 	object3dPlayer->Update();
+
+	// Move Walk on the XZ ground plane with the left stick.
+	Vector2 walkInput = Input::GetInstance()->GetLeftStick();
+	const float inputLength = walkInput.Norm();
+	const bool isWalkMoving = inputLength > 0.0f;
+
+	// Prevent diagonal input from exceeding the maximum movement speed.
+	if (inputLength > 1.0f) {
+		walkInput /= inputLength;
+	}
+
+	Vector3 walkPosition = object3dWalk->GetTransform().translate;
+	walkPosition.y = 0.0f;
+
+	if (isWalkMoving) {
+		constexpr float kWalkMoveSpeed = 3.0f;
+		const float deltaTime = TimeManager::GetInstance()->GetDeltaTime();
+
+		walkPosition.x += walkInput.x * kWalkMoveSpeed * deltaTime;
+		walkPosition.z += walkInput.y * kWalkMoveSpeed * deltaTime;
+
+		// Face the model in its movement direction.
+		Vector3 walkRotation = object3dWalk->GetTransform().rotate;
+		walkRotation.y = std::atan2(walkInput.x, walkInput.y);
+		object3dWalk->SetRotate(walkRotation);
+	}
+
+	object3dWalk->SetTranslate(walkPosition);
+	object3dWalk->SetAnimationPlaying(isWalkMoving);
 	object3dWalk->Update();
 
 	for (auto& object : levelObjects_) {

@@ -54,8 +54,10 @@ void SkinnedObject3D::Update()
 
 	// アニメーションがある場合は更新する
 	if (animation_ != nullptr) {
-		animationTime += 1.0f / 60.0f;
-		animationTime = std::fmod(animationTime, animation_->duration);
+		if (isAnimationPlaying_) {
+			animationTime += 1.0f / 60.0f;
+			animationTime = std::fmod(animationTime, animation_->duration);
+		}
 		/*NodeAnimation& rootNodeAnimation = animation_->nodeAnimations[modelData_->rootNode_.name];
 		Vector3 translate = AnimationManager::CalculateValue(rootNodeAnimation.translate.keyframes, animationTime);
 		Quaternion rotate = AnimationManager::CalculateValue(rootNodeAnimation.rotate.keyframes, animationTime);
@@ -94,23 +96,8 @@ void SkinnedObject3D::Draw()
 
 			if (skinCluster.skinnedVertexResourceState !=
 				D3D12_RESOURCE_STATE_UNORDERED_ACCESS) {
-
-				D3D12_RESOURCE_BARRIER barrier{};
-				barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-				barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-				barrier.Transition.pResource =
-					skinCluster.skinnedVertexResource.Get();
-				barrier.Transition.StateBefore =
-					skinCluster.skinnedVertexResourceState;
-				barrier.Transition.StateAfter =
-					D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-				barrier.Transition.Subresource =
-					D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-				skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->ResourceBarrier(1, &barrier);
-
-				skinCluster.skinnedVertexResourceState =
-					D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+				skinnedObject3DBasic_->GetDirectXBasic()->TransitionBarrier(skinCluster.skinnedVertexResource.Get(), skinCluster.skinnedVertexResourceState, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
+				skinCluster.skinnedVertexResourceState = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 			}
 
 			skinnedObject3DBasic_->SetComputeResources(
@@ -123,19 +110,7 @@ void SkinnedObject3D::Draw()
 			skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->Dispatch(UINT(modelData_->meshes_.at(i).vertices.size() + 1023) / 1024, 1, 1);
 			
 			if (skinCluster.skinnedVertexResourceState != D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER) {
-				//TransitionBarrierの設定
-				D3D12_RESOURCE_BARRIER barrier_ = {};
-				//今回のバリアはTransition
-				barrier_.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-				//Noneにしておく
-				barrier_.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-				//バリアを張る対象のリソース。現在のバックバッファに対して行う
-				barrier_.Transition.pResource = skinCluster.skinnedVertexResource.Get();
-				//遷移前(現在)のResourceState
-				barrier_.Transition.StateBefore = skinCluster.skinnedVertexResourceState;
-				barrier_.Transition.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
-				//TransitionBarrierを張る
-				skinnedObject3DBasic_->GetDirectXBasic()->GetCommandList()->ResourceBarrier(1, &barrier_);
+				skinnedObject3DBasic_->GetDirectXBasic()->TransitionBarrier(skinCluster.skinnedVertexResource.Get(), skinCluster.skinnedVertexResourceState, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
 				skinCluster.skinnedVertexResourceState = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER;
 			}
 		}

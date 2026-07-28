@@ -35,8 +35,5 @@ private:
 
 	SRVManager* srvManager_ = nullptr;
 
-	// バリア
-	D3D12_RESOURCE_BARRIER barrier_{};
-
 };
 

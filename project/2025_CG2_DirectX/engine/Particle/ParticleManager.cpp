@@ -867,93 +867,39 @@ void ParticleManager::DispatchInitializeParticle()
 	ID3D12DescriptorHeap* descriptorHeaps[] = {
 		srvManager_->GetDescriptorHeap()
 	};
-	commandList->SetDescriptorHeaps(
-		_countof(descriptorHeaps),
-		descriptorHeaps);
+	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// COMMON → UAV
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Transition.pResource = UAVResource_.Get();
-	barrier.Transition.StateBefore = particleResourceState_;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	directXBasic_->TransitionBarrier(UAVResource_.Get(), particleResourceState_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	particleResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
-	commandList->ResourceBarrier(1, &barrier);
-	particleResourceState_ =
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	directXBasic_->TransitionBarrier(freeCounterResource_.Get(), freeCounterResourceState_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	freeCounterResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
-	D3D12_RESOURCE_BARRIER counterBarrier{};
-	counterBarrier.Type =
-		D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	counterBarrier.Transition.pResource =
-		freeCounterResource_.Get();
-	counterBarrier.Transition.StateBefore =
-		D3D12_RESOURCE_STATE_COMMON;
-	counterBarrier.Transition.StateAfter =
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-	counterBarrier.Transition.Subresource =
-		D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	commandList->ResourceBarrier(1, &counterBarrier);
-
-	freeCounterResourceState_ =
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-
-	D3D12_RESOURCE_BARRIER freeListBarrier{};
-	freeListBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	freeListBarrier.Transition.pResource = freeListResource_.Get();
-	freeListBarrier.Transition.StateBefore = freeListResourceState_;
-	freeListBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-	freeListBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	commandList->ResourceBarrier(1, &freeListBarrier);
+	directXBasic_->TransitionBarrier(freeListResource_.Get(), freeListResourceState_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 	freeListResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
 	// 初期化用Compute Shader
-	commandList->SetComputeRootSignature(
-		computeRootSignature_.Get());
+	commandList->SetComputeRootSignature(computeRootSignature_.Get());
 
-	commandList->SetPipelineState(
-		computePipelineState_.Get());
+	commandList->SetPipelineState(computePipelineState_.Get());
 
-	commandList->SetComputeRootDescriptorTable(
-		0,
-		srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
+	commandList->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 
-	commandList->SetComputeRootDescriptorTable(
-		1,
-		srvManager_->GetGPUDescriptorHandle(freeCounterUavIndex_));
+	commandList->SetComputeRootDescriptorTable(1, srvManager_->GetGPUDescriptorHandle(freeCounterUavIndex_));
 
-	commandList->SetComputeRootDescriptorTable(
-		2,
-		srvManager_->GetGPUDescriptorHandle(freeListUavIndex_));
+	commandList->SetComputeRootDescriptorTable(2, srvManager_->GetGPUDescriptorHandle(freeListUavIndex_));
 
 	commandList->Dispatch(1, 1, 1);
-
+	
 	// UAV → Vertex Shaderから読めるSRV状態
-	barrier.Transition.StateBefore =
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-	barrier.Transition.StateAfter =
-		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+	directXBasic_->TransitionBarrier(UAVResource_.Get(), particleResourceState_, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+	particleResourceState_ = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 
-	commandList->ResourceBarrier(1, &barrier);
-	particleResourceState_ =
-		D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+	directXBasic_->UAVBarrier(freeCounterResource_.Get());
 
-	D3D12_RESOURCE_BARRIER counterUavBarrier{};
-	counterUavBarrier.Type =
-		D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	counterUavBarrier.UAV.pResource =
-		freeCounterResource_.Get();
+	directXBasic_->UAVBarrier(freeListResource_.Get());
 
-	commandList->ResourceBarrier(1, &counterUavBarrier);
-
-	D3D12_RESOURCE_BARRIER freeListUavBarrier{};
-	freeListUavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	freeListUavBarrier.UAV.pResource = freeListResource_.Get();
-
-	commandList->ResourceBarrier(1, &freeListUavBarrier);
 }
 
 void ParticleManager::DispatchEmitParticle() {
@@ -963,28 +909,16 @@ void ParticleManager::DispatchEmitParticle() {
 	ID3D12DescriptorHeap* descriptorHeaps[] = {
 		srvManager_->GetDescriptorHeap()
 	};
-	commandList->SetDescriptorHeaps(
-		_countof(descriptorHeaps),
-		descriptorHeaps);
+	commandList->SetDescriptorHeaps(_countof(descriptorHeaps), descriptorHeaps);
 
 	// COMMON → UAV
-	D3D12_RESOURCE_BARRIER barrier{};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Transition.pResource = UAVResource_.Get();
-	barrier.Transition.StateBefore = particleResourceState_;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	commandList->ResourceBarrier(1, &barrier);
-	particleResourceState_ =
-		D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
+	directXBasic_->TransitionBarrier(UAVResource_.Get(), particleResourceState_, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+	particleResourceState_ = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 
 	// 初期化用Compute Shader
-	commandList->SetComputeRootSignature(
-		computeRootSignatureEmit_.Get());
+	commandList->SetComputeRootSignature(computeRootSignatureEmit_.Get());
 
-	commandList->SetPipelineState(
-		computePipelineStateEmit_.Get());
+	commandList->SetPipelineState(computePipelineStateEmit_.Get());
 
 	commandList->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 
@@ -999,20 +933,13 @@ void ParticleManager::DispatchEmitParticle() {
 	commandList->Dispatch(1, 1, 1);
 
 	// バリア
-	D3D12_RESOURCE_BARRIER uavBarriers[3]{};
-	uavBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	uavBarriers[0].UAV.pResource = UAVResource_.Get();
-	uavBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	uavBarriers[1].UAV.pResource = freeCounterResource_.Get();
-	uavBarriers[2].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	uavBarriers[2].UAV.pResource = freeListResource_.Get();
-	commandList->ResourceBarrier(_countof(uavBarriers), uavBarriers);
+	directXBasic_->UAVBarrier(UAVResource_.Get());
+	directXBasic_->UAVBarrier(freeCounterResource_.Get());
+	directXBasic_->UAVBarrier(freeListResource_.Get());
 
-	commandList->SetComputeRootSignature(
-		computeRootSignatureUpdate_.Get());
+	commandList->SetComputeRootSignature(computeRootSignatureUpdate_.Get());
 
-	commandList->SetPipelineState(
-		computePipelineStateUpdate_.Get());
+	commandList->SetPipelineState(computePipelineStateUpdate_.Get());
 
 	commandList->SetComputeRootDescriptorTable(0, srvManager_->GetGPUDescriptorHandle(particleUavIndex_));
 
@@ -1025,23 +952,10 @@ void ParticleManager::DispatchEmitParticle() {
 	commandList->Dispatch(1, 1, 1);
 
 	// UAV → Vertex Shaderから読めるSRV状態
-	D3D12_RESOURCE_BARRIER toSrvBarrier{};
-	toSrvBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	toSrvBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	toSrvBarrier.Transition.pResource = UAVResource_.Get();
-	toSrvBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
-	toSrvBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
-	toSrvBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	commandList->ResourceBarrier(1, &toSrvBarrier);
-
+	directXBasic_->TransitionBarrier(UAVResource_.Get(), particleResourceState_, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
 	particleResourceState_ = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
 
-	D3D12_RESOURCE_BARRIER auxiliaryUavBarriers[2]{};
-	auxiliaryUavBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	auxiliaryUavBarriers[0].UAV.pResource = freeCounterResource_.Get();
-	auxiliaryUavBarriers[1].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
-	auxiliaryUavBarriers[1].UAV.pResource = freeListResource_.Get();
+	directXBasic_->UAVBarrier(freeCounterResource_.Get());
+	directXBasic_->UAVBarrier(freeListResource_.Get());
 
-	commandList->ResourceBarrier(_countof(auxiliaryUavBarriers), auxiliaryUavBarriers);
 }

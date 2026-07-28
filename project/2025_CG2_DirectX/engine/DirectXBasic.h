@@ -128,6 +128,10 @@ public:
 
 	void CreateRenderTexturePSO(PostEffectType postEffectType, std::wstring shaderFile);
 
+	void TransitionBarrier(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES);
+
+	void UAVBarrier(ID3D12Resource* resource);
+
 	/* --------- ゲッター --------- */
 
 	/// <summary>
@@ -308,9 +312,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 	uint64_t fenceValue_;
 	HANDLE fenceEvent_;
-
-	// バリア
-	D3D12_RESOURCE_BARRIER barrier_{};
 
 	// デプスステンシルリソース
 	Comptr<ID3D12Resource> depthStencilResource_ = nullptr;

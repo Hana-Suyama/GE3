@@ -54,6 +54,7 @@ public:
 	/// </summary>
 	/// <param name="animation">アニメーションデータ</param>
 	void SetAnimation(Animation& animation) { animation_ = &animation; }
+	void SetAnimationPlaying(bool isPlaying) { isAnimationPlaying_ = isPlaying; }
 
 	/* --------- ゲッター --------- */
 
@@ -164,6 +165,7 @@ private:
 
 	// アニメーション
 	Animation* animation_ = nullptr;
+	bool isAnimationPlaying_ = true;
 	// アニメーションの再生時間
 	float animationTime = 0.0f;
 	// スケルトン
