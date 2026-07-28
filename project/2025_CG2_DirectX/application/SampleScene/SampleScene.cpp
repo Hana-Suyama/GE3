@@ -327,7 +327,7 @@ void SampleScene::ModelDraw()
 	particleManager->Draw();
 
 	skyBoxBasic_->SkyBoxPreDraw();
-	skyBox_->Draw();
+	//skyBox_->Draw();
 
 }
 
