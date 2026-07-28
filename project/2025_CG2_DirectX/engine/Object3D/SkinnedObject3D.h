@@ -5,7 +5,7 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "Material.h"
-#include "../../../AnimationManager.h"
+#include <AnimationManager.h>
 
 class SkinnedObject3D
 {

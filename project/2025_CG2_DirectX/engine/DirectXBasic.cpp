@@ -63,18 +63,18 @@ void DirectXBasic::Initialize(Logger* logger, WindowsApi* winApi)
 	CreateDSV();
 
 	// レンダーテクスチャ用のPSOの生成
-	CreateRenderTexturePSO(PostEffectType::None, L"resources/shaders/Fullscreen.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::Grayscale, L"resources/shaders/Grayscale.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::Sepia, L"resources/shaders/Sepia.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::Vignette, L"resources/shaders/Vignette.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::BoxFilter3x3, L"resources/shaders/BoxFilter3x3.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::BoxFilter5x5, L"resources/shaders/BoxFilter5x5.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::GaussianBlur, L"resources/shaders/GaussianFilter.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::RadialBlur, L"resources/shaders/RadialBlur.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::LuminanceOutline, L"resources/shaders/LuminanceBasedOutline.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::DepthOutline, L"resources/shaders/DepthBasedOutline.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::Random, L"resources/shaders/Random.PS.hlsl");
-	CreateRenderTexturePSO(PostEffectType::Dissolve, L"resources/shaders/Dissolve.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::None, L"resources/shaders/postEffect/Fullscreen.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Grayscale, L"resources/shaders/postEffect/Grayscale.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Sepia, L"resources/shaders/postEffect/Sepia.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Vignette, L"resources/shaders/postEffect/Vignette.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::BoxFilter3x3, L"resources/shaders/postEffect/BoxFilter3x3.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::BoxFilter5x5, L"resources/shaders/postEffect/BoxFilter5x5.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::GaussianBlur, L"resources/shaders/postEffect/GaussianFilter.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::RadialBlur, L"resources/shaders/postEffect/RadialBlur.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::LuminanceOutline, L"resources/shaders/postEffect/LuminanceBasedOutline.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::DepthOutline, L"resources/shaders/postEffect/DepthBasedOutline.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Random, L"resources/shaders/postEffect/Random.PS.hlsl");
+	CreateRenderTexturePSO(PostEffectType::Dissolve, L"resources/shaders/postEffect/Dissolve.PS.hlsl");
 
 }
 
@@ -368,7 +368,7 @@ void DirectXBasic::CreateRenderTexturePSO(PostEffectType postEffectType, std::ws
 	depthStencilDesc.DepthEnable = false;
 
 	//Shaderをコンパイルする
-	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/Fullscreen.VS.hlsl",
+	Microsoft::WRL::ComPtr<IDxcBlob> vertexShaderBlob = CompileShader(L"resources/shaders/postEffect/Fullscreen.VS.hlsl",
 		L"vs_6_0", logger_);
 	assert(vertexShaderBlob != nullptr);
 

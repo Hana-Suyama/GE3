@@ -252,7 +252,7 @@
     <ClCompile Include="2025_CG2_DirectX\engine\Primitive\Primitive.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp">
+    <ClCompile Include="2025_CG2_DirectX\engine\Animation\Animation.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.cpp">
@@ -275,47 +275,36 @@
     <FxCompile Include="resources\shaders\BasicGeometryShader.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.PS.hlsl">
+    <FxCompile Include="resources\shaders\particle\Particle.PS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.VS.hlsl">
+    <FxCompile Include="resources\shaders\particle\Particle.VS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ParticleGS.hlsl">
+    <FxCompile Include="resources\shaders\particle\ParticleGS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="resources\shaders\SkyBox.PS.hlsl" />
     <FxCompile Include="resources\shaders\SkyBox.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Fullscreen.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Fullscreen.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Grayscale.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Grayscale.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Sepia.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Sepia.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Vignette.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Vignette.VS.hlsl" />
-    <FxCompile Include="resources\shaders\BoxFilter3x3.PS.hlsl" />
-    <FxCompile Include="resources\shaders\BoxFilter3x3.VS.hlsl" />
-    <FxCompile Include="resources\shaders\BoxFilter5x5.PS.hlsl" />
-    <FxCompile Include="resources\shaders\BoxFilter5x5.VS.hlsl" />
-    <FxCompile Include="resources\shaders\GaussianFilter.PS.hlsl" />
-    <FxCompile Include="resources\shaders\GaussianFilter.VS.hlsl" />
-    <FxCompile Include="resources\shaders\LuminanceBasedOutline.PS.hlsl" />
-    <FxCompile Include="resources\shaders\LuminanceBasedOutline.VS.hlsl" />
-    <FxCompile Include="resources\shaders\DepthBasedOutline.PS.hlsl" />
-    <FxCompile Include="resources\shaders\DepthBasedOutline.VS.hlsl" />
-    <FxCompile Include="resources\shaders\RadialBlur.PS.hlsl" />
-    <FxCompile Include="resources\shaders\RadialBlur.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Dissolve.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Dissolve.VS.hlsl" />
-    <FxCompile Include="resources\shaders\Random.PS.hlsl" />
-    <FxCompile Include="resources\shaders\Random.VS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Fullscreen.VS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Fullscreen.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Grayscale.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Sepia.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Vignette.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\BoxFilter3x3.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\BoxFilter5x5.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\GaussianFilter.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\LuminanceBasedOutline.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\DepthBasedOutline.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\RadialBlur.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Dissolve.PS.hlsl" />
+    <FxCompile Include="resources\shaders\postEffect\Random.PS.hlsl" />
     <FxCompile Include="resources\shaders\SkinningObject3d.VS.hlsl" />
-    <FxCompile Include="resources\shaders\ParticleCS.hlsli" />
-    <FxCompile Include="resources\shaders\InitializeParticle.CS.hlsl" />
-    <FxCompile Include="resources\shaders\ParticleCS.VS.hlsl" />
-    <FxCompile Include="resources\shaders\EmitParticle.CS.hlsl" />
-    <FxCompile Include="resources\shaders\UpdateParticle.CS.hlsl" />
+    <FxCompile Include="resources\shaders\particle\ParticleCS.hlsli" />
+    <FxCompile Include="resources\shaders\particle\InitializeParticle.CS.hlsl" />
+    <FxCompile Include="resources\shaders\particle\ParticleCS.VS.hlsl" />
+    <FxCompile Include="resources\shaders\particle\EmitParticle.CS.hlsl" />
+    <FxCompile Include="resources\shaders\particle\UpdateParticle.CS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\imgui\imconfig.h">
@@ -522,13 +511,13 @@
     <ClInclude Include="2025_CG2_DirectX\engine\Primitive\Primitive.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\PostEffectMaterial.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectMaterial.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\PostEffectController.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectController.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
-    <ClInclude Include="AnimationManager.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Animation\AnimationManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.h">
@@ -550,22 +539,11 @@
     <None Include="resources\shaders\Object3d.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="resources\shaders\Particle.hlsli">
+    <None Include="resources\shaders\particle\Particle.hlsli">
       <Filter>Shader</Filter>
     </None>
     <None Include="resources\shaders\SkyBox.hlsli" />
-    <None Include="resources\shaders\Fullscreen.hlsli" />
-    <None Include="resources\shaders\Grayscale.hlsli" />
-    <None Include="resources\shaders\Sepia.hlsli" />
-    <None Include="resources\shaders\Vignette.hlsli" />
-    <None Include="resources\shaders\BoxFilter3x3.hlsli" />
-    <None Include="resources\shaders\BoxFilter5x5.hlsli" />
-    <None Include="resources\shaders\GaussianFilter.hlsli" />
-    <None Include="resources\shaders\LuminanceBasedOutline.hlsli" />
-    <None Include="resources\shaders\DepthBasedOutline.hlsli" />
-    <None Include="resources\shaders\RadialBlur.hlsli" />
-    <None Include="resources\shaders\Dissolve.hlsli" />
-    <None Include="resources\shaders\Random.hlsli" />
+    <None Include="resources\shaders\postEffect\Fullscreen.hlsli" />
     <None Include="resources\shaders\Skinning.CS.hlsl" />
   </ItemGroup>
 </Project>

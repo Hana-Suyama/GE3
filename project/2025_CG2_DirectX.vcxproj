@@ -60,17 +60,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Development|x64'">
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
-    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(SolutionDir)2025_CG2_DirectX\engine\Animation;$(SolutionDir)2025_CG2_DirectX\engine\Debug;$(SolutionDir)2025_CG2_DirectX\engine\LevelLoader;$(SolutionDir)2025_CG2_DirectX\engine\PostEffect;$(SolutionDir)2025_CG2_DirectX\engine\Primitive;$(SolutionDir)2025_CG2_DirectX\engine\Skybox;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(SolutionDir)2025_CG2_DirectX\engine\Animation;$(SolutionDir)2025_CG2_DirectX\engine\Debug;$(SolutionDir)2025_CG2_DirectX\engine\LevelLoader;$(SolutionDir)2025_CG2_DirectX\engine\PostEffect;$(SolutionDir)2025_CG2_DirectX\engine\Primitive;$(SolutionDir)2025_CG2_DirectX\engine\Skybox;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\generated\outputs\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\generated\obj\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)externals\imgui;$(SolutionDir)2025_CG2_DirectX\engine\Audio;$(SolutionDir)2025_CG2_DirectX\engine\Camera;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Dump;$(SolutionDir)2025_CG2_DirectX\engine\Debug\ImGui;$(SolutionDir)2025_CG2_DirectX\engine\Debug\Logger;$(SolutionDir)2025_CG2_DirectX\engine\Input;$(SolutionDir)2025_CG2_DirectX\engine\Light;$(SolutionDir)2025_CG2_DirectX\engine\Model;$(SolutionDir)2025_CG2_DirectX\engine\Object3D;$(SolutionDir)2025_CG2_DirectX\engine\Particle;$(SolutionDir)2025_CG2_DirectX\engine\Scene;$(SolutionDir)2025_CG2_DirectX\engine\Sprite;$(SolutionDir)2025_CG2_DirectX\engine\Time;$(SolutionDir)2025_CG2_DirectX\engine\Utility\Math;$(SolutionDir)2025_CG2_DirectX\engine\Utility;$(SolutionDir)externals\DirectXTex;$(SolutionDir)2025_CG2_DirectX\engine;$(SolutionDir)2025_CG2_DirectX\engine\Animation;$(SolutionDir)2025_CG2_DirectX\engine\Debug;$(SolutionDir)2025_CG2_DirectX\engine\LevelLoader;$(SolutionDir)2025_CG2_DirectX\engine\PostEffect;$(SolutionDir)2025_CG2_DirectX\engine\Primitive;$(SolutionDir)2025_CG2_DirectX\engine\Skybox;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -169,7 +169,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\BaseScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Skybox\SkyBox.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Skybox\SkyBoxBasic.cpp" />
-    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Animation\Animation.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -216,17 +216,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="resources\shaders\EmitParticle.CS.hlsl">
+    <FxCompile Include="resources\shaders\particle\EmitParticle.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\InitializeParticle.CS.hlsl">
+    <FxCompile Include="resources\shaders\particle\InitializeParticle.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ParticleCS.hlsli">
+    <FxCompile Include="resources\shaders\particle\ParticleCS.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -242,47 +242,27 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\BoxFilter3x3.PS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\BoxFilter3x3.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\BoxFilter3x3.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\BoxFilter5x5.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\BoxFilter5x5.PS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\DepthBasedOutline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\BoxFilter5x5.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Dissolve.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\DepthBasedOutline.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\DepthBasedOutline.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Dissolve.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Dissolve.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Fullscreen.PS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Fullscreen.PS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -290,7 +270,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Fullscreen.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Fullscreen.VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Development|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
@@ -298,32 +278,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\GaussianFilter.PS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\GaussianFilter.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\GaussianFilter.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Grayscale.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Grayscale.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Grayscale.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\LuminanceBasedOutline.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\LuminanceBasedOutline.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\LuminanceBasedOutline.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -344,22 +309,22 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.PS.hlsl">
+    <FxCompile Include="resources\shaders\particle\Particle.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Particle.VS.hlsl">
+    <FxCompile Include="resources\shaders\particle\Particle.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ParticleCS.VS.hlsl">
+    <FxCompile Include="resources\shaders\particle\ParticleCS.VS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\ParticleGS.hlsl">
+    <FxCompile Include="resources\shaders\particle\ParticleGS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
@@ -370,32 +335,17 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\RadialBlur.PS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\RadialBlur.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\RadialBlur.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Random.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Random.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Random.VS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Sepia.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Sepia.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Sepia.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -415,17 +365,12 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\UpdateParticle.CS.hlsl">
+    <FxCompile Include="resources\shaders\particle\UpdateParticle.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="resources\shaders\Vignette.PS.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="resources\shaders\Vignette.VS.hlsl">
+    <FxCompile Include="resources\shaders\postEffect\Vignette.PS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -445,8 +390,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Light\LightType.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\SpotLight.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\PostEffectMaterial.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\PostEffectController.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectMaterial.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectController.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Skybox\SkyBox.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Skybox\SkyBoxBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Geometry.h" />
@@ -463,7 +408,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\application\CameraController.h" />
     <ClInclude Include="2025_CG2_DirectX\application\ClearScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\BaseScene.h" />
-    <ClInclude Include="AnimationManager.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Animation\AnimationManager.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_impl_dx12.h" />
@@ -516,31 +461,21 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\BoxFilter3x3.hlsli" />
-    <None Include="resources\shaders\BoxFilter5x5.hlsli" />
-    <None Include="resources\shaders\DepthBasedOutline.hlsli" />
-    <None Include="resources\shaders\Dissolve.hlsli" />
-    <None Include="resources\shaders\Fullscreen.hlsli">
+    <None Include="resources\shaders\postEffect\Fullscreen.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="resources\shaders\GaussianFilter.hlsli" />
-    <None Include="resources\shaders\Grayscale.hlsli" />
-    <None Include="resources\shaders\LuminanceBasedOutline.hlsli" />
     <None Include="resources\shaders\Object3d.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="resources\shaders\Particle.hlsli">
+    <None Include="resources\shaders\particle\Particle.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="resources\shaders\RadialBlur.hlsli" />
-    <None Include="resources\shaders\Random.hlsli" />
-    <None Include="resources\shaders\Sepia.hlsli" />
     <None Include="resources\shaders\Skinning.CS.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -551,7 +486,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
-    <None Include="resources\shaders\Vignette.hlsli" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

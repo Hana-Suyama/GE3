@@ -4,7 +4,7 @@
 #include <TimeManager.h>
 #include <AreaLight.h>
 #include <PostEffectController.h>
-#include "../../../AnimationManager.h"
+#include <AnimationManager.h>
 using namespace MyMath;
 
 void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
