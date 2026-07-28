@@ -212,5 +212,11 @@ private:
 	Comptr<ID3D12Resource> freeCounterResource_ = nullptr;
 	uint32_t freeCounterUavIndex_ = 0;
 	D3D12_RESOURCE_STATES freeCounterResourceState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	Comptr<ID3D12Resource> freeListResource_ = nullptr;
+	uint32_t freeListUavIndex_ = 0;
+	D3D12_RESOURCE_STATES freeListResourceState_ = D3D12_RESOURCE_STATE_COMMON;
+
+	const uint32_t kMaxParticles = 1024;
 };
 
