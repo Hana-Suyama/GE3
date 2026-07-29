@@ -42,11 +42,6 @@ public:
 	void Update();
 
 	/// <summary>
-	/// 描画前処理
-	/// </summary>
-	void PreDraw();
-
-	/// <summary>
 	/// レンダーテクスチャ描画前処理
 	/// </summary>
 	void PreDrawRenderTexture();

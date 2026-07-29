@@ -109,6 +109,16 @@ void LevelLoader::LoadObjectRecursive(const nlohmann::json& object, LevelData* l
 			assert(object["file_name"].is_string());
 			enemyData.fileName = object["file_name"].get<std::string>();
 		}
+	} else if (type.compare("CoinSpawn") == 0) {
+		levelData->coins.emplace_back(CoinSpawnData{});
+		CoinSpawnData& coinData = levelData->coins.back();
+
+		assert(object.contains("transform"));
+		const nlohmann::json& transform = object["transform"];
+
+		coinData.translation.x = (float)transform["translation"][0];
+		coinData.translation.y = (float)transform["translation"][2];
+		coinData.translation.z = (float)transform["translation"][1];
 	}
 
 	if (object.contains("children")) {

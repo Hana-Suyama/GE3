@@ -156,6 +156,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="2025_CG2_DirectX\application\Coin.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\Enemy.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\MapChipField.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Camera\DebugCamera.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
@@ -184,6 +186,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\Game.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\LevelLoader\LevelLoader.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.cpp" />
     <ClCompile Include="main.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -214,6 +217,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="resources\shaders\particle\EmitParticle.CS.hlsl">
@@ -377,6 +381,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="2025_CG2_DirectX\application\Coin.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\Enemy.h" />
     <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\CameraForGPU.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Debug\D3DResourceLeakChecker.h" />
@@ -451,6 +457,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

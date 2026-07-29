@@ -5,13 +5,10 @@ void Game::Initialize()
 
 	Engine::Initialize();
 
-	currentScene_ = Scene::SampleScene;
+	currentScene_ = Scene::TitleScene;
 
-	sampleScene = std::make_unique<SampleScene>();
-	sceneManager_->SetNextScene(move(sampleScene));
-
-	/*titleScene = std::make_unique<TitleScene>();
-	sceneManager_->SetNextScene(move(titleScene));*/
+	titleScene = std::make_unique<TitleScene>();
+	sceneManager_->SetNextScene(move(titleScene));
 
 }
 
@@ -37,7 +34,7 @@ void Game::Update()
 #endif
 
 	sceneManager_->ImGuiDraw();
-	Engine::PostEffectImGuiDraw();
+	Engine::PostEffectDebugDraw();
 
 	//ゲームの処理
 
@@ -49,13 +46,12 @@ void Game::Update()
 
 void Game::Draw()
 {
-	Engine::PreDraw();
-	Engine::SpritePreDraw();
-
-	Engine::ModelPreDraw();
+	Engine::RenderTexturePreDraw();
+	Engine::SceneSpriteDraw();
+	Engine::SceneModelDraw();
 
 	Engine::BackBufferPreDraw();
-	Engine::DrawRenderTexture();
+	Engine::DrawPostEffect();
 	imguiManager_->Draw();
 
 	Engine::PostDraw();

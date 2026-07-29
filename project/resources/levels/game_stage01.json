@@ -63,6 +63,142 @@
                     1.0
                 ]
             }
+        },
+        {
+            "type": "EnemySpawn",
+            "name": "EnemySpawn",
+            "file_name": "enemy",
+            "transform": {
+                "translation": [
+                    33.0,
+                    0.0,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "EnemySpawn",
+            "name": "EnemySpawn.001",
+            "file_name": "enemy",
+            "transform": {
+                "translation": [
+                    52.0,
+                    0.0,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "EnemySpawn",
+            "name": "EnemySpawn.002",
+            "file_name": "enemy",
+            "transform": {
+                "translation": [
+                    102.0,
+                    0.0,
+                    1.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scaling": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn",
+            "transform": {
+                "translation": [25.0, 0.0, 1.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.001",
+            "transform": {
+                "translation": [38.0, 0.0, 4.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.002",
+            "transform": {
+                "translation": [47.0, 0.0, 5.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.003",
+            "transform": {
+                "translation": [73.0, 0.0, 1.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.004",
+            "transform": {
+                "translation": [82.0, 0.0, 9.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.005",
+            "transform": {
+                "translation": [101.0, 0.0, 5.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.006",
+            "transform": {
+                "translation": [122.0, 0.0, 9.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.007",
+            "transform": {
+                "translation": [166.0, 0.0, 5.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.008",
+            "transform": {
+                "translation": [184.0, 0.0, 6.5]
+            }
+        },
+        {
+            "type": "CoinSpawn",
+            "name": "CoinSpawn.009",
+            "transform": {
+                "translation": [190.0, 0.0, 1.5]
+            }
         }
     ]
 }

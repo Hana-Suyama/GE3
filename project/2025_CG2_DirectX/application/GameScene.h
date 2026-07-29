@@ -1,8 +1,12 @@
 #pragma once
+#include "Coin.h"
+#include "Enemy.h"
 #include "Player.h"
 #include "CameraController.h"
 #include "../engine/Scene/BaseScene.h"
+#include "../engine/Sprite/Sprite.h"
 #include <LevelLoader/LevelLoader.h>
+#include <array>
 
 class GameScene : public BaseScene
 {
@@ -29,6 +33,10 @@ public:
 	void GenerateLevelObjects();
 
 private:
+
+	void RespawnPlayer();
+	void InitializeTimerDisplay();
+	void UpdateTimerDisplay();
 
 	DirectXBasic* directXBasic_ = nullptr;
 	Object3DBasic* object3dBasic_ = nullptr;
@@ -77,6 +85,17 @@ private:
 	std::unique_ptr<Object3D> flag_ = nullptr;
 
 	std::unique_ptr<Player> player_ = nullptr;
+	Vector3 playerSpawnPosition_{};
+
+	std::vector<std::unique_ptr<Enemy>> enemies_;
+	std::vector<std::unique_ptr<Coin>> coins_;
+	uint32_t collectedCoinCount_ = 0;
+	uint32_t totalCoinCount_ = 0;
+
+	static constexpr size_t kTimerDigitCount = 6;
+	std::array<std::unique_ptr<Sprite>, kTimerDigitCount> timerDigitSprites_;
+	std::array<std::string, 10> timerDigitTexturePaths_;
+	float elapsedTime_ = 0.0f;
 
 	std::unique_ptr<Vector3> planePosition{};
 

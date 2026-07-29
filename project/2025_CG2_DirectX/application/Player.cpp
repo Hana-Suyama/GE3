@@ -3,6 +3,7 @@
 #include"../engine/utility/Math/MyMath.h"
 #include <numbers>
 #include <array>
+#include <cmath>
 #include <TimeManager.h>
 using namespace MyMath;
 
@@ -15,6 +16,9 @@ void Player::Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager
 
 	lrDirection_ = LRDirection::kRight;
 	model_->SetRotate({ 0.0f, DEGtoRAD(90.0f), 0.0f });
+	coyoteTimer_ = 0.0f;
+	jumpBufferTimer_ = 0.0f;
+	isJumpRising_ = false;
 }
 
 void Player::Update()
@@ -60,18 +64,51 @@ void Player::Draw()
 	model_->Draw();
 }
 
+void Player::Respawn(const Vector3& position)
+{
+	model_->SetTranslate(position);
+	velocity_ = {};
+	onGround_ = false;
+	turnTimer_ = 0.0f;
+	coyoteTimer_ = 0.0f;
+	jumpBufferTimer_ = 0.0f;
+	isJumpRising_ = false;
+	model_->Update();
+}
+
+void Player::BounceFromEnemy()
+{
+	velocity_.y = kEnemyBounceAcceleration;
+	onGround_ = false;
+	coyoteTimer_ = 0.0f;
+	isJumpRising_ = false;
+}
+
 void Player::Move()
 {
+	Input* input = Input::GetInstance();
+	const float deltaTime = TimeManager::GetInstance()->GetDeltaTime();
+
+	jumpBufferTimer_ = (std::max)(0.0f, jumpBufferTimer_ - deltaTime);
+	if (input->IsTriggerPushKey(DIK_UP)) {
+		jumpBufferTimer_ = kJumpBufferTime;
+	}
+
+	if (onGround_) {
+		coyoteTimer_ = kCoyoteTime;
+	} else {
+		coyoteTimer_ = (std::max)(0.0f, coyoteTimer_ - deltaTime);
+	}
 	// 移動入力
 
 	// 接地状態
 	if (onGround_) {
 		// 左右移動操作
-		if (Input::GetInstance()->IsPushKey(DIK_RIGHT) || Input::GetInstance()->IsPushKey(DIK_LEFT)) {
+		if (input->IsPushKey(DIK_RIGHT) || input->IsPushKey(DIK_LEFT)) {
 
 			// 左右加速
 			Vector3 acceleration = {};
-			if (Input::GetInstance()->IsPushKey(DIK_RIGHT)) {
+			if (input->IsPushKey(DIK_RIGHT)) {
 
 				// 左入力中の右入力
 				if (velocity_.x < 0.0f) {
@@ -86,7 +123,7 @@ void Player::Move()
 					turnTimer_ = kTimeTurn;
 				}
 
-			} else if (Input::GetInstance()->IsPushKey(DIK_LEFT)) {
+			} else if (input->IsPushKey(DIK_LEFT)) {
 
 				// 右移動中の左入力
 				if (velocity_.x > 0.0f) {
@@ -114,11 +151,13 @@ void Player::Move()
 			velocity_.x *= (1.0f - kAttenuation);
 		}
 
-		if (Input::GetInstance()->IsPushKey(DIK_UP)) {
+		if (jumpBufferTimer_ > 0.0f && (onGround_ || coyoteTimer_ > 0.0f)) {
 			// ジャンプ初速
-			velocity_.x += Vector3(0, kJumpAcceleration, 0).x;
-			velocity_.y += Vector3(0, kJumpAcceleration, 0).y;
-			velocity_.z += Vector3(0, kJumpAcceleration, 0).z;
+			velocity_.y = kJumpAcceleration;
+			onGround_ = false;
+			coyoteTimer_ = 0.0f;
+			jumpBufferTimer_ = 0.0f;
+			isJumpRising_ = true;
 		}
 
 	} else {
@@ -128,8 +167,28 @@ void Player::Move()
 		velocity_.z += Vector3(0, -kGravityAcceleration, 0).z;
 		// 落下速度制限
 		velocity_.y = (std::max)(velocity_.y, -kLimitFallSpeed);
+
+		if (jumpBufferTimer_ > 0.0f && coyoteTimer_ > 0.0f) {
+			velocity_.y = kJumpAcceleration;
+			coyoteTimer_ = 0.0f;
+			jumpBufferTimer_ = 0.0f;
+			isJumpRising_ = true;
+		}
 	}
 
+	if (isJumpRising_ && velocity_.y > 0.0f && !input->IsPushKey(DIK_UP)) {
+		velocity_.y *= kJumpCutMultiplier;
+		isJumpRising_ = false;
+	}
+
+	if (velocity_.y <= 0.0f) {
+		isJumpRising_ = false;
+	}
+
+	if (!input->IsPushKey(DIK_RIGHT) && !input->IsPushKey(DIK_LEFT) &&
+		std::abs(velocity_.x) < kStopSpeedThreshold) {
+		velocity_.x = 0.0f;
+	}
 }
 
 void Player::MapCollisionCheck(CollisionMapInfo& info)
@@ -404,6 +463,7 @@ void Player::CeilingCollisionMove(const CollisionMapInfo& info)
 	//天井に当たった？
 	if (info.isCeilingCollision) {
 		velocity_.y = 0;
+		isJumpRising_ = false;
 	}
 }
 
@@ -452,6 +512,7 @@ void Player::OnGroundSwitch(const CollisionMapInfo& info)
 		if (info.isGroundCollision) {
 			//着地状態に切り替える(落下を止める)
 			onGround_ = true;
+			isJumpRising_ = false;
 			//着地時にX速度を減衰
 			velocity_.x *= (1.0f - kAttenuationLanding);
 			//Y速度をゼロにする

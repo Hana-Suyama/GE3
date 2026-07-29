@@ -22,6 +22,10 @@ struct EnemySpawnData {
 	Vector3 rotation;
 };
 
+struct CoinSpawnData {
+	Vector3 translation;
+};
+
 struct LevelData {
 	struct ObjectData {
 		std::string fileName;
@@ -31,6 +35,7 @@ struct LevelData {
 	std::vector<ObjectData> objects;
 	std::vector<PlayerSpawnData> players;
 	std::vector<EnemySpawnData> enemies;
+	std::vector<CoinSpawnData> coins;
 };
 
 class LevelLoader

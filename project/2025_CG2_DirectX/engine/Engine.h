@@ -40,7 +40,7 @@
 #include "Logger.h"
 #include <dxcapi.h>
 #include "SceneManager.h"
-#include <PostEffectMaterial.h>
+#include <PostEffectRenderer.h>
 #include "PostEffectController.h"
 
 using namespace MyMath;
@@ -59,13 +59,13 @@ public:
 
 	virtual void Draw() = 0;
 
-	void PreDraw();
+	void RenderTexturePreDraw();
 	void BackBufferPreDraw();
-	void SpritePreDraw();
-	void ModelPreDraw();
-	void DrawRenderTexture();
+	void SceneSpriteDraw();
+	void SceneModelDraw();
+	void DrawPostEffect();
 	void PostDraw();
-	void PostEffectImGuiDraw();
+	void PostEffectDebugDraw();
 
 	virtual void Finalize();
 
@@ -91,6 +91,7 @@ protected:
 	std::unique_ptr<Camera> defaultCamera_ = nullptr;
 	std::unique_ptr<Object3DBasic> object3DBasic_ = nullptr;
 	std::unique_ptr<SkinnedObject3DBasic> skinnedObject3DBasic_ = nullptr;
+	std::unique_ptr<PostEffectRenderer> postEffectRenderer_ = nullptr;
 
 	BYTE beforeKey_[256] = {};
 	std::unique_ptr<DebugCamera> debugcamera_ = nullptr;
@@ -100,14 +101,6 @@ protected:
 	std::mt19937 randomEngine_{ std::random_device{}() };
 
 	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
-
-	uint32_t renderTextureSrvIndex;
-	uint32_t depthTextureSrvIndex;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> outlineMaterialResource_;
-	PostEffectMaterial* outlineMaterialData_ = nullptr;
-
-	float postEffectTime_ = 0.0f;
 
 	// ポストエフェクト用の設定群
 	PostEffectController postEffectController_;

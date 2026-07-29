@@ -105,6 +105,26 @@ void ClearScene::SkinnedModelDraw()
 
 void ClearScene::ImGuiDraw()
 {
+	ImGui::SetNextWindowPos(
+		ImVec2(640.0f, 500.0f),
+		ImGuiCond_Always,
+		ImVec2(0.5f, 0.5f));
+	ImGui::SetNextWindowBgAlpha(0.65f);
+
+	const ImGuiWindowFlags flags =
+		ImGuiWindowFlags_NoDecoration |
+		ImGuiWindowFlags_AlwaysAutoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoSavedSettings |
+		ImGuiWindowFlags_NoInputs;
+
+	ImGui::Begin("ResultCoinCount", nullptr, flags);
+	ImGui::SetWindowFontScale(2.0f);
+	ImGui::Text(
+		"COINS  %u / %u",
+		collectedCoinCount_,
+		totalCoinCount_);
+	ImGui::End();
 }
 
 void ClearScene::Finalize()

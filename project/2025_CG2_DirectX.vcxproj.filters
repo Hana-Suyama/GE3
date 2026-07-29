@@ -195,6 +195,12 @@
     <ClCompile Include="2025_CG2_DirectX\application\ClearScene.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\Coin.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\application\Enemy.cpp">
+      <Filter>ソース ファイル\application</Filter>
+    </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
@@ -262,6 +268,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -418,6 +430,12 @@
     <ClInclude Include="2025_CG2_DirectX\application\Game.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\Coin.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\application\Enemy.h">
+      <Filter>ヘッダー ファイル\application</Filter>
+    </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\application\GameScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
@@ -527,6 +545,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

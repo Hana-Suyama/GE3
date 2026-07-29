@@ -46,6 +46,10 @@ public:
 
 	void Draw();
 
+	void Respawn(const Vector3& position);
+
+	void BounceFromEnemy();
+
 	void Move();
 
 	void MapCollisionCheck(CollisionMapInfo& info);
@@ -105,7 +109,8 @@ private:
 	//速度
 	static inline const float kAcceleration = 0.03f;
 	//速度減衰率
-	static inline const float kAttenuation = 0.1f;
+	static inline const float kAttenuation = 0.22f;
+	static inline const float kStopSpeedThreshold = 0.01f;
 	//上限速度
 	static inline const float kLimitRunSpeed = 0.5f;
 	//左右
@@ -118,12 +123,20 @@ private:
 	static inline const float kTimeTurn = 0.3f;
 	//接地状態フラグ
 	bool onGround_ = true;
+	float coyoteTimer_ = 0.0f;
+	float jumpBufferTimer_ = 0.0f;
+	bool isJumpRising_ = false;
+
+	static inline const float kCoyoteTime = 0.10f;
+	static inline const float kJumpBufferTime = 0.12f;
+	static inline const float kJumpCutMultiplier = 0.5f;
 	//重力加速度(下方向)
 	static inline const float kGravityAcceleration = 0.03f;
 	//最大落下速度(下方向)
 	static inline const float kLimitFallSpeed = 1.0f;
 	//ジャンプ初速(上方向)
 	static inline const float kJumpAcceleration = 0.5f;
+	static inline const float kEnemyBounceAcceleration = 0.35f;
 	//マップチップによるフィールド
 	MapChipField* mapChipField_ = nullptr;
 	//キャラクターの当たり判定サイズ
@@ -132,7 +145,7 @@ private:
 
 	static inline const float kBlank = 0.1f;
 	//着地時の速度減衰率
-	static inline const float kAttenuationLanding = 0.1f;
+	static inline const float kAttenuationLanding = 0.25f;
 	//壁接触時の速度減衰率
 	static inline const float kAttenuationWall = 0.1f;
 
