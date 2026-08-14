@@ -1,107 +1,50 @@
 #include "TitleScene.h"
-#include "../engine/Light/DirectionalLight.h"
-#include "../engine/Camera/CameraForGPU.h"
-#include "../engine/Light/PointLight.h"
-#include "../engine/Light/SpotLight.h"
-#include <numbers>
+
 #include "../engine/Scene/SceneManager.h"
+#include "../engine/WindowsApi.h"
 #include "GameScene.h"
 
-using namespace MyMath;
-
-void TitleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
+void TitleScene::Initialize(
+	DirectXBasic*, Object3DBasic*, SkinnedObject3DBasic*, ModelManager*, Logger*,
+	SRVManager*, TextureManager* textureManager, SpriteBasic* spriteBasic,
+	XAudio2Basic*, std::mt19937*)
 {
-	directXBasic_ = directXBasic;
-	object3dBasic_ = object3dBasic;
-	skinnedObject3dBasic_ = skinnedObject3dBasic;
-	modelManager_ = modelManager;
-	logger_ = logger;
-	srvManager_ = srvManager;
-	textureManager_ = textureManager;
-	spriteBasic_ = spriteBasic;
-	xaudio2Basic_ = xaudio2Basic;
-	randomEngine_ = randomEngine;
+	const std::string titleLogoTexturePath = "resources/TitleLogo.png";
+	textureManager->LoadTexture(titleLogoTexturePath);
 
-	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
-
-	modelManager_->LoadModel("resources", "title.obj");
-
-	camera = std::make_unique<Camera>();
-	camera->SetRotate({ 0.0f, 0.0f, 0.0f });
-	camera->SetTranslate({ 0.0f, 0.0f, -10.0f });
-	object3dBasic_->SetDefaultCamera(camera.get());
-
-	// カメラ位置転送用のリソースを作る
-	cameraForGPUResource = directXBasic->CreateBufferResource(sizeof(CameraForGPU));
-	// データを書き込む
-	// 書き込むためのアドレスを取得
-	cameraForGPUResource->Map(0, nullptr, reinterpret_cast<void**>(&cameraForGPUData));
-	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
-
-	object_ = std::make_unique<Object3D>();
-	object_->Initialize(object3dBasic_, modelManager_, "resources/title.obj");
-	object_->SetRotate({ DEGtoRAD(90.0f), DEGtoRAD(180.0f), 0.0f });
-
-	lights_.push_back(std::make_unique<DirectionalLight>());
-	lights_.back()->Initialize();
-
-	lights_.push_back(std::make_unique<PointLight>());
-	lights_.back()->Initialize();
-
-	lights_.push_back(std::make_unique<SpotLight>());
-	lights_.back()->Initialize();
-
-	// ライトを一括でGPUに送るためのバッファを作る
-	lightsBufferResource_ = directXBasic->CreateBufferResource(sizeof(LightBuffer));
-	// データを書き込む
-	lightsBufferResource_->Map(0, nullptr, reinterpret_cast<void**>(&lightsBufferData_));
-
+	titleLogoSprite_ = std::make_unique<Sprite>();
+	titleLogoSprite_->Initialize(
+		spriteBasic, textureManager, titleLogoTexturePath);
+	titleLogoSprite_->SetAnchorPoint({ 0.5f, 0.5f });
+	titleLogoSprite_->SetPosition({
+		static_cast<float>(WindowsApi::kClientWidth) * 0.5f,
+		static_cast<float>(WindowsApi::kClientHeight) * 0.5f,
+	});
+	titleLogoSprite_->SetIsDraw(true);
+	titleLogoSprite_->Update();
 }
 
 void TitleScene::Update()
 {
-
 	if (Input::GetInstance()->IsTriggerPushKey(DIK_SPACE)) {
 		std::unique_ptr<BaseScene> scene = std::make_unique<GameScene>();
-		sceneManager_->SetNextScene(move(scene));
+		sceneManager_->SetNextScene(std::move(scene));
 	}
 
-	camera->Update();
-	object_->Update();
-
-	cameraForGPUData->worldPosition = camera->GetTranslate();// あとでワールド座標取得に変えておく
+	titleLogoSprite_->Update();
 }
 
 void TitleScene::SpriteDraw()
 {
-	// ライトデータを一括でライトバッファに書き込む
-
-	//GPUに送るためのLightDataベクターを作成
-	std::vector<LightData> lightDataVector;
-
-	for (auto& light : lights_) {
-		LightData data{};
-		light->WriteToLightData(data);
-		lightDataVector.push_back(data);
-	}
-
-	lightsBufferData_->lightCount = static_cast<uint32_t>(lights_.size());
-	memcpy(lightsBufferData_->lights, lightDataVector.data(), sizeof(LightData) * lightsBufferData_->lightCount);
-
-	//directionalLight用のCBufferの場所を設定
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(3, lightsBufferResource_->GetGPUVirtualAddress());
-	directXBasic_->GetCommandList()->SetGraphicsRootConstantBufferView(4, cameraForGPUResource->GetGPUVirtualAddress());
-
+	titleLogoSprite_->Draw();
 }
 
 void TitleScene::ModelDraw()
 {
-	object_->Draw();
 }
 
 void TitleScene::SkinnedModelDraw()
 {
-
 }
 
 void TitleScene::ImGuiDraw()
@@ -110,5 +53,4 @@ void TitleScene::ImGuiDraw()
 
 void TitleScene::Finalize()
 {
-	
 }

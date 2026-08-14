@@ -321,7 +321,7 @@ PixelShaderOutput main(GSOutput input)
     float32_t3 reflectedVector = reflect(cameraToPosition, normalize(input.normal));
     float32_t4 environmentColor = gEnvironmentTexture.Sample(gSampler, reflectedVector);
     
-    output.color.rgb += environmentColor.rgb;
+    //output.color.rgb += environmentColor.rgb;
     
     // 透明度の計算
     output.color.a = gMaterial.color.a;

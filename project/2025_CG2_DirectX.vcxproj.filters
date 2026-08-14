@@ -267,9 +267,6 @@
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -544,13 +541,16 @@
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleEffect.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleEmitter.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

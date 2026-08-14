@@ -216,7 +216,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Primitive\Primitive.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -396,6 +395,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Light\LightType.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\PointLight.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Light\SpotLight.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleEffect.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleEmitter.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectMaterial.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectController.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Skybox\SkyBox.h" />
@@ -456,7 +457,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Primitive\Primitive.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3DBasic.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Object3D\SkinnedObject3D.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitterSphere.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\PostEffect\PostEffectRenderer.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.h" />
   </ItemGroup>

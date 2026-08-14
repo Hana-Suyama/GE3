@@ -1,13 +1,22 @@
 #include "ParticleCS.hlsli"
 
-struct EmitterSphere
+struct Emitter
 {
-    float32_t3 translate;
-    float32_t radius;
-    uint32_t count;
-    float32_t frequency;
-    float32_t frequencyTime;
-    uint32_t emit;
+    float32_t3 position;
+    float32_t emissionRate;
+
+    float32_t3 rotation;
+    float32_t emissionAccumulator;
+
+    float32_t3 scale;
+    uint32_t effectIndex;
+
+    uint32_t shapeType;
+    uint32_t randomSeed;
+    uint32_t active;
+    uint32_t burstCount;
+
+    float32_t4 shapeParameter;
 };
 
 float32_t rand3dTo1d(

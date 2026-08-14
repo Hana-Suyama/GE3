@@ -105,6 +105,7 @@ void ClearScene::SkinnedModelDraw()
 
 void ClearScene::ImGuiDraw()
 {
+#ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(
 		ImVec2(640.0f, 500.0f),
 		ImGuiCond_Always,
@@ -125,6 +126,7 @@ void ClearScene::ImGuiDraw()
 		collectedCoinCount_,
 		totalCoinCount_);
 	ImGui::End();
+#endif
 }
 
 void ClearScene::Finalize()

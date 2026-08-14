@@ -216,6 +216,7 @@ void GameScene::SkinnedModelDraw()
 
 void GameScene::ImGuiDraw()
 {
+#ifdef USE_IMGUI
 	ImGui::SetNextWindowPos(ImVec2(20.0f, 82.0f), ImGuiCond_Always);
 	ImGui::SetNextWindowBgAlpha(0.55f);
 
@@ -233,6 +234,7 @@ void GameScene::ImGuiDraw()
 		collectedCoinCount_,
 		totalCoinCount_);
 	ImGui::End();
+#endif
 }
 
 void GameScene::Finalize()
