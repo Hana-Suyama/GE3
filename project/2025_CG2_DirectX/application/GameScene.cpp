@@ -1,14 +1,34 @@
 #include "GameScene.h"
+#include "CameraController.h"
+#include "Coin.h"
+#include "Enemy.h"
+#include "MapChipField.h"
+#include "Player.h"
+#include "../engine/Camera/Camera.h"
 #include "../engine/Light/DirectionalLight.h"
 #include "../engine/Camera/CameraForGPU.h"
+#include "../engine/DirectXBasic.h"
+#include "../engine/LevelLoader/LevelLoader.h"
+#include "../engine/Light/Light.h"
+#include "../engine/Light/LightData.h"
 #include "../engine/Light/PointLight.h"
 #include "../engine/Light/SpotLight.h"
+#include "../engine/Model/ModelManager.h"
+#include "../engine/Utility/Math/MyMath.h"
+#include "../engine/Object3D/Object3D.h"
+#include "../engine/Object3D/Object3DBasic.h"
+#include "../engine/Sprite/Sprite.h"
+#include "../engine/TextureManager.h"
 #include <numbers>
 #include "ClearScene.h"
 #include "../engine/Scene/SceneManager.h"
 #include "../engine/Time/TimeManager.h"
 
 using namespace MyMath;
+
+GameScene::GameScene() = default;
+
+GameScene::~GameScene() = default;
 
 void GameScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {

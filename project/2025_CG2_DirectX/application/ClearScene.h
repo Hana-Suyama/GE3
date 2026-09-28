@@ -1,13 +1,24 @@
 #pragma once
-#include "Player.h"
-#include "CameraController.h"
 #include "../engine/Scene/BaseScene.h"
+#include "../engine/Utility/Math/Transform.h"
+
+#include <cstdint>
+#include <d3d12.h>
+#include <memory>
+#include <vector>
+#include <wrl.h>
+
+class Camera;
+class Light;
+class Object3D;
+struct CameraForGPU;
+struct LightBuffer;
 
 class ClearScene : public BaseScene
 {
 public:
-	explicit ClearScene(uint32_t collectedCoinCount = 0, uint32_t totalCoinCount = 0)
-		: collectedCoinCount_(collectedCoinCount), totalCoinCount_(totalCoinCount) {}
+	explicit ClearScene(uint32_t collectedCoinCount = 0, uint32_t totalCoinCount = 0);
+	~ClearScene() override;
 
 	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3DBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
 

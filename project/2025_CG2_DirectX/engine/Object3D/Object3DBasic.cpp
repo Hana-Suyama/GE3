@@ -1,4 +1,7 @@
 #include "Object3DBasic.h"
+#include "DirectXBasic.h"
+#include "Logger.h"
+#include <cassert>
 
 void Object3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
 {

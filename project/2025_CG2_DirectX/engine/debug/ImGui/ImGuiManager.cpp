@@ -1,4 +1,7 @@
 #include "ImGuiManager.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
+#include "WindowsApi.h"
 
 #include <imgui.h>
 #include <imgui_impl_win32.h>

@@ -2,19 +2,27 @@
 #include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
-#include "Logger.h"
-#include "WindowsApi.h"
 #include <dxcapi.h>
-#include "DirectXTex.h"
-#include "d3dx12.h"
-#include "FixFPS.h"
 #include "PostEffectController.h"
 #include <Vector4.h>
 #include <array>
+#include <memory>
+#include <string>
+
+class FixFPS;
+class Logger;
+class WindowsApi;
+
+namespace DirectX
+{
+	class ScratchImage;
+	struct TexMetadata;
+}
 
 class DirectXBasic
 {
 public:
+	DirectXBasic();
 
 	/* --------- namespace省略 --------- */
 

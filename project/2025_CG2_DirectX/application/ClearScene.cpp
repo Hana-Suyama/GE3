@@ -1,13 +1,30 @@
 #include "ClearScene.h"
+#include "../engine/Camera/Camera.h"
 #include "../engine/Light/DirectionalLight.h"
 #include "../engine/Camera/CameraForGPU.h"
+#include "../engine/DirectXBasic.h"
+#include "../engine/Input/Input.h"
+#include "../engine/Light/Light.h"
+#include "../engine/Light/LightData.h"
 #include "../engine/Light/PointLight.h"
 #include "../engine/Light/SpotLight.h"
+#include "../engine/Model/ModelManager.h"
+#include "../engine/Utility/Math/MyMath.h"
+#include "../engine/Object3D/Object3D.h"
+#include "../engine/Object3D/Object3DBasic.h"
 #include <numbers>
 #include "TitleScene.h"
 #include "../engine/Scene/SceneManager.h"
+#include "../engine/TextureManager.h"
 
 using namespace MyMath;
+
+ClearScene::ClearScene(uint32_t collectedCoinCount, uint32_t totalCoinCount)
+	: collectedCoinCount_(collectedCoinCount), totalCoinCount_(totalCoinCount)
+{
+}
+
+ClearScene::~ClearScene() = default;
 
 void ClearScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {

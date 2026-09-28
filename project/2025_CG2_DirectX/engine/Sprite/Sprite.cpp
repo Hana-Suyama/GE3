@@ -1,8 +1,26 @@
 #include "Sprite.h"
 #include "DirectXTex.h"
-#include "ImGuiManager.h"
+#include "DirectXBasic.h"
+#include "MyMath.h"
+#include <imgui.h>
+#include "Material.h"
+#include "SpriteBasic.h"
+#include "TextureManager.h"
+#include "TransformationMatrix.h"
+#include "VertexData.h"
+#include "WindowsApi.h"
 
 using namespace MyMath;
+
+const Vector4& Sprite::GetColor() const
+{
+	return materialData_->color;
+}
+
+void Sprite::SetColor(const Vector4& color)
+{
+	materialData_->color = color;
+}
 
 void Sprite::Initialize(SpriteBasic* spriteBasic, TextureManager* textureManager, std::string textureFilePath)
 {

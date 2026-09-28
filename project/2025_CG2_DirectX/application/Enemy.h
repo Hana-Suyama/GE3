@@ -1,14 +1,18 @@
 #pragma once
 
-#include "../engine/Model/ModelManager.h"
-#include "../engine/Object3D/Object3D.h"
-#include "../engine/Object3D/Object3DBasic.h"
 #include "../engine/Utility/Math/Vector3.h"
 #include <memory>
+
+class ModelManager;
+class Object3D;
+class Object3DBasic;
 
 class Enemy
 {
 public:
+	Enemy();
+	~Enemy();
+
 	void Initialize(
 		Object3DBasic* object3dBasic,
 		ModelManager* modelManager,

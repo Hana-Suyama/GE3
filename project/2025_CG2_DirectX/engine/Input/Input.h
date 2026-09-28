@@ -3,13 +3,14 @@
 #define DIRECTINPUT_VERSION     0x0800	// DirectInputのバージョン指定
 #include <dinput.h>
 #include <wrl.h>
-#include "WindowsApi.h"
 #include "Vector2.h"
 #include <memory>
 #include <vector>
 #include <Xinput.h>
 
 #pragma comment(lib, "xinput.lib")
+
+class WindowsApi;
 
 class Input
 {

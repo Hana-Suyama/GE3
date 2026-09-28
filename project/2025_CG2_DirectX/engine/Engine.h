@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PostEffectController.h"
-#include "MyMath.h"
 
 #include <memory>
 #include <random>
@@ -21,8 +20,6 @@ class SkinnedObject3DBasic;
 class PostEffectRenderer;
 class DebugCamera;
 class SceneManager;
-
-using namespace MyMath;
 
 #pragma comment(lib, "dxguid.lib")
 

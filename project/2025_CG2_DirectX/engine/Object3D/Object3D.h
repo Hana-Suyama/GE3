@@ -1,11 +1,17 @@
 #pragma once
-#include "Object3DBasic.h"
-#include "ModelManager.h"
-#include "TransformationMatrix.h"
 #include "Transform.h"
-#include "Camera.h"
-#include "Material.h"
-#include <AnimationManager.h>
+
+#include <d3d12.h>
+#include <string>
+#include <vector>
+#include <wrl.h>
+
+class Camera;
+class Model;
+class ModelManager;
+class Object3DBasic;
+struct Material;
+struct TransformationMatrix;
 
 class Object3D
 {

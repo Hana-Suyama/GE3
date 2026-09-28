@@ -2,6 +2,7 @@
 #include "BaseScene.h"
 
 #include <cassert>
+#include <utility>
 
 SceneManager::SceneManager() = default;
 
@@ -82,7 +83,7 @@ void SceneManager::ImGuiDraw()
 void SceneManager::RequestSceneChange(std::unique_ptr<BaseScene> nextScene)
 {
 	assert(nextScene);
-	pendingScene_ = move(nextScene);
+	pendingScene_ = std::move(nextScene);
 }
 
 void SceneManager::ActivatePendingScene()

@@ -1,6 +1,13 @@
 #include "SkinnedObject3D.h"
+#include "Camera.h"
+#include "DirectXBasic.h"
+#include "Material.h"
+#include "ModelManager.h"
+#include "MyMath.h"
+#include "SkinnedObject3DBasic.h"
+#include "TextureManager.h"
 #include "TransformationMatrix.h"
-#include "ImGuiManager.h"
+#include <imgui.h>
 #include <numbers>
 
 using namespace MyMath;

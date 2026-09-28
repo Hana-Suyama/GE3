@@ -1,11 +1,17 @@
 #pragma once
-#include "SkinnedObject3DBasic.h"
-#include "ModelManager.h"
-#include "TransformationMatrix.h"
+#include "AnimationManager.h"
 #include "Transform.h"
-#include "Camera.h"
-#include "Material.h"
-#include <AnimationManager.h>
+
+#include <d3d12.h>
+#include <string>
+#include <vector>
+#include <wrl.h>
+
+class Camera;
+class ModelManager;
+class SkinnedObject3DBasic;
+struct Material;
+struct TransformationMatrix;
 
 class SkinnedObject3D
 {

@@ -5,6 +5,8 @@
 #include <wrl.h>
 #include <unordered_map>
 #include <fstream>
+#include <string>
+#include <vector>
 
 #pragma comment(lib, "xaudio2.lib")
 

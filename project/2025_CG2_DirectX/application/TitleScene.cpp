@@ -1,11 +1,24 @@
 #include "TitleScene.h"
 
+#include "../engine/Camera/Camera.h"
+#include "../engine/Camera/CameraForGPU.h"
+#include "../engine/DirectXBasic.h"
+#include "../engine/Input/Input.h"
 #include "../engine/Light/DirectionalLight.h"
+#include "../engine/Light/Light.h"
+#include "../engine/Light/LightData.h"
 #include "../engine/Light/PointLight.h"
 #include "../engine/Light/SpotLight.h"
+#include "../engine/Object3D/Object3DBasic.h"
 #include "../engine/Scene/SceneManager.h"
+#include "../engine/Sprite/Sprite.h"
+#include "../engine/TextureManager.h"
 #include "../engine/WindowsApi.h"
 #include "GameScene.h"
+
+TitleScene::TitleScene() = default;
+
+TitleScene::~TitleScene() = default;
 
 void TitleScene::Initialize(
 	DirectXBasic* directXBasic, Object3DBasic* object3dBasic,

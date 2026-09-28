@@ -1,7 +1,10 @@
 #pragma once
 #include <LightType.h>
 #include <LightData.h>
-#include <ImGuiManager.h>
+
+#ifdef USE_IMGUI
+#include <imgui.h>
+#endif
 
 /// <summary>
 /// ライト基底クラス

@@ -2,16 +2,20 @@
 #include <Vector2.h>
 #include <Vector3.h>
 #include <Vector4.h>
+#include <Matrix4x4.h>
 
-#include <DirectXBasic.h>
-#include <SRVManager.h>
-#include <TextureManager.h>
-#include <Camera.h>
-#include <VertexData.h>
-#include <Material.h>
-#include <GPUParticle/GPUParticleEmitter.h>
-
+#include <d3d12.h>
 #include <random>
+#include <string>
+#include <wrl.h>
+
+class Camera;
+class DirectXBasic;
+class Logger;
+class SRVManager;
+class TextureManager;
+struct GPUParticleEmitter;
+struct Material;
 
 struct GPUParticle {
     Vector3 position;

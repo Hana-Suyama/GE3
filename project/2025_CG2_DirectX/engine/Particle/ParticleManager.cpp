@@ -1,9 +1,17 @@
 #include "ParticleManager.h"
+#include "Camera.h"
+#include "DirectXBasic.h"
+#include "Logger.h"
+#include "Material.h"
+#include "MyMath.h"
+#include "SRVManager.h"
+#include "TextureManager.h"
 #include "VertexData.h"
 #include "TransformationMatrix.h"
 #include <algorithm>
 #include <numbers>
-#include "ImGuiManager.h"
+#include <imgui.h>
+#include <cassert>
 #include <TimeManager.h>
 #include "../Primitive/Primitive.h"
 

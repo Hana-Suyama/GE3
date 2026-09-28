@@ -1,8 +1,19 @@
 #include "ModelManager.h"
+#include "AnimationManager.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
+#include "TextureManager.h"
 #include "Material.h"
+#include "MyMath.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include <numbers>
 #include <Transform.h>
 #include <algorithm>
+#include <cassert>
+#include <fstream>
+#include <sstream>
 
 void ModelManager::Initialize(DirectXBasic* directXBasic, TextureManager* textureManager, SRVManager* srvManager)
 {

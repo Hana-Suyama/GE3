@@ -1,4 +1,8 @@
 #include "TextureManager.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
+
+#include <cassert>
 
 void TextureManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvManager)
 {

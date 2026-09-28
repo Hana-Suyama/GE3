@@ -1,4 +1,9 @@
+#define NOMINMAX
 #include "Player.h"
+#include "MapChipField.h"
+#include "../engine/Camera/Camera.h"
+#include "../engine/Input/Input.h"
+#include "../engine/Object3D/Object3D.h"
 #include <algorithm>
 #include"../engine/utility/Math/MyMath.h"
 #include <numbers>
@@ -6,6 +11,11 @@
 #include <cmath>
 #include <TimeManager.h>
 using namespace MyMath;
+
+const Vector3& Player::GetWorldTransform()
+{
+	return model_->GetTransform().translate;
+}
 
 void Player::Initialize(Object3DBasic* object3dBasic, ModelManager* modelManager, Object3D* model, Camera* camera)
 {

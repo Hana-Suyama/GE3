@@ -1,9 +1,14 @@
 #include "Coin.h"
 
 #include "../engine/Material.h"
+#include "../engine/Object3D/Object3D.h"
 #include "../engine/Time/TimeManager.h"
 #include <algorithm>
 #include <cmath>
+
+Coin::Coin() = default;
+
+Coin::~Coin() = default;
 
 void Coin::Initialize(
 	Object3DBasic* object3dBasic,

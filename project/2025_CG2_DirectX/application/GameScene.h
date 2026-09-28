@@ -1,16 +1,31 @@
 #pragma once
-#include "Coin.h"
-#include "Enemy.h"
-#include "Player.h"
-#include "CameraController.h"
 #include "../engine/Scene/BaseScene.h"
-#include "../engine/Sprite/Sprite.h"
-#include <LevelLoader/LevelLoader.h>
+#include "../engine/Utility/Math/Transform.h"
 #include <array>
+#include <d3d12.h>
+#include <memory>
+#include <string>
+#include <vector>
+#include <wrl.h>
+
+class Camera;
+class CameraController;
+class Coin;
+class Enemy;
+class Light;
+class MapChipField;
+class Object3D;
+class Player;
+class Sprite;
+struct CameraForGPU;
+struct LevelData;
+struct LightBuffer;
 
 class GameScene : public BaseScene
 {
 public:
+	GameScene();
+	~GameScene() override;
 
 	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3DBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
 

@@ -1,9 +1,19 @@
 #include "GPUParticleManager.h"
+#include "GPUParticleEmitter.h"
+#include <Camera.h>
+#include <DirectXBasic.h>
+#include <Logger.h>
+#include <MyMath.h>
+#include <Material.h>
+#include <SRVManager.h>
+#include <TextureManager.h>
+#include <VertexData.h>
 #include <Primitive.h>
-#include <ImGuiManager.h>
+#include <imgui.h>
 #include <TimeManager.h>
 
 #include <numbers>
+#include <cassert>
 
 using namespace MyMath;
 

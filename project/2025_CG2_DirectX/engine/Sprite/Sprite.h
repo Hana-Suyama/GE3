@@ -1,12 +1,16 @@
 #pragma once
 #include <wrl.h>
 #include <d3d12.h>
-#include "VertexData.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
-#include "SpriteBasic.h"
-#include "TextureManager.h"
 #include "Transform.h"
+#include "Vector2.h"
+#include "Vector4.h"
+
+#include <string>
+
+class SpriteBasic;
+class TextureManager;
+struct Material;
+struct TransformationMatrix;
 
 class Sprite
 {
@@ -72,7 +76,7 @@ public:
 	/// <summary>
 	///	色のゲッター
 	/// </summary>
-	const Vector4& GetColor() const { return materialData_->color; }
+	const Vector4& GetColor() const;
 
 	/// <summary>
 	///	アンカーポイントのゲッター
@@ -147,7 +151,7 @@ public:
 	///	色のセッター
 	/// </summary>
 	/// <param name="spriteBasic">色</param>
-	void SetColor(const Vector4& color) { materialData_->color = color; };
+	void SetColor(const Vector4& color);
 
 	/// <summary>
 	///	アンカーポイントのセッター

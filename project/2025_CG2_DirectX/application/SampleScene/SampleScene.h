@@ -1,12 +1,30 @@
 #pragma once
 #include "../../engine/Scene/BaseScene.h"
-#include <Skybox/SkyBoxBasic.h>
-#include <Skybox/SkyBox.h>
-#include "../../engine/LevelLoader/LevelLoader.h"
+#include "../../engine/Animation/AnimationManager.h"
+#include "../../engine/Utility/Math/Transform.h"
+
+#include <d3d12.h>
+#include <memory>
+#include <vector>
+#include <wrl.h>
+
+class Camera;
+class Light;
+class Object3D;
+class ParticleManager;
+class SkinnedObject3D;
+class SkyBox;
+class SkyBoxBasic;
+class Sprite;
+struct CameraForGPU;
+struct LevelData;
+struct LightBuffer;
 
 class SampleScene : public BaseScene
 {
 public:
+	SampleScene();
+	~SampleScene() override;
 
 	virtual void Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3DBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine);
 

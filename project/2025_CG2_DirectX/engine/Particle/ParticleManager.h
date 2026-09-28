@@ -1,12 +1,22 @@
 #pragma once
-#include "Camera.h"
-#include "TextureManager.h"
-#include "Material.h"
-#include "TransformationMatrix.h"
+#include "Geometry.h"
+#include "Matrix4x4.h"
+#include "ParticleEmitter.h"
+
+#include <d3d12.h>
+#include <list>
 #include <random>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <ParticleEmitter.h>
+#include <wrl.h>
+
+class Camera;
+class DirectXBasic;
+class Logger;
+class SRVManager;
+class TextureManager;
+struct Material;
 
 struct Particle {
 	struct EulerTransform transform;
