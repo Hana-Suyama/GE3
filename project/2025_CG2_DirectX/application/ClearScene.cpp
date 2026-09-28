@@ -62,7 +62,7 @@ void ClearScene::Update()
 
 	if (Input::GetInstance()->IsTriggerPushKey(DIK_SPACE)) {
 		std::unique_ptr<BaseScene> scene = std::make_unique<TitleScene>();
-		sceneManager_->SetNextScene(move(scene));
+		sceneManager_->RequestSceneChange(move(scene));
 	}
 
 	camera->Update();

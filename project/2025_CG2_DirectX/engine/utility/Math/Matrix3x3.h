@@ -47,7 +47,7 @@ struct Matrix3x3 {
 	/// <summary>
 	/// 単位行列
 	/// </summary>
-	static Matrix3x3 MakeIdentity4x4();
+	static Matrix3x3 MakeIdentity3x3();
 
 };
 
@@ -159,7 +159,7 @@ inline Matrix3x3 Matrix3x3::Transpose() const {
 /// <summary>
 /// 単位行列
 /// </summary>
-inline Matrix3x3 Matrix3x3::MakeIdentity4x4() {
+inline Matrix3x3 Matrix3x3::MakeIdentity3x3() {
 	Matrix3x3 result{};
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {

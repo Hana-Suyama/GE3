@@ -98,7 +98,7 @@ void GameScene::Update()
 	if (isClear_) {
 		std::unique_ptr<BaseScene> scene =
 			std::make_unique<ClearScene>(collectedCoinCount_, totalCoinCount_);
-		sceneManager_->SetNextScene(move(scene));
+		sceneManager_->RequestSceneChange(move(scene));
 	}
 
 	if(playerModel_->GetTransform().translate.x >= 196.0f) {

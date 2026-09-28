@@ -47,7 +47,7 @@ struct Matrix2x2 {
 	/// <summary>
 	/// 単位行列
 	/// </summary>
-	static Matrix2x2 MakeIdentity4x4();
+	static Matrix2x2 MakeIdentity2x2();
 
 };
 
@@ -109,16 +109,16 @@ inline Matrix2x2 Matrix2x2::Inverse() const {
 	A = (m[0][0] * m[1][1]) - (m[0][1] * m[1][0]);
 
 	result.m[0][0] =
-		A * m[1][1];
+		1.0f / A * m[1][1];
 
 	result.m[0][1] =
-		A * -m[0][1];
+		1.0f / A * -m[0][1];
 
 	result.m[1][0] =
-		A * -m[1][0];
+		1.0f / A * -m[1][0];
 
 	result.m[1][1] =
-		A * m[0][0];
+		1.0f / A * m[0][0];
 
 	return result;
 }
@@ -139,7 +139,7 @@ inline Matrix2x2 Matrix2x2::Transpose() const {
 /// <summary>
 /// 単位行列
 /// </summary>
-inline Matrix2x2 Matrix2x2::MakeIdentity4x4() {
+inline Matrix2x2 Matrix2x2::MakeIdentity2x2() {
 	Matrix2x2 result{};
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {

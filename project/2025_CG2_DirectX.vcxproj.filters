@@ -400,7 +400,7 @@
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Transform.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\engine\TransformationMatrix.h">
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\TransformationMatrix.h">
       <Filter>ヘッダー ファイル\engine\utility\Math</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector2.h">
