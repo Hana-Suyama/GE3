@@ -510,15 +510,15 @@ void GPUParticleManager::CreateMaterialResource() {
 	//SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = Reflectance::None;
 	//UVTransformを単位行列で初期化
-	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
+	materialData_->uvTransform = Matrix4x4::MakeIdentity();
 }
 
 void GPUParticleManager::CreatePerViewResource() {
 	perViewResource_ = directXBasic_->CreateBufferResource(sizeof(PerView));
 	HRESULT hr = perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
 	assert(SUCCEEDED(hr));
-	perViewData_->viewProjection = Matrix4x4::MakeIdentity4x4();
-	perViewData_->billboardMatrix = Matrix4x4::MakeIdentity4x4();
+	perViewData_->viewProjection = Matrix4x4::MakeIdentity();
+	perViewData_->billboardMatrix = Matrix4x4::MakeIdentity();
 }
 
 void GPUParticleManager::CreatePerFrameResource() {

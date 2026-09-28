@@ -4,14 +4,14 @@ using namespace MyMath;
 
 void DebugCamera::Initialize(const int32_t clientWidth, const int32_t clientHeight) {
 
-	viewMatrix_ = Matrix4x4::MakeIdentity4x4();
+	viewMatrix_ = Matrix4x4::MakeIdentity();
 	projectionMatrix_ = MakePerspectiveFovMatrix(0.45f, float(clientWidth) / float(clientHeight), 0.1f, 100.0f);
-	matRot_ = Matrix4x4::MakeIdentity4x4();
+	matRot_ = Matrix4x4::MakeIdentity();
 }
 
 void DebugCamera::Update(const BYTE key[256]) {
 
-	Matrix4x4 cameraMatrix = Matrix4x4::MakeIdentity4x4();
+	Matrix4x4 cameraMatrix = Matrix4x4::MakeIdentity();
 	cameraMatrix = cameraMatrix.Multiply(matRot_);
 	cameraMatrix = cameraMatrix.Multiply(MakeTranslateMatrix(translation_));
 
@@ -88,7 +88,7 @@ void DebugCamera::Update(const BYTE key[256]) {
 	}
 
 	//追加回転分の回転行列を生成
-	Matrix4x4 matRotDelta = Matrix4x4::MakeIdentity4x4();
+	Matrix4x4 matRotDelta = Matrix4x4::MakeIdentity();
 	matRotDelta = matRotDelta.Multiply(MakeRotateXMatrix(Xrotate));
 	matRotDelta = matRotDelta.Multiply(MakeRotateYMatrix(Yrotate));
 	matRotDelta = matRotDelta.Multiply(MakeRotateZMatrix(Zrotate));

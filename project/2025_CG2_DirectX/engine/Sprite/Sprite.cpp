@@ -58,7 +58,7 @@ void Sprite::Update()
 	CreateVertexData();
 
 	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 viewMatrix = Matrix4x4::MakeIdentity4x4();
+	Matrix4x4 viewMatrix = Matrix4x4::MakeIdentity();
 	Matrix4x4 projectionMatrix = MakeOrthographicMatrix(0.0f, 0.0f, float(WindowsApi::kClientWidth), float(WindowsApi::kClientHeight), 0.0f, 100.0f);
 	Matrix4x4 worldViewProjectionMatrix = worldMatrix.Multiply(viewMatrix.Multiply(projectionMatrix));
 	transformationMatrixData_->WVP = worldViewProjectionMatrix;
@@ -185,7 +185,7 @@ void Sprite::CreateMaterialResource()
 	materialData_->enableLighting = Reflectance::None;
 	materialData_->enableReflection = Reflection::NoneReflection;
 	// UVTransformを単位行列で初期化
-	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
+	materialData_->uvTransform = Matrix4x4::MakeIdentity();
 }
 
 void Sprite::CreateTransformationMatrixResource()
@@ -196,8 +196,8 @@ void Sprite::CreateTransformationMatrixResource()
 	// 書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	// 単位行列を書き込んでおく
-	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity4x4();
-	transformationMatrixData_->World = Matrix4x4::MakeIdentity4x4();
+	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity();
+	transformationMatrixData_->World = Matrix4x4::MakeIdentity();
 }
 
 void Sprite::CreateIndexResource()

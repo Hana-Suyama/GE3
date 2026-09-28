@@ -69,13 +69,13 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	//SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = Reflectance::None;
 	//UVTransformを単位行列で初期化
-	materialData_->uvTransform = Matrix4x4::MakeIdentity4x4();
+	materialData_->uvTransform = Matrix4x4::MakeIdentity();
 
 	instancingResource_ = directXBasic_->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance_);
 	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
 	for (uint32_t index = 0; index < kNumMaxInstance_; ++index) {
-		instancingData_[index].WVP = Matrix4x4::MakeIdentity4x4();
-		instancingData_[index].World = Matrix4x4::MakeIdentity4x4();
+		instancingData_[index].WVP = Matrix4x4::MakeIdentity();
+		instancingData_[index].World = Matrix4x4::MakeIdentity();
 		instancingData_[index].color = Vector4( 1.0f, 1.0f, 1.0f, 1.0f );
 		instancingData_[index].scale = Vector3(1.0f, 1.0f, 1.0f);
 	}
@@ -90,8 +90,8 @@ void ParticleManager::Initialize(DirectXBasic* directXBasic, SRVManager* srvMana
 	perViewResource_ = directXBasic_->CreateBufferResource(sizeof(PerView));
 	HRESULT hr = perViewResource_->Map(0, nullptr, reinterpret_cast<void**>(&perViewData_));
 	assert(SUCCEEDED(hr));
-	perViewData_->viewProjection = Matrix4x4::MakeIdentity4x4();
-	perViewData_->billboardMatrix = Matrix4x4::MakeIdentity4x4();
+	perViewData_->viewProjection = Matrix4x4::MakeIdentity();
+	perViewData_->billboardMatrix = Matrix4x4::MakeIdentity();
 
 	perFrameResource_ = directXBasic_->CreateBufferResource(sizeof(PerFrame));
 	hr = perFrameResource_->Map(0, nullptr, reinterpret_cast<void**>(&perFrameData_));
@@ -231,7 +231,7 @@ void ParticleManager::Update(Vector3 EmitPos, std::mt19937& randomEngine)
 
 #endif
 
-	/*Matrix4x4 billboardMatrix = Matrix4x4::MakeIdentity4x4();
+	/*Matrix4x4 billboardMatrix = Matrix4x4::MakeIdentity();
 	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
 	billboardMatrix = backToFrontMatrix.Multiply(camera_->GetWorldMatrix());
 	billboardMatrix.m[3][0] = 0.0f;

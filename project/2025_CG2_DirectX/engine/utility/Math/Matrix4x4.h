@@ -47,7 +47,7 @@ struct Matrix4x4 {
 	/// <summary>
 	/// 単位行列
 	/// </summary>
-	static Matrix4x4 MakeIdentity4x4();
+	static Matrix4x4 MakeIdentity();
 
 };
 
@@ -230,7 +230,7 @@ inline Matrix4x4 Matrix4x4::Transpose() const {
 /// <summary>
 /// 単位行列
 /// </summary>
-inline Matrix4x4 Matrix4x4::MakeIdentity4x4() {
+inline Matrix4x4 Matrix4x4::MakeIdentity() {
 	Matrix4x4 result{};
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 4; j++) {

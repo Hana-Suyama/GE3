@@ -120,9 +120,9 @@ void SkyBox::CreateWVPResource()
 	//データを書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	//単位行列を書き込んでおく
-	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity4x4();
-	transformationMatrixData_->World = Matrix4x4::MakeIdentity4x4();
-	transformationMatrixData_->WorldInverseTranspose = Matrix4x4::MakeIdentity4x4();
+	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity();
+	transformationMatrixData_->World = Matrix4x4::MakeIdentity();
+	transformationMatrixData_->WorldInverseTranspose = Matrix4x4::MakeIdentity();
 }
 
 void SkyBox::CreateMTUV()
