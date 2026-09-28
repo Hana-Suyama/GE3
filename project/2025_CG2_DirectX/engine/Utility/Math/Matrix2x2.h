@@ -47,7 +47,7 @@ struct Matrix2x2 {
 	/// <summary>
 	/// 単位行列
 	/// </summary>
-	static Matrix2x2 MakeIdentity2x2();
+	static Matrix2x2 MakeIdentity();
 
 };
 
@@ -139,7 +139,7 @@ inline Matrix2x2 Matrix2x2::Transpose() const {
 /// <summary>
 /// 単位行列
 /// </summary>
-inline Matrix2x2 Matrix2x2::MakeIdentity2x2() {
+inline Matrix2x2 Matrix2x2::MakeIdentity() {
 	Matrix2x2 result{};
 	for (int i = 0; i < 2; i++) {
 		for (int j = 0; j < 2; j++) {
