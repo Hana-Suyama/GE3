@@ -25,6 +25,11 @@ public:
 	/* --------- public関数 --------- */
 
 	/// <summary>
+	/// コンストラクタ
+	/// </summary>
+	DirectXBasic();
+
+	/// <summary>
 	/// デクストラクタ
 	/// </summary>
 	~DirectXBasic();
