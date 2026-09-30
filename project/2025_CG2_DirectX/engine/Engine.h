@@ -1,49 +1,25 @@
 #pragma once
 
-#include "cmath"
-#include <Windows.h>
-#include <numbers>
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
-#include "CameraForGPU.h"
-#include "../application/SampleScene/SampleScene.h"
-#include "StringUtility.h"
-#include "SpriteBasic.h"
-#include "VertexData.h"
-#include "Sprite.h"
-#include "TextureManager.h"
-#include "Object3DBasic.h"
-#include "ModelManager.h"
-#include "Object3D.h"
-#include "Object3D/SkinnedObject3DBasic.h"
-#include "SRVManager.h"
-#include "ParticleManager.h"
-#include "ImGuiManager.h"
-#include <random>
-#include "XAudio2Basic.h"
-#include "../application/GameScene.h"
-#include <cstdint>
-#include <string>
-#include <format>
-#include <chrono>
-#include <d3d12.h>
-#include <cassert>
-#include <dxgidebug.h>
-#include <vector>
-#include <wrl.h>
-#include "Input.h"
-#include "MyMath.h"
-#include "DebugCamera.h"
-#include "WindowsApi.h"
-#include "DirectXBasic.h"
-#include "Logger.h"
-#include <dxcapi.h>
-#include "SceneManager.h"
-#include <PostEffectRenderer.h>
 #include "PostEffectController.h"
 
-using namespace MyMath;
+#include <memory>
+#include <random>
+
+class TextureManager;
+class ModelManager;
+class XAudio2Basic;
+class Logger;
+class WindowsApi;
+class DirectXBasic;
+class SRVManager;
+class ImGuiManager;
+class SpriteBasic;
+class Camera;
+class Object3DBasic;
+class SkinnedObject3DBasic;
+class PostEffectRenderer;
+class DebugCamera;
+class SceneManager;
 
 #pragma comment(lib, "dxguid.lib")
 
@@ -51,7 +27,8 @@ class Engine
 {
 public:
 
-	virtual ~Engine() = default;
+	Engine();
+	virtual ~Engine();
 
 	virtual void Initialize();
 
@@ -73,37 +50,30 @@ public:
 
 	void SetPostEffectType(PostEffectType type){ postEffectController_.SetType(type); }
 
-private:
-
-	
-
 protected:
 
-	std::unique_ptr<TextureManager> textureManager_ = nullptr;
-	std::unique_ptr<ModelManager> modelManager_ = nullptr;
-	std::unique_ptr<XAudio2Basic> xaudio2Basic_ = nullptr;
-	std::unique_ptr<Logger> logger_ = nullptr;
-	std::unique_ptr<WindowsApi> winApi_ = nullptr;
-	std::unique_ptr<DirectXBasic> directXBasic_ = nullptr;
-	std::unique_ptr<SRVManager> srvManager_ = nullptr;
-	std::unique_ptr<ImGuiManager> imguiManager_ = nullptr;
-	std::unique_ptr<SpriteBasic> spriteBasic_ = nullptr;
-	std::unique_ptr<Camera> defaultCamera_ = nullptr;
-	std::unique_ptr<Object3DBasic> object3DBasic_ = nullptr;
-	std::unique_ptr<SkinnedObject3DBasic> skinnedObject3DBasic_ = nullptr;
-	std::unique_ptr<PostEffectRenderer> postEffectRenderer_ = nullptr;
+	std::unique_ptr<Logger> logger_;
+	std::unique_ptr<WindowsApi> winApi_;
+	std::unique_ptr<DirectXBasic> directXBasic_;
+	std::unique_ptr<SRVManager> srvManager_;
+	std::unique_ptr<ImGuiManager> imguiManager_;
 
-	BYTE beforeKey_[256] = {};
-	std::unique_ptr<DebugCamera> debugcamera_ = nullptr;
+	std::unique_ptr<TextureManager> textureManager_;
+	std::unique_ptr<ModelManager> modelManager_;
+	std::unique_ptr<XAudio2Basic> xaudio2Basic_;
 
-	bool useDebugcamera_ = false;
+	std::unique_ptr<SpriteBasic> spriteBasic_;
+	std::unique_ptr<Camera> defaultCamera_;
+	std::unique_ptr<Object3DBasic> object3DBasic_;
+	std::unique_ptr<SkinnedObject3DBasic> skinnedObject3DBasic_;
+
+	PostEffectController postEffectController_;
+	std::unique_ptr<PostEffectRenderer> postEffectRenderer_;
 
 	std::mt19937 randomEngine_{ std::random_device{}() };
 
-	std::unique_ptr<SceneManager> sceneManager_ = nullptr;
-
-	// ポストエフェクト用の設定群
-	PostEffectController postEffectController_;
+	// 依存先より先に破棄する必要があるので最後に宣言
+	std::unique_ptr<SceneManager> sceneManager_;
 };
 
 

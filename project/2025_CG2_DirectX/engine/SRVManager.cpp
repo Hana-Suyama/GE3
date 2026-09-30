@@ -1,4 +1,5 @@
 #include "SRVManager.h"
+#include "DirectXBasic.h"
 
 void SRVManager::Initialize(DirectXBasic* directXBasic)
 {

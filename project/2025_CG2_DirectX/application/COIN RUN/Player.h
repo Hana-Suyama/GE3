@@ -1,9 +1,12 @@
 #pragma once
-#include "../engine/Object3D/Object3DBasic.h"
-#include "../engine/Model/ModelManager.h"
-#include "../engine/Object3D/Object3D.h"
-#include "../engine/Input/input.h"
-#include "MapChipField.h"
+#include "../engine/Utility/Math/Vector3.h"
+
+class Camera;
+class MapChipField;
+class ModelManager;
+class Object3D;
+class Object3DBasic;
+
 class Player
 {
 public:
@@ -71,7 +74,7 @@ public:
 
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; };
 
-	const Vector3& GetWorldTransform() { return model_->GetTransform().translate; };
+	const Vector3& GetWorldTransform();
 
 	const Vector3& GetVelocity() const { return velocity_; };
 

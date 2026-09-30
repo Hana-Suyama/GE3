@@ -1,8 +1,19 @@
 #include "ModelManager.h"
+#include "AnimationManager.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
+#include "TextureManager.h"
 #include "Material.h"
+#include "MyMath.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include <numbers>
 #include <Transform.h>
 #include <algorithm>
+#include <cassert>
+#include <fstream>
+#include <sstream>
 
 void ModelManager::Initialize(DirectXBasic* directXBasic, TextureManager* textureManager, SRVManager* srvManager)
 {
@@ -73,7 +84,7 @@ void ModelManager::LoadModel(const std::string& directoryPath, const std::string
 		//Lighting有効
 		materialData->enableLighting = Reflectance::HalfLambert;
 		//UVTransformを単位行列で初期化
-		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
+		materialData->uvTransform = Matrix4x4::MakeIdentity();
 
 		materialData->shininess = 1.0f;
 	}
@@ -171,7 +182,7 @@ void ModelManager::LoadModelAssimp(const std::string& directoryPath, const std::
 		//Lighting有効
 		materialData->enableLighting = Reflectance::HalfLambert;
 		//UVTransformを単位行列で初期化
-		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
+		materialData->uvTransform = Matrix4x4::MakeIdentity();
 
 		materialData->shininess = 1.0f;
 	}
@@ -330,7 +341,7 @@ void ModelManager::CreateSphere()
 	//SpriteはLightingしないのでfalseを設定する
 	materialDataSphere->enableLighting = Reflectance::HalfLambert;
 	//UVTransformを単位行列で初期化
-	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity4x4();
+	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity();
 
 	materialDataSphere->shininess = 1.0f;
 
@@ -365,7 +376,7 @@ void ModelManager::CreateSphere()
 	textureManager_->LoadTexture("resources/monsterBall.png");
 	newModel.meshes_.at(0).defaultTextureFilePath = "resources/monsterBall.png";
 
-	newModel.rootNode_.localMatrix = Matrix4x4::MakeIdentity4x4();
+	newModel.rootNode_.localMatrix = Matrix4x4::MakeIdentity();
 
 	modelDatas_.push_back(newModel);
 }
@@ -474,7 +485,7 @@ void ModelManager::CreateSkyBox()
 	//SpriteはLightingしないのでfalseを設定する
 	materialDataSphere->enableLighting = Reflectance::HalfLambert;
 	//UVTransformを単位行列で初期化
-	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity4x4();
+	materialDataSphere->uvTransform = Matrix4x4::MakeIdentity();
 
 	materialDataSphere->shininess = 1.0f;
 
@@ -499,7 +510,7 @@ void ModelManager::CreateSkyBox()
 	textureManager_->LoadTexture("resources/rostock_laage_airport_4k.dds");
 	newModel.meshes_.at(0).defaultTextureFilePath = "resources/rostock_laage_airport_4k.dds";
 
-	newModel.rootNode_.localMatrix = Matrix4x4::MakeIdentity4x4();
+	newModel.rootNode_.localMatrix = Matrix4x4::MakeIdentity();
 
 	modelDatas_.push_back(newModel);
 }
@@ -590,7 +601,7 @@ Model::SkinCluster ModelManager::CreateSkinCluster(const Skeleton& skeleton, con
 
 	// InverseBindPoseMatrixを格納する場所を作成して、単位行列で埋める
 	skinCluster.inverseBindPoseMatrices.resize(skeleton.joints.size());
-	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), Matrix4x4::MakeIdentity4x4);
+	std::generate(skinCluster.inverseBindPoseMatrices.begin(), skinCluster.inverseBindPoseMatrices.end(), Matrix4x4::MakeIdentity);
 
 	for (const auto& jointWeight : modelData.skinClusterData) {// ModelのSkinClusterの情報を解析
 		auto it = skeleton.jointMap.find(jointWeight.first);// jointWeight.firstはjoint名なので、skeletonに対象となるjointが含まれているか判断
@@ -744,7 +755,7 @@ Model ModelManager::LoadObjFile(const std::string& directoryPath, const std::str
 
 	}
 
-	modelData.rootNode_.localMatrix = Matrix4x4::MakeIdentity4x4();
+	modelData.rootNode_.localMatrix = Matrix4x4::MakeIdentity();
 
 	return modelData;
 

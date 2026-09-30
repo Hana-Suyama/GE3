@@ -1,6 +1,13 @@
 #include "SkinnedObject3D.h"
+#include "Camera.h"
+#include "DirectXBasic.h"
+#include "Material.h"
+#include "ModelManager.h"
+#include "MyMath.h"
+#include "SkinnedObject3DBasic.h"
+#include "TextureManager.h"
 #include "TransformationMatrix.h"
-#include "ImGuiManager.h"
+#include <imgui.h>
 #include <numbers>
 
 using namespace MyMath;
@@ -154,7 +161,7 @@ void SkinnedObject3D::DrawSkeletonDebug()
 
 	const float jointRadius = 0.05f;
 	Matrix4x4 objectWorldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
-	Matrix4x4 viewProjectionMatrix = Matrix4x4::MakeIdentity4x4();
+	Matrix4x4 viewProjectionMatrix = Matrix4x4::MakeIdentity();
 
 	if (camera_) {
 		viewProjectionMatrix = camera_->GetViewProjectionMatrix();
@@ -235,9 +242,9 @@ void SkinnedObject3D::CreateWVPResource()
 	//データを書き込むためのアドレスを取得
 	transformationMatrixResource_->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData_));
 	//単位行列を書き込んでおく
-	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity4x4();
-	transformationMatrixData_->World = Matrix4x4::MakeIdentity4x4();
-	transformationMatrixData_->WorldInverseTranspose = Matrix4x4::MakeIdentity4x4();
+	transformationMatrixData_->WVP = Matrix4x4::MakeIdentity();
+	transformationMatrixData_->World = Matrix4x4::MakeIdentity();
+	transformationMatrixData_->WorldInverseTranspose = Matrix4x4::MakeIdentity();
 }
 
 void SkinnedObject3D::CreateSkeletonDebugResources()
@@ -253,9 +260,9 @@ void SkinnedObject3D::CreateSkeletonDebugResources()
 	for (int32_t i = 0; i < skeleton_.joints.size(); i++) {
 		skeletonDebugTransformationMatrixResources_[i] = skinnedObject3DBasic_->GetDirectXBasic()->CreateBufferResource(sizeof(TransformationMatrix));
 		skeletonDebugTransformationMatrixResources_[i]->Map(0, nullptr, reinterpret_cast<void**>(&skeletonDebugTransformationMatrixDatas_[i]));
-		skeletonDebugTransformationMatrixDatas_[i]->WVP = Matrix4x4::MakeIdentity4x4();
-		skeletonDebugTransformationMatrixDatas_[i]->World = Matrix4x4::MakeIdentity4x4();
-		skeletonDebugTransformationMatrixDatas_[i]->WorldInverseTranspose = Matrix4x4::MakeIdentity4x4();
+		skeletonDebugTransformationMatrixDatas_[i]->WVP = Matrix4x4::MakeIdentity();
+		skeletonDebugTransformationMatrixDatas_[i]->World = Matrix4x4::MakeIdentity();
+		skeletonDebugTransformationMatrixDatas_[i]->WorldInverseTranspose = Matrix4x4::MakeIdentity();
 	}
 
 	modelManager_->GetTextureManager()->LoadTexture("resources/white2x2.png");
@@ -269,7 +276,7 @@ void SkinnedObject3D::CreateSkeletonDebugResources()
 		materialData->enableLighting = None;
 		materialData->enableReflection = NoneReflection;
 		materialData->shininess = 1.0f;
-		materialData->uvTransform = Matrix4x4::MakeIdentity4x4();
+		materialData->uvTransform = Matrix4x4::MakeIdentity();
 
 		skeletonDebugMaterialResources_.push_back(materialResource);
 		skeletonDebugMaterialDatas_.push_back(materialData);

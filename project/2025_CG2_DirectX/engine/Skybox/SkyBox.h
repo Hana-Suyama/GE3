@@ -1,10 +1,17 @@
 #pragma once
-#include "ModelManager.h"
-#include "TransformationMatrix.h"
 #include "Transform.h"
-#include "Camera.h"
-#include "Material.h"
-#include "SkyBoxBasic.h"
+
+#include <d3d12.h>
+#include <string>
+#include <vector>
+#include <wrl.h>
+
+class Camera;
+class Model;
+class ModelManager;
+class SkyBoxBasic;
+struct Material;
+struct TransformationMatrix;
 
 class SkyBox
 {

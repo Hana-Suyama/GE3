@@ -1,17 +1,8 @@
 #pragma once
-#include "../engine/Engine.h"
-#include "TitleScene.h"
-#include "ClearScene.h"
+#include "Engine.h"
 
 class Game : public Engine
 {
-
-	enum class Scene {
-		GameScene,
-		TitleScene,
-		ClearScene,
-		SampleScene,
-	};
 
 	void Initialize() override;
 
@@ -20,15 +11,6 @@ class Game : public Engine
 	void Update() override;
 
 	void Draw() override;
-
-private:
-
-	std::unique_ptr<GameScene> gameScene = nullptr;
-	std::unique_ptr<SampleScene> sampleScene = nullptr;
-	std::unique_ptr<TitleScene> titleScene = nullptr;
-	std::unique_ptr<ClearScene> clearScene = nullptr;
-
-	Scene currentScene_;
 
 };
 

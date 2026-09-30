@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
 #include "../Utility/Math/Transform.h"
 #include "../../../externals/nlohmann_json/json.hpp"
 

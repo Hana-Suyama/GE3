@@ -1,6 +1,6 @@
 #include "ParticleEmitter.h"
 #include <TimeManager.h>
-#include "ImGuiManager.h"
+#include <imgui.h>
 #include "ParticleManager.h"
 
 void ParticleEmitter::Initialize(std::list<Particle>* particlesPtr, ParticleManager* particleManager, ParticleEffectType effectType)

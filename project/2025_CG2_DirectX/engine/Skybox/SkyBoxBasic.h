@@ -1,7 +1,10 @@
 #pragma once
-#include "DirectXBasic.h"
-#include "Camera.h"
+#include <d3d12.h>
+#include <wrl.h>
 
+class Camera;
+class DirectXBasic;
+class Logger;
 
 class SkyBoxBasic
 {

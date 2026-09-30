@@ -1,21 +1,18 @@
 #pragma once
-#include "Object3DBasic.h"
-#include "../Object3D/SkinnedObject3DBasic.h"
-#include "ModelManager.h"
-#include "Input.h"
-#include "Object3D.h"
-#include "../Object3D/SkinnedObject3D.h"
-#include "ParticleManager.h"
-#include "Sprite.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
-#include "CameraForGPU.h"
-#include "ImGuiManager.h"
-#include "XAudio2Basic.h"
+
+#include <random>
 
 class SceneManager;
 class PostEffectController;
+class DirectXBasic;
+class Object3DBasic;
+class SkinnedObject3DBasic;
+class ModelManager;
+class Logger;
+class SRVManager;
+class TextureManager;
+class SpriteBasic;
+class XAudio2Basic;
 
 class BaseScene
 {

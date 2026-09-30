@@ -1,5 +1,4 @@
 #pragma once
-#include "MyMath.h"
 #include "Matrix4x4.h"
 
 struct TransformationMatrix {

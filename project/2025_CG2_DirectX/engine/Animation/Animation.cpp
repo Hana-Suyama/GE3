@@ -1,4 +1,8 @@
 #include "AnimationManager.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include <assert.h>
 #include <Lerp.h>
 #include <MyMath.h>
@@ -100,7 +104,7 @@ int32_t AnimationManager::CreateJoint(const Model::Node& node, const std::option
 	Joint joint;
 	joint.name = node.name;
 	joint.localMatrix = node.localMatrix;
-	joint.skeletonSpaceMatrix.MakeIdentity4x4();
+	joint.skeletonSpaceMatrix.MakeIdentity();
 	joint.transform = node.transform;
 	joint.index = int32_t(joints.size()); // 現在登録されてる数をIndexに
 	joint.parent = parent;

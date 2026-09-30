@@ -1,4 +1,6 @@
 #include "SpriteBasic.h"
+#include "DirectXBasic.h"
+#include "Logger.h"
 #include <cassert>
 #include <dxcapi.h>
 

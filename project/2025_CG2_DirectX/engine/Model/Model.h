@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "VertexData.h"
+#include "Matrix4x4.h"
 #include <wrl.h>
 #include <d3d12.h>
 #include <Transform.h>

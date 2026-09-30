@@ -1,11 +1,13 @@
 #pragma once
 #include <d3d12.h>
 #include "DirectXTex.h"
-#include "d3dx12.h"
-#include "DirectXBasic.h"
+#include <wrl.h>
+#include <string>
 #include <vector>
 #include <unordered_map>
-#include "SRVManager.h"
+
+class DirectXBasic;
+class SRVManager;
 
 class TextureManager
 {

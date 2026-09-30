@@ -8,10 +8,6 @@
 #include <optional>
 #include <Transform.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 template <typename tValue>
 struct Keyframe {
 	float time;

@@ -47,7 +47,7 @@ struct Matrix3x3 {
 	/// <summary>
 	/// 単位行列
 	/// </summary>
-	static Matrix3x3 MakeIdentity4x4();
+	static Matrix3x3 MakeIdentity();
 
 };
 
@@ -135,7 +135,7 @@ inline Matrix3x3 Matrix3x3::Inverse() const {
 		(1 / A) * ((m[1][0] * m[2][1]) - (m[1][1] * m[2][0]));
 
 	result.m[2][1] =
-		(1 / A) * (-(m[0][1] * m[2][0]) - (m[0][0] * m[2][1]));
+		(1 / A) * ((m[0][1] * m[2][0]) - (m[0][0] * m[2][1]));
 
 	result.m[2][2] =
 		(1 / A) * ((m[0][0] * m[1][1]) - (m[0][1] * m[1][0]));
@@ -159,7 +159,7 @@ inline Matrix3x3 Matrix3x3::Transpose() const {
 /// <summary>
 /// 単位行列
 /// </summary>
-inline Matrix3x3 Matrix3x3::MakeIdentity4x4() {
+inline Matrix3x3 Matrix3x3::MakeIdentity() {
 	Matrix3x3 result{};
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {

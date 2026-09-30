@@ -1,4 +1,8 @@
 #include "DirectXBasic.h"
+#include "DirectXTex.h"
+#include "Logger.h"
+#include "WindowsApi.h"
+#include "d3dx12.h"
 #include <windows.h>
 #include <cassert>
 #include <string>
@@ -11,6 +15,8 @@
 #pragma comment(lib, "d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxcompiler.lib")
+
+DirectXBasic::DirectXBasic() = default;
 
 DirectXBasic::~DirectXBasic()
 {

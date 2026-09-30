@@ -1,5 +1,11 @@
 #include "PostEffectRenderer.h"
-#include <ImGuiManager.h>
+#include "PostEffectController.h"
+#include "PostEffectMaterial.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
+#include "TextureManager.h"
+#include "Camera.h"
+#include <imgui.h>
 
 void PostEffectRenderer::Initialize(DirectXBasic* directXBasic, SRVManager* srvManager, TextureManager* textureManager) {
 

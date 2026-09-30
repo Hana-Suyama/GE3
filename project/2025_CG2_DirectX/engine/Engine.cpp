@@ -1,6 +1,31 @@
 #include "Engine.h"
+
+#include "WindowsApi.h"
+#include "DirectXBasic.h"
+#include "SRVManager.h"
+#include "TextureManager.h"
+#include "ModelManager.h"
+#include "XAudio2Basic.h"
+#include "Input.h"
+
+#include "SpriteBasic.h"
+#include "Camera.h"
+#include "Object3DBasic.h"
+#include "Object3D/SkinnedObject3DBasic.h"
+
+#include "PostEffectRenderer.h"
+#include "SceneManager.h"
+
+#include "ImGuiManager.h"
+#include "Logger.h"
+#include "TimeManager.h"
 #include "ExportDump.h"
-#include <TimeManager.h>
+
+#include <Windows.h>
+#include <memory>
+
+Engine::Engine() = default;
+Engine::~Engine() = default;
 
 void Engine::Initialize()
 {
@@ -69,9 +94,6 @@ void Engine::Initialize()
 	skinnedObject3DBasic_ = std::make_unique<SkinnedObject3DBasic>();
 	skinnedObject3DBasic_->Initialize(directXBasic_.get(), logger_.get());
 	skinnedObject3DBasic_->SetDefaultCamera(defaultCamera_.get());
-
-	debugcamera_ = std::make_unique<DebugCamera>();
-	debugcamera_->Initialize(WindowsApi::kClientWidth, WindowsApi::kClientHeight);
 
 	sceneManager_ = std::make_unique<SceneManager>();
 	sceneManager_->Initialize(directXBasic_.get(), object3DBasic_.get(), skinnedObject3DBasic_.get(), modelManager_.get(), logger_.get(), srvManager_.get(), textureManager_.get(), spriteBasic_.get(), xaudio2Basic_.get(), &randomEngine_, &postEffectController_);

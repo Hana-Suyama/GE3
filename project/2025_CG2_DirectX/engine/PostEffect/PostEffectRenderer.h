@@ -1,9 +1,14 @@
 #pragma once
-#include <PostEffectMaterial.h>
-#include <PostEffectController.h>
-#include <DirectXBasic.h>
-#include <TextureManager.h>
-#include <Camera.h>
+#include <cstdint>
+#include <d3d12.h>
+#include <wrl.h>
+
+class Camera;
+class DirectXBasic;
+class SRVManager;
+class TextureManager;
+struct PostEffectMaterial;
+struct PostEffectSettings;
 
 class PostEffectRenderer {
 public:

@@ -156,9 +156,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="2025_CG2_DirectX\application\Coin.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\Enemy.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\MapChipField.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\Coin.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\Enemy.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\MapChipField.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Camera\DebugCamera.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">MaxSpeed</Optimization>
       <WholeProgramOptimization Condition="'$(Configuration)|$(Platform)'=='Development|x64'">true</WholeProgramOptimization>
@@ -166,8 +166,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\DirectXBasic.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Camera\Camera.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Engine.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\CameraController.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\ClearScene.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\CameraController.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\ClearScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\BaseScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Skybox\SkyBox.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Skybox\SkyBoxBasic.cpp" />
@@ -183,7 +183,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\Debug\Logger\Logger.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Time\FixFPS.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Debug\ImGui\ImGuiManager.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\GameScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\Game.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\LevelLoader\LevelLoader.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\GPUParticle\GPUParticleManager.cpp" />
@@ -206,10 +206,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="2025_CG2_DirectX\engine\SRVManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\TextureManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\Player.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\Player.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Model\Model.cpp" />
     <ClCompile Include="2025_CG2_DirectX\application\SampleScene\SampleScene.cpp" />
-    <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp" />
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\TitleScene.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Scene\SceneManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Time\TimeManager.cpp" />
     <ClCompile Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.cpp" />
@@ -380,9 +380,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="2025_CG2_DirectX\application\Coin.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\Enemy.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\Coin.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\Enemy.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\MapChipField.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\CameraForGPU.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Debug\D3DResourceLeakChecker.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\DebugCamera.h" />
@@ -412,8 +412,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Vector4.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Camera\Camera.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Engine.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\CameraController.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\ClearScene.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\CameraController.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\ClearScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\BaseScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Animation\AnimationManager.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
@@ -431,7 +431,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\StringUtility.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Time\FixFPS.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Debug\ImGui\ImGuiManager.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\GameScene.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\GameScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Material.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\Sprite.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Sprite\SpriteBasic.h" />
@@ -441,15 +441,15 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\SRVManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\TextureManager.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\Player.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\Player.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Model\Model.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\Transform.h" />
     <ClInclude Include="2025_CG2_DirectX\application\SampleScene\SampleScene.h" />
-    <ClInclude Include="2025_CG2_DirectX\engine\TransformationMatrix.h" />
+    <ClInclude Include="2025_CG2_DirectX\engine\Utility\Math\TransformationMatrix.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\VertexData.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Audio\XAudio2Basic.h" />
     <ClInclude Include="2025_CG2_DirectX\application\Game.h" />
-    <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h" />
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\TitleScene.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Scene\SceneManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Time\TimeManager.h" />
     <ClInclude Include="2025_CG2_DirectX\engine\Particle\ParticleEmitter.h" />

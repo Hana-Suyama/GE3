@@ -1,8 +1,9 @@
 #pragma once
-#include "MyMath.h"
 #include "Vector2.h"
 #include "Vector3.h"
 #include "Vector4.h"
+
+#include <cstdint>
 
 struct VertexData {
 	Vector4 position;

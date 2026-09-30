@@ -1,4 +1,7 @@
 #include "SkyBoxBasic.h"
+#include "DirectXBasic.h"
+#include "Logger.h"
+#include <cassert>
 
 void SkyBoxBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
 {

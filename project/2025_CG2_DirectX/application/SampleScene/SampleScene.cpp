@@ -1,4 +1,25 @@
 #include "SampleScene.h"
+#include <Camera.h>
+#include <CameraForGPU.h>
+#include <DirectXBasic.h>
+#include <DirectionalLight.h>
+#include <Input.h>
+#include <LevelLoader.h>
+#include <Light.h>
+#include <LightData.h>
+#include <ModelManager.h>
+#include <MyMath.h>
+#include <Object3D.h>
+#include <Object3DBasic.h>
+#include <ParticleManager.h>
+#include <SkinnedObject3D.h>
+#include <SkinnedObject3DBasic.h>
+#include <Skybox/SkyBox.h>
+#include <Skybox/SkyBoxBasic.h>
+#include <Sprite.h>
+#include <SpotLight.h>
+#include <TextureManager.h>
+#include <XAudio2Basic.h>
 #include <numbers>
 #include "../../engine/Utility/Math/Lerp.h"
 #include <TimeManager.h>
@@ -6,6 +27,10 @@
 #include <PostEffectController.h>
 #include <AnimationManager.h>
 using namespace MyMath;
+
+SampleScene::SampleScene() = default;
+
+SampleScene::~SampleScene() = default;
 
 void SampleScene::Initialize(DirectXBasic* directXBasic, Object3DBasic* object3dBasic, SkinnedObject3DBasic* skinnedObject3dBasic, ModelManager* modelManager, Logger* logger, SRVManager* srvManager, TextureManager* textureManager, SpriteBasic* spriteBasic, XAudio2Basic* xaudio2Basic, std::mt19937* randomEngine)
 {

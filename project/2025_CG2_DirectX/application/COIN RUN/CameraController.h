@@ -1,7 +1,7 @@
 #pragma once
-#include "Player.h"
+#include "../engine/Utility/Math/Vector3.h"
 
-//前方宣言
+class Camera;
 class Player;
 
 struct Rect {

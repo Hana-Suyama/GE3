@@ -1,8 +1,9 @@
 #pragma once
 #include <d3d12.h>
 #include <wrl.h>
-#include "DirectXBasic.h"
-#include "Logger.h"
+
+class DirectXBasic;
+class Logger;
 
 class SpriteBasic
 {

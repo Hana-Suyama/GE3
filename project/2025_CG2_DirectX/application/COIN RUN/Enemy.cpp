@@ -1,11 +1,16 @@
 #include "Enemy.h"
 
+#include "../engine/Object3D/Object3D.h"
 #include "../engine/Time/TimeManager.h"
 #include "../engine/Utility/Math/MyMath.h"
 #include <algorithm>
 #include <cmath>
 
 using namespace MyMath;
+
+Enemy::Enemy() = default;
+
+Enemy::~Enemy() = default;
 
 void Enemy::Initialize(
 	Object3DBasic* object3dBasic,

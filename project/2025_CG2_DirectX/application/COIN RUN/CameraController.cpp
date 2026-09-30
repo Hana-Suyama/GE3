@@ -1,5 +1,7 @@
 #define NOMINMAX
 #include "CameraController.h"
+#include "Player.h"
+#include "../engine/Camera/Camera.h"
 #include <algorithm>
 #include "../engine/Utility/Math/Lerp.h"
 

@@ -1,4 +1,7 @@
 #include "SkinnedObject3DBasic.h"
+#include "DirectXBasic.h"
+#include "Logger.h"
+#include <cassert>
 
 void SkinnedObject3DBasic::Initialize(DirectXBasic* directXBasic, Logger* logger)
 {

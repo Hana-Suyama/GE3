@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <DirectXBasic.h>
+#include <d3d12.h>
 #include <VertexData.h>
 
 struct ParticleMeshData {
