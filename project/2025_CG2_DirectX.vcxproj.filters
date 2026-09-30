@@ -189,28 +189,28 @@
     <ClCompile Include="2025_CG2_DirectX\engine\TextureManager.cpp">
       <Filter>ソース ファイル\engine</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\CameraController.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\CameraController.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\ClearScene.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\ClearScene.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\Coin.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\Coin.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\Enemy.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\Enemy.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\GameScene.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\GameScene.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\MapChipField.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\MapChipField.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\Player.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\Player.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
-    <ClCompile Include="2025_CG2_DirectX\application\TitleScene.cpp">
+    <ClCompile Include="2025_CG2_DirectX\application\COIN RUN\TitleScene.cpp">
       <Filter>ソース ファイル\application</Filter>
     </ClCompile>
     <ClCompile Include="2025_CG2_DirectX\application\SampleScene\SampleScene.cpp">
@@ -418,31 +418,31 @@
     <ClInclude Include="2025_CG2_DirectX\engine\VertexData.h">
       <Filter>ヘッダー ファイル\engine</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\CameraController.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\CameraController.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\ClearScene.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\ClearScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\application\Game.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\Coin.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\Coin.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\Enemy.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\Enemy.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\GameScene.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\GameScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\MapChipField.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\MapChipField.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\Player.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\Player.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
-    <ClInclude Include="2025_CG2_DirectX\application\TitleScene.h">
+    <ClInclude Include="2025_CG2_DirectX\application\COIN RUN\TitleScene.h">
       <Filter>ヘッダー ファイル\application</Filter>
     </ClInclude>
     <ClInclude Include="2025_CG2_DirectX\application\SampleScene\SampleScene.h">
